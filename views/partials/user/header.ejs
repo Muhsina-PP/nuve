@@ -1,0 +1,110 @@
+ <style>
+  
+        /* Header Styles */
+        .top-bar {
+            background: #000;
+            color: #fff;
+            padding: 10px 0;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        header {
+            background: #fff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 5%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            color: #d4145a;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #d4145a;
+        }
+
+        .nav-icons {
+            display: flex;
+            gap: 1.5rem;
+            font-size: 20px;
+        }
+
+        .nav-icons a {
+            color: #333;
+            position: relative;
+            transition: color 0.3s;
+        }
+
+        .nav-icons a:hover {
+            color: #d4145a;
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #d4145a;
+            color: #fff;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+  </style> 
+
+  <!-- Top Bar -->
+    <div class="top-bar">
+        <p>🎉 Free Shipping on Orders Above ₹999 | Use Code: FREESHIP</p>
+    </div>
+
+  <!-- Header -->
+  <header>
+        <nav>
+            <a href="/" class="logo">NUVE</a>
+            <ul class="nav-links">
+                <li><a href="/shop">Shop</a></li>
+                <li><a href="/orders">Orders</a></li>
+                <li><a href="/contact-us">Contact us</a></li>
+                <li><a href="/about">About</a></li>
+            </ul>
+            <div class="nav-icons">
+                <a href="/search"><i class="fas fa-search"></i></a>
+                <a href="/profile"><i class="fas fa-user"></i></a>
+                <a href="/wishlist"><i class="fas fa-heart"></i></a>
+                <a href="/cart">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span class="cart-count">3</span>
+                </a>
+            </div>
+        </nav>
+    </header>

@@ -1,0 +1,631 @@
+<%-include("../../views/partials/user/header")%>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NUVE - Women's Fashion Store</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        /* Hero Section */
+        .hero {
+            position: relative;
+            height: 600px;
+            background-image: url('/images/heroin.jpg');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            text-align: center;
+            color: #fff;
+            z-index: 2;
+            animation: fadeInUp 1s ease;
+        }
+
+        .hero h1 {
+            font-size: 56px;
+            margin-bottom: 20px;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .hero p {
+            font-size: 20px;
+            margin-bottom: 30px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+        }
+
+        .btn-primary {
+            background: #d4145a;
+            color: #fff;
+            padding: 15px 40px;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            display: inline-block;
+            transition: all 0.3s;
+        }
+
+        .btn-primary:hover {
+            background: #a81049;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Categories Section */
+        .categories {
+            padding: 80px 5%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 36px;
+            margin-bottom: 50px;
+            color: #333;
+        }
+
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+        }
+
+        .category-card {
+            position: relative;
+            height: 400px;
+            border-radius: 15px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .category-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .category-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s;
+        }
+
+        .category-card:hover img {
+            transform: scale(1.1);
+        }
+
+        .category-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+            padding: 30px;
+            color: #fff;
+        }
+
+        .category-card h3 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        /* Featured Products */
+        .featured-products {
+            padding: 80px 5%;
+            background: #f8f9fa;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .product-card {
+            background: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .product-card:hover {
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            transform: translateY(-5px);
+        }
+
+        .product-image {
+            position: relative;
+            height: 350px;
+            overflow: hidden;
+        }
+
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s;
+        }
+
+        .product-card:hover .product-image img {
+            transform: scale(1.1);
+        }
+
+        .product-badge {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: #d4145a;
+            color: #fff;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .wishlist-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #fff;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .wishlist-btn:hover {
+            background: #d4145a;
+            color: #fff;
+        }
+
+        .product-info {
+            padding: 20px;
+        }
+
+        .product-title {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .product-price {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .current-price {
+            font-size: 22px;
+            font-weight: 700;
+            color: #d4145a;
+        }
+
+        .original-price {
+            font-size: 16px;
+            text-decoration: line-through;
+            color: #999;
+        }
+
+        .product-rating {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #ffa500;
+        }
+
+        /* Newsletter Section */
+        .newsletter {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 80px 5%;
+            color: #fff;
+            text-align: center;
+        }
+
+        .newsletter h2 {
+            font-size: 36px;
+            margin-bottom: 20px;
+        }
+
+        .newsletter p {
+            font-size: 18px;
+            margin-bottom: 30px;
+        }
+
+        .newsletter-form {
+            max-width: 500px;
+            margin: 0 auto;
+            display: flex;
+            gap: 10px;
+        }
+
+        .newsletter-form input {
+            flex: 1;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 50px;
+            font-size: 16px;
+        }
+
+        .newsletter-form button {
+            padding: 15px 40px;
+            background: #d4145a;
+            color: #fff;
+            border: none;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .newsletter-form button:hover {
+            background: #a81049;
+        }
+
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .hero h1 {
+                font-size: 36px;
+            }
+
+            .hero p {
+                font-size: 16px;
+            }
+
+            .newsletter-form {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+  
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>New Collection 2025</h1>
+            <p>Discover the latest trends in women's fashion</p>
+            <a href="/shop" class="btn-primary">Shop Now</a>
+        </div>
+    </section>
+
+    <!-- Categories Section -->
+    <section class="categories">
+        <h2 class="section-title">Shop by Category</h2>
+        <div class="category-grid">
+            <div class="category-card">
+                <img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=500" alt="Dresses">
+                <div class="category-overlay">
+                    <h3>Dresses</h3>
+                    <p>Elegant & Comfortable</p>
+                </div>
+            </div>
+            <div class="category-card">
+                <img src="https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?w=500" alt="Tops">
+                <div class="category-overlay">
+                    <h3>Tops & Blouses</h3>
+                    <p>Chic & Stylish</p>
+                </div>
+            </div>
+            <div class="category-card">
+                <img src="https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=500" alt="Bottoms">
+                <div class="category-overlay">
+                    <h3>Bottoms</h3>
+                    <p>Comfort Meets Style</p>
+                </div>
+            </div>
+            <div class="category-card">
+                <img src="https://images.unsplash.com/photo-1539533018447-63fcce2678e3?w=500" alt="Accessories">
+                <div class="category-overlay">
+                    <h3>Accessories</h3>
+                    <p>Complete Your Look</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Products -->
+    <section class="featured-products">
+        <h2 class="section-title">Featured Products</h2>
+        <div class="product-grid">
+            <div class="product-card">
+                <div class="product-image">
+                    <img src="https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=400" alt="Floral Dress">
+                    <span class="product-badge">NEW</span>
+                    <div class="wishlist-btn">
+                        <i class="far fa-heart"></i>
+                    </div>
+                </div>
+                <div class="product-info">
+                    <h3 class="product-title">Floral Summer Dress</h3>
+                    <div class="product-price">
+                        <span class="current-price">₹1,999</span>
+                        <span class="original-price">₹2,999</span>
+                    </div>
+                    <div class="product-rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half-alt"></i>
+                        <span style="color: #666;">(4.5)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <div class="product-image">
+                    <img src="https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?w=400" alt="Casual Top">
+                    <span class="product-badge">SALE</span>
+                    <div class="wishlist-btn">
+                        <i class="far fa-heart"></i>
+                    </div>
+                </div>
+                <div class="product-info">
+                    <h3 class="product-title">Casual Comfort Top</h3>
+                    <div class="product-price">
+                        <span class="current-price">₹899</span>
+                        <span class="original-price">₹1,499</span>
+                    </div>
+                    <div class="product-rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="far fa-star"></i>
+                        <span style="color: #666;">(4.0)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <div class="product-image">
+                    <img src="https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=400" alt="Denim Jacket">
+                    <div class="wishlist-btn">
+                        <i class="far fa-heart"></i>
+                    </div>
+                </div>
+                <div class="product-info">
+                    <h3 class="product-title">Classic Denim Jacket</h3>
+                    <div class="product-price">
+                        <span class="current-price">₹2,499</span>
+                    </div>
+                    <div class="product-rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <span style="color: #666;">(5.0)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <div class="product-image">
+                    <img src="https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=400" alt="Maxi Dress">
+                    <span class="product-badge">TRENDING</span>
+                    <div class="wishlist-btn">
+                        <i class="far fa-heart"></i>
+                    </div>
+                </div>
+                <div class="product-info">
+                    <h3 class="product-title">Elegant Maxi Dress</h3>
+                    <div class="product-price">
+                        <span class="current-price">₹3,299</span>
+                        <span class="original-price">₹4,999</span>
+                    </div>
+                    <div class="product-rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half-alt"></i>
+                        <span style="color: #666;">(4.7)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <div class="product-image">
+                    <img src="https://images.unsplash.com/photo-1562137369-1a1a0bc66744?w=400" alt="Silk Blouse">
+                    <span class="product-badge">NEW</span>
+                    <div class="wishlist-btn">
+                        <i class="far fa-heart"></i>
+                    </div>
+                </div>
+                <div class="product-info">
+                    <h3 class="product-title">Silk Blouse</h3>
+                    <div class="product-price">
+                        <span class="current-price">₹1,599</span>
+                        <span class="original-price">₹2,299</span>
+                    </div>
+                    <div class="product-rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <span style="color: #666;">(4.8)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <div class="product-image">
+                    <img src="https://images.unsplash.com/photo-1509631179647-0177331693ae?w=400" alt="Wide Leg Pants">
+                    <div class="wishlist-btn">
+                        <i class="far fa-heart"></i>
+                    </div>
+                </div>
+                <div class="product-info">
+                    <h3 class="product-title">Wide Leg Pants</h3>
+                    <div class="product-price">
+                        <span class="current-price">₹1,799</span>
+                    </div>
+                    <div class="product-rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="far fa-star"></i>
+                        <span style="color: #666;">(4.2)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <div class="product-image">
+                    <img src="https://images.unsplash.com/photo-1591369822096-ffd140ec948f?w=400" alt="Blazer">
+                    <span class="product-badge">SALE</span>
+                    <div class="wishlist-btn">
+                        <i class="far fa-heart"></i>
+                    </div>
+                </div>
+                <div class="product-info">
+                    <h3 class="product-title">Professional Blazer</h3>
+                    <div class="product-price">
+                        <span class="current-price">₹2,999</span>
+                        <span class="original-price">₹4,499</span>
+                    </div>
+                    <div class="product-rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half-alt"></i>
+                        <span style="color: #666;">(4.6)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <div class="product-image">
+                    <img src="https://images.unsplash.com/photo-1596783074918-c84cb06531ca?w=400" alt="Sweater">
+                    <span class="product-badge">TRENDING</span>
+                    <div class="wishlist-btn">
+                        <i class="far fa-heart"></i>
+                    </div>
+                </div>
+                <div class="product-info">
+                    <h3 class="product-title">Cozy Knit Sweater</h3>
+                    <div class="product-price">
+                        <span class="current-price">₹1,899</span>
+                        <span class="original-price">₹2,799</span>
+                    </div>
+                    <div class="product-rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <span style="color: #666;">(4.9)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Newsletter Section -->
+    <section class="newsletter">
+        <h2>Join Our Newsletter</h2>
+        <p>Subscribe to get special offers, free giveaways, and exclusive deals</p>
+        <form class="newsletter-form" action="/newsletter/subscribe" method="POST">
+            <input type="email" name="email" placeholder="Enter your email" required>
+            <button type="submit">Subscribe</button>
+        </form>
+    </section>
+
+   
+
+    <script>
+        // Wishlist toggle functionality
+        document.querySelectorAll('.wishlist-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                const icon = this.querySelector('i');
+                if (icon.classList.contains('far')) {
+                    icon.classList.remove('far');
+                    icon.classList.add('fas');
+                    this.style.color = '#d4145a';
+                } else {
+                    icon.classList.remove('fas');
+                    icon.classList.add('far');
+                    this.style.color = '';
+                }
+            });
+        });
+
+        // Product card click handler
+        document.querySelectorAll('.product-card').forEach(card => {
+            card.addEventListener('click', function(e) {
+                if (!e.target.closest('.wishlist-btn')) {
+                    console.log('Product clicked - redirect to product detail page');
+                    // window.location.href = '/product/' + productId;
+                }
+            });
+        });
+
+        // Newsletter form submission
+        document.querySelector('.newsletter-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = this.querySelector('input[type="email"]').value;
+            alert('Thank you for subscribing with: ' + email);
+            this.reset();
+        });
+
+        // Category card click handler
+        document.querySelectorAll('.category-card').forEach(card => {
+            card.addEventListener('click', function() {
+                console.log('Category clicked');
+                // window.location.href = '/category/' + categoryName;
+            });
+        });
+    </script>
+</body>
+</html>
+<%-include("../../views/partials/user/footer")%>
