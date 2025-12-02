@@ -1,0 +1,373 @@
+<%-include("../../views/partials/user/header")%>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | NUVE - Women's Fashion Store</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+       * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f9f9f9;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Assuming header takes ~80px */
+        main {
+            height: calc(100vh - 80px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+        }
+
+        .login-container {
+            display: flex;
+            width: 900px;
+            height: 100%;
+            max-height: 100%;
+            max-width: 95vw;
+            background: #fff;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+        }
+
+        /* Left Side - Fashion Image */
+        .login-image {
+            flex: 1;
+            background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.4)),
+                        url('https://images.unsplash.com/photo-1483985988355-763728e1935b?w=800&q=80') center/cover no-repeat;
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+            padding: 30px;
+            color: #fff;
+        }
+
+        .image-overlay h2 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .image-overlay p {
+            font-size: 16px;
+            opacity: 0.9;
+            line-height: 1.4;
+        }
+
+        /* Right Side - Form */
+        .login-form-container {
+            flex: 1;
+            padding: 30px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background: #fff;
+        }
+
+        .login-form-container h1 {
+            font-size: 32px;
+            color: #333;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        .login-form-container > p {
+            text-align: center;
+            color: #777;
+            margin-bottom: 25px;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+            position: relative;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1.5px solid #ddd;
+            border-radius: 10px;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #d4145a;
+            box-shadow: 0 0 0 3px rgba(212, 20, 90, 0.1);
+        }
+
+        .form-group label {
+            position: absolute;
+            left: 16px;
+            top: 13px;
+            font-size: 15px;
+            color: #999;
+            pointer-events: none;
+            transition: all 0.3s;
+            /* background: #fff; */
+            padding: 0 6px;
+        }
+
+        .form-group input:focus ~ label,
+        .form-group input:valid ~ label {
+            top: -10px;
+            font-size: 12px;
+            color: #d4145a;
+            font-weight: 600;
+        }
+
+        /* Forgot Password */
+        .forgot-password-link {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+
+        .forgot-password {
+            color: #d4145a;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .forgot-password:hover {
+            text-decoration: underline;
+        }
+
+        /* Submit Button */
+        .submit-btn {
+            width: 100%;
+            padding: 13px;
+            background: #d4145a;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 18px;
+        }
+
+        .submit-btn:hover {
+            background: #b8124a;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(212, 20, 90, 0.3);
+        }
+
+        /* Divider */
+        .divider {
+            text-align: center;
+            margin: 20px 0;
+            color: #aaa;
+            font-size: 13px;
+            position: relative;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 42%;
+            height: 1px;
+            background: #ddd;
+        }
+
+        .divider::before { left: 0; }
+        .divider::after { right: 0; }
+
+        /* Google Button */
+        .google-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 11px;
+            background: #fff;
+            border: 1.5px solid #ddd;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 20px;
+            
+        }
+
+        .google-btn:hover {
+            border-color: #d4145a;
+            background: #fdf2f5;
+        }
+
+        .google-btn i {
+            font-size: 18px;
+            color: #d4145a;
+        }
+
+        .signup-link {
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+            margin-top: 0px;
+            margin-bottom: 10px;
+        }
+
+        .signup-link a {
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .signup-link a:hover {
+            background: #b8124a;
+        }
+        .error-msg{
+            color:red;
+            font-size: 10px;
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .login-container {
+                flex-direction: column;
+            }
+            .login-image {
+                min-height: 200px;
+                padding: 25px;
+            }
+            .image-overlay h2 { font-size: 28px; }
+            .login-form-container { padding: 30px 25px; }
+        }
+
+        @media (max-width: 500px) {
+            main { padding: 10px; }
+            .login-form-container { padding: 25px 20px; }
+            .login-image { min-height: 180px; }
+            .image-overlay h2 { font-size: 24px; }
+            .login-form-container h1 { font-size: 28px; }
+        }
+    </style>
+</head>
+<body>
+
+<main>
+    <div class="login-container">
+        <!-- Left: Fashion Image -->
+        <div class="login-image">
+            <div class="image-overlay">
+                <h2>Welcome Back</h2>
+                <p>Log in to continue your fashion journey with NUVE.</p>
+            </div>
+        </div>
+
+        <!-- Right: Login Form -->
+        <div class="login-form-container">
+            <h1>Login</h1>
+            <p>Welcome back! Please login to your account.</p>
+
+            <form id="loginForm" action="/login" method="POST">
+                <!-- Email -->
+                <div class="form-group">
+                    <input type="email" name="email" id="emailInput">
+                    <label>Email Address</label>
+                    <div class="error-msg" id="emailError"></div>
+                </div>
+
+                <!-- Password -->
+                <div class="form-group">
+                    <input type="password" name="password" id="passwordInput" >
+                    <label>Password</label>
+                    <div class="error-msg" id="passwordError"></div>
+
+                </div>
+
+                <!-- Forgot Password -->
+                <div class="forgot-password-link">
+                    <a href="/forgot-password" class="forgot-password">Forgot Password?</a>
+                </div>
+
+                <button type="submit" class="submit-btn">Login</button>
+            </form>
+
+            <div class="divider">or</div>
+
+            <!-- Google Login -->
+            <a href="/auth/google" type="button" class="google-btn">
+                <i class="fab fa-google"></i>
+                Continue with Google
+            </a>
+
+           
+            <div class="signup-link">
+                Don't have an account? <a href="/signup">Sign up</a>
+            </div>
+        </div>
+    </div>
+</main>
+
+
+<script>
+
+    document.addEventListener("DOMContentLoaded", function(){
+        const loginForm = document.getElementById("loginForm");
+        const emailInput = document.getElementById("emailInput");
+        const passwordInput = document.getElementById("passwordInput");
+
+        const emailError = document.getElementById("emailError");
+        const passwordError = document.getElementById("passwordError");
+
+        loginForm.addEventListener("submit", function(e){
+            let isValid = true;
+
+            emailError.textContent = "";
+            passwordError.textContent = "";
+
+            const emailValue = emailInput.value.trim();
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            if (emailValue === "") {
+                emailError.textContent = "Email is required";
+                isValid = false;
+            } else if (!emailPattern.test(emailValue)) {
+                emailError.textContent = "Please enter a valid email";
+                isValid = false;
+            }
+
+            const passwordValue = passwordInput.value.trim();
+            if (passwordValue === "") {
+                passwordError.textContent = "Password is required";
+                isValid = false;
+            }
+
+            if (!isValid) {
+                e.preventDefault(); 
+            }
+        
+        })
+    })
+
+</script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+  <% if (typeof message !== "undefined" && message) { %>
+    Swal.fire({
+      icon: 'error',
+      title: 'Login Failed',
+      text: '<%= message %>',
+    });
+  <% } %>
+</script>
+
+</body>
+</html>

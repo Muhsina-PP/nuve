@@ -1,0 +1,720 @@
+<%- include("../../views/partials/admin/header") %>
+<head>
+   <style>
+       /* Main Content */
+       .content-main {
+           padding: 30px;
+           background-color: #f8f9fa;
+       }
+
+       /* Page Header */
+       .page-header {
+           background: #ffffff;
+           padding: 25px 30px;
+           border-radius: 12px;
+           box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+           margin-bottom: 30px;
+           display: flex;
+           justify-content: space-between;
+           align-items: center;
+       }
+
+       .page-title {
+           font-size: 26px;
+           font-weight: 700;
+           color: #2d2d2d;
+           margin: 0;
+           position: relative;
+           display: inline-block;
+       }
+
+       .page-title::after {
+           content: '';
+           position: absolute;
+           left: 0;
+           bottom: -8px;
+           width: 50px;
+           height: 3px;
+           background: linear-gradient(90deg, #d4145a, #b8124a);
+           border-radius: 2px;
+       }
+
+       .back-btn {
+           padding: 10px 20px;
+           background: #6c757d;
+           color: #ffffff;
+           border: none;
+           border-radius: 8px;
+           font-weight: 600;
+           text-decoration: none;
+           transition: all 0.3s ease;
+           display: inline-flex;
+           align-items: center;
+           gap: 8px;
+       }
+
+       .back-btn:hover {
+           background: #5a6268;
+           transform: translateY(-2px);
+           box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+           color: #ffffff;
+       }
+
+       /* Form Container */
+       .form-container {
+           max-width: 900px;
+           margin: 0 auto;
+       }
+
+       /* Card */
+       .card {
+           background: #ffffff;
+           border: none;
+           border-radius: 12px;
+           box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+           margin-bottom: 25px;
+       }
+
+       .card-header {
+           background: linear-gradient(135deg, #fef5f8, #fce4ec);
+           padding: 20px 25px;
+           border-bottom: 2px solid #f0f0f0;
+           border-radius: 12px 12px 0 0;
+       }
+
+       .card-header h4 {
+           margin: 0;
+           font-size: 18px;
+           font-weight: 700;
+           color: #2d2d2d;
+       }
+
+       .card-body {
+           padding: 30px;
+       }
+
+       /* Form Elements */
+       .mb-4 {
+           margin-bottom: 20px;
+       }
+
+       .form-label {
+           display: block;
+           margin-bottom: 8px;
+           font-weight: 600;
+           color: #2d2d2d;
+           font-size: 14px;
+       }
+
+       .form-control, .form-select {
+           width: 100%;
+           padding: 12px 16px;
+           border: 2px solid #e0e0e0;
+           border-radius: 8px;
+           font-size: 14px;
+           transition: all 0.3s ease;
+           font-family: 'Nunito Sans', sans-serif;
+           background: #fafafa;
+       }
+
+       .form-control:focus, .form-select:focus {
+           outline: none;
+           border-color: #d4145a;
+           background: #ffffff;
+           box-shadow: 0 0 0 3px rgba(212, 20, 90, 0.1);
+       }
+
+       textarea.form-control {
+           min-height: 120px;
+           resize: vertical;
+       }
+
+       .error-message {
+           color: #d4145a;
+           font-size: 13px;
+           margin-top: 5px;
+           font-weight: 500;
+       }
+
+       /* Row Layout */
+       .row {
+           display: flex;
+           gap: 20px;
+           margin-bottom: 20px;
+       }
+
+       .col-lg-4, .col-lg-6 {
+           flex: 1;
+       }
+
+       /* Variants Section */
+       .variants-container {
+           background: #fafafa;
+           padding: 20px;
+           border-radius: 8px;
+           border: 2px solid #e8e8e8;
+       }
+
+       .variant-item {
+           display: flex;
+           align-items: center;
+           gap: 15px;
+           margin-bottom: 15px;
+           padding: 15px;
+           background: #ffffff;
+           border-radius: 8px;
+           border: 1px solid #e0e0e0;
+       }
+
+       .variant-size {
+           min-width: 60px;
+           font-weight: 700;
+           color: #2d2d2d;
+           font-size: 16px;
+       }
+
+       .variant-quantity {
+           flex: 1;
+       }
+
+       .variant-quantity label {
+           font-size: 13px;
+           margin-bottom: 5px;
+           display: block;
+           color: #6c757d;
+       }
+
+       .variant-quantity input {
+           width: 100%;
+           padding: 10px 14px;
+           border: 2px solid #e0e0e0;
+           border-radius: 6px;
+           font-size: 14px;
+       }
+
+       .variant-quantity input:focus {
+           outline: none;
+           border-color: #d4145a;
+           box-shadow: 0 0 0 3px rgba(212, 20, 90, 0.1);
+       }
+
+       /* Image Upload Section */
+       .image-upload-wrapper {
+           border: 2px dashed #e0e0e0;
+           border-radius: 8px;
+           padding: 30px;
+           text-align: center;
+           transition: all 0.3s ease;
+           background: #fafafa;
+           cursor: pointer;
+       }
+
+       .image-upload-wrapper:hover {
+           border-color: #d4145a;
+           background: #fef5f8;
+       }
+
+       .image-upload-wrapper i {
+           font-size: 48px;
+           color: #d4145a;
+           margin-bottom: 15px;
+       }
+
+       .image-upload-wrapper p {
+           margin: 10px 0 0 0;
+           color: #6c757d;
+           font-size: 14px;
+       }
+
+       .upload-note {
+           margin-top: 10px;
+           font-size: 12px;
+           color: #999;
+       }
+
+       .image-preview-container {
+           display: grid;
+           grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+           gap: 15px;
+           margin-top: 20px;
+       }
+
+       .image-preview-item {
+           position: relative;
+           border-radius: 8px;
+           overflow: hidden;
+           border: 2px solid #e0e0e0;
+       }
+
+       .image-preview-item img {
+           width: 100%;
+           height: 120px;
+           object-fit: cover;
+           display: block;
+       }
+
+       .remove-image-btn {
+           position: absolute;
+           top: 5px;
+           right: 5px;
+           background: #dc3545;
+           color: #ffffff;
+           border: none;
+           border-radius: 50%;
+           width: 25px;
+           height: 25px;
+           cursor: pointer;
+           font-size: 14px;
+           display: flex;
+           align-items: center;
+           justify-content: center;
+           transition: all 0.3s ease;
+       }
+
+       .remove-image-btn:hover {
+           background: #c82333;
+           transform: scale(1.1);
+       }
+
+       /* Buttons */
+       .btn-primary {
+           padding: 12px 40px;
+           background: linear-gradient(135deg, #d4145a, #b8124a);
+           color: #ffffff;
+           border: none;
+           border-radius: 8px;
+           font-weight: 700;
+           font-size: 15px;
+           cursor: pointer;
+           transition: all 0.3s ease;
+       }
+
+       .btn-primary:hover {
+           background: linear-gradient(135deg, #b8124a, #a01040);
+           transform: translateY(-2px);
+           box-shadow: 0 6px 16px rgba(212, 20, 90, 0.3);
+       }
+
+       .button-group {
+           display: flex;
+           gap: 15px;
+           justify-content: flex-end;
+           margin-top: 30px;
+           padding-top: 25px;
+           border-top: 2px solid #f0f0f0;
+       }
+
+       .btn-secondary {
+           padding: 12px 30px;
+           background: #6c757d;
+           color: #ffffff;
+           border: none;
+           border-radius: 8px;
+           font-weight: 700;
+           font-size: 15px;
+           cursor: pointer;
+           transition: all 0.3s ease;
+           text-decoration: none;
+           display: inline-flex;
+           align-items: center;
+           gap: 8px;
+       }
+
+       .btn-secondary:hover {
+           background: #5a6268;
+           transform: translateY(-2px);
+           box-shadow: 0 6px 16px rgba(108, 117, 125, 0.3);
+           color: #ffffff;
+       }
+        .modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7);
+            display: flex; justify-content: center; align-items: center;
+        }
+        .modal-content {
+            background: white; padding: 20px;
+        }
+
+
+       /* Responsive */
+       @media (max-width: 768px) {
+           .content-main {
+               padding: 15px;
+           }
+
+           .card-body {
+               padding: 20px;
+           }
+
+           .row {
+               flex-direction: column;
+               gap: 0;
+           }
+
+           .page-header {
+               flex-direction: column;
+               gap: 15px;
+               align-items: flex-start;
+           }
+
+           .button-group {
+               flex-direction: column-reverse;
+           }
+
+           .btn-primary,
+           .btn-secondary {
+               width: 100%;
+               justify-content: center;
+           }
+
+           .variant-item {
+               flex-direction: column;
+               align-items: flex-start;
+           }
+
+           .variant-size {
+               min-width: auto;
+           }
+       }
+   </style>
+</head>
+
+<section class="content-main">
+   <!-- Page Header -->
+   <div class="page-header">
+       <h2 class="page-title">Add New Product</h2>
+       <a href="/admin/products" class="back-btn">
+           <i class="fas fa-arrow-left"></i> Back to Products
+       </a>
+   </div>
+
+   <!-- Form Container -->
+   <div class="form-container">
+       <form method="post" action="/admin/addProducts" enctype="multipart/form-data" onsubmit="return validateForm()">
+           
+           <!-- Product Details Card -->
+           <div class="card">
+               <div class="card-header">
+                   <h4><i class="fas fa-info-circle"></i> Product Information</h4>
+               </div>
+               <div class="card-body">
+                   <!-- Product Name -->
+                   <div class="mb-4">
+                       <label for="product_name" class="form-label">Product Name</label>
+                       <input type="text" placeholder="Enter product name" name="productName"
+                           class="form-control" id="product_name" >
+                       <div id="productName-error" class="error-message"></div>
+                   </div>
+
+                   <!-- Brand and Category Row -->
+                   <div class="row">
+                       <div class="col-lg-6">
+                           <div class="mb-4">
+                               <label class="form-label">Brand</label>
+                               <select class="form-select" name="brand" >
+                                  <% for (let i = 0; i < brand.length; i++) { %>
+                                    <option value="<%= brand[i].brandName %>"><%= brand[i].brandName %></option>
+                                  <% } %>
+                                </select>
+
+                               <div id="brand-error" class="error-message"></div>
+                           </div>
+                       </div>
+                       <div class="col-lg-6">
+                           <div class="mb-4">
+                               <label class="form-label">Category</label>
+                               <select class="form-select" name="category" >
+                                  <% for( let i = 0; i < category.length; i++ ) { %>
+                                   <option value="<%= category[i].name %>"><%= category[i].name %></option>
+                                  <% } %>
+                               </select>
+                               <div id="category-error" class="error-message"></div>
+                           </div>
+                       </div>
+                   </div>
+
+                   <!-- Description -->
+                   <div class="mb-4">
+                       <label class="form-label">Product Description</label>
+                       <textarea placeholder="Enter detailed product description" id="descriptionid" 
+                           name="description" class="form-control" rows="4" ></textarea>
+                       <div id="description-error" class="error-message"></div>
+                   </div>
+
+                   <!-- Price and Color Row -->
+                   <div class="row">
+                       <div class="col-lg-6">
+                           <div class="mb-4">
+                               <label class="form-label">Regular Price</label>
+                               <input placeholder="$0.00" name="regularPrice" type="number" step="0.01"
+                                   class="form-control" >
+                               <div id="regularPrice-error" class="error-message"></div>
+                           </div>
+                       </div>
+                       <div class="col-lg-6">
+                           <div class="mb-4">
+                               <label class="form-label">Color</label>
+                               <input name="color" type="text" class="form-control" 
+                                   placeholder="e.g., Red, Blue, Black" >
+                               <div id="color-error" class="error-message"></div>
+                           </div>
+                       </div>
+                   </div>
+               </div>
+           </div>
+
+           <!-- Size Variants Card -->
+           <div class="card">
+               <div class="card-header">
+                   <h4><i class="fas fa-ruler"></i> Size Variants & Stock</h4>
+               </div>
+               <div class="card-body">
+                   <div class="variants-container">
+                       <div class="variant-item">
+                           <div class="variant-size">S</div>
+                           <div class="variant-quantity">
+                               <label>Quantity</label>
+                               <input type="number" name="quantity_S" placeholder="0" min="0" value="0">
+                               <div id="quantity-error" class="error-message"></div>
+                           </div>
+                       </div>
+
+                       <div class="variant-item">
+                           <div class="variant-size">M</div>
+                           <div class="variant-quantity">
+                               <label>Quantity</label>
+                               <input type="number" name="quantity_M" placeholder="0" min="0" value="0">
+                               <div id="quantity-error" class="error-message"></div>
+                           </div>
+                       </div>
+
+                       <div class="variant-item">
+                           <div class="variant-size">L</div>
+                           <div class="variant-quantity">
+                               <label>Quantity</label>
+                               <input type="number" name="quantity_L" placeholder="0" min="0" value="0">
+                               <div id="quantity-error" class="error-message"></div>
+                           </div>
+                       </div>
+
+                       <div class="variant-item">
+                           <div class="variant-size">XL</div>
+                           <div class="variant-quantity">
+                               <label>Quantity</label>
+                               <input type="number" name="quantity_XL" placeholder="0" min="0" value="0">
+                               <div id="quantity-error" class="error-message"></div>
+                           </div>
+                       </div>
+
+                       <div class="variant-item">
+                           <div class="variant-size">XXL</div>
+                           <div class="variant-quantity">
+                               <label>Quantity</label>
+                               <input type="number" name="quantity_XXL" placeholder="0" min="0" value="0">
+                               <div id="quantity-error" class="error-message"></div>
+                           </div>
+                       </div>
+                   </div>
+               </div>
+           </div>
+
+           <!-- Product Images Card -->
+           <div class="card">
+                <div class="card-header">
+                    <h4><i class="fas fa-images"></i> Product Images</h4>
+                </div>
+
+                <div class="card-body">
+
+                    <!-- Upload Section -->
+                    <div class="image-upload-wrapper" onclick="document.getElementById('productImages').click()">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <h5>Click to Upload Images</h5>
+                        <p>or drag and drop images here</p>
+                        <p class="upload-note">PNG, JPG, JPEG | Multiple allowed</p>
+                    </div>
+
+                    <input type="file" id="productImages" name="images" multiple style="display:none;" onchange="previewImages(event)">
+
+                    <!-- Image Preview -->
+                    <div id="imagePreviewContainer" class="image-preview-container"></div>
+                    <div id="images-error" class="error-message"></div>
+
+                    <!-- Cropper Modal (YES you can place it here) -->
+                    <div id="cropperModal" class="modal" style="display:none;">
+                        <div class="modal-content">
+                            <img id="cropperImage">
+
+                            <div class="modal-buttons">
+                                <button id="cropBtn">Crop</button>
+                                <button id="cancelCropBtn">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+           <!-- Submit Buttons -->
+           <div class="button-group">
+               <a href="/admin/products" class="btn-secondary">
+                   <i class="fas fa-times"></i> Cancel
+               </a>
+               <button class="btn-primary" type="submit" >
+                   <i class="fas fa-check"></i> Publish Product
+               </button>
+           </div>
+       </form>
+   </div>
+</section>
+
+<script>
+
+
+function validateForm() {
+    clearErrorMessages();
+    let isValid = true;
+
+    const name = document.querySelector("[name='productName']").value.trim();
+    const description = document.getElementById("descriptionid").value;
+    const brand = document.querySelector("[name='brand']").value;
+    const category = document.querySelector("[name='category']").value;
+    const price = document.querySelector("[name='regularPrice']").value;
+    const color = document.querySelector("[name='color']").value;
+    const images = document.getElementById('productImages');
+
+    if (name === "") {
+        showError("productName-error", "Please enter a product name.");
+        isValid = false;
+    }
+
+    if (description === "") {
+        showError("description-error", "Please enter a product description.");
+        isValid = false;
+    }
+
+    if (!brand) {
+        showError("brand-error", "Please select a brand.");
+        isValid = false;
+    }
+
+    if (!category) {
+        showError("category-error", "Please select a category.");
+        isValid = false;
+    }
+
+    if (price === "" || parseFloat(price) < 0) {
+        showError("regularPrice-error", "Please enter a valid price.");
+        isValid = false;
+    }
+
+    if (color === "") {
+        showError("color-error", "Please enter a color.");
+        isValid = false;
+    }else if (!/^[A-Za-z\s]+$/.test(color)){
+      showError("color-error", "Color should only be alphabets");
+      isValid = false;
+    }
+
+    const sizeFields = ["S", "M", "L", "XL", "XXL"];
+    let anySizeHasValue = false;
+
+    sizeFields.forEach(size => {
+        const input = document.querySelector(`[name='quantity_${size}']`);
+        const value = parseInt(input.value);
+
+        if (value < 0 || isNaN(value)) {
+            showError("quantity-error", `Quantity for ${size} must be 0 or greater.`);
+            isValid = false;
+        }
+
+        if (value > 0) {
+            anySizeHasValue = true;
+        }
+    });
+
+    if (!anySizeHasValue) {
+        showError("quantity-error","Please add stock for at least one size.");
+        isValid = false;
+    }
+
+    if (selectedImages.length === 0) {
+        console.log("images.files : ",images.files);
+        
+        showError("images-error", "Please upload at least one product image.");
+        isValid = false;
+    }
+
+    return isValid;
+}
+
+
+function showError(id, message) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.innerText = message;
+    el.style.display = "block";
+}
+
+function clearErrorMessages() {
+    const all = document.querySelectorAll(".error-message");
+    all.forEach(el => {
+        el.innerText = "";
+        el.style.display = "none";
+    });
+}
+
+
+
+function validateAndSubmit(){
+  if (validateForm()){
+    document.forms[0].submit();
+  }
+}
+
+let selectedImages = []; 
+
+function previewImages(event) {
+    const container = document.getElementById("imagePreviewContainer");
+
+    const files = Array.from(event.target.files);
+
+    selectedImages.push(...files);
+
+    // Clear the input so selecting the same file twice still works
+    event.target.value = "";
+
+    container.innerHTML = "";
+
+    selectedImages.forEach((file, index) => {
+        const reader = new FileReader();
+
+        reader.onload = function (e) {
+            const div = document.createElement("div");
+            div.className = "image-preview-item";
+
+            const img = document.createElement("img");
+            img.src = e.target.result;
+
+            const removeBtn = document.createElement("button");
+            removeBtn.className = "remove-image-btn";
+            removeBtn.innerHTML = "×";
+            removeBtn.type = "button";
+
+            removeBtn.onclick = function () {
+                selectedImages.splice(index, 1); 
+                div.remove();
+            };
+
+            div.appendChild(img);
+            div.appendChild(removeBtn);
+            container.appendChild(div);
+        };
+
+        reader.readAsDataURL(file);
+    });
+}
+</script>
+
+
+<%- include("../../views/partials/admin/footer") %>

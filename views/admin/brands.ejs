@@ -1,0 +1,744 @@
+<%- include("../../views/partials/admin/header") %>
+<head>
+  <style>
+    /* Main Content */
+    .content-main {
+      padding: 30px;
+      background-color: #f8f9fa;
+    }
+
+    /* Add Brand Button */
+    .add-brand-btn {
+      padding: 12px 30px;
+      background: #d4145a;
+      color: #ffffff;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 15px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .add-brand-btn:hover {
+      background: #b8124a;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(212, 20, 90, 0.25);
+    }
+
+    /* Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      /* z-index: 9999; */
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      animation: fadeIn 0.3s ease;
+    }
+
+    .modal.show {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .modal-content {
+      background-color: #ffffff;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 500px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+      animation: slideDown 0.3s ease;
+    }
+
+    @keyframes slideDown {
+      from {
+        transform: translateY(-50px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .modal-header {
+      padding: 20px 25px;
+      border-bottom: 2px solid #f0f0f0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: linear-gradient(135deg, #d4145a 0%, #b8124a 100%);
+      border-radius: 12px 12px 0 0;
+    }
+
+    .modal-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #ffffff;
+      margin: 0;
+    }
+
+    .close-btn {
+      background: transparent;
+      border: none;
+      font-size: 28px;
+      color: #ffffff;
+      cursor: pointer;
+      padding: 0;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: all 0.3s ease;
+    }
+
+    .close-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: rotate(90deg);
+    }
+
+    .modal-body {
+      padding: 30px 25px;
+    }
+
+    /* Form Styles */
+    .mb-4 {
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #4a4a4a;
+      font-size: 14px;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      font-family: 'Nunito Sans', sans-serif;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: #d4145a;
+      box-shadow: 0 0 0 3px rgba(212, 20, 90, 0.1);
+    }
+
+    .input-upload {
+      margin-bottom: 20px;
+    }
+
+    .input-upload img {
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      border: 2px solid #e0e0e0;
+    }
+
+    .d-grid {
+      margin-top: 25px;
+    }
+
+    .btn-primary {
+      width: 100%;
+      padding: 14px;
+      background: #d4145a;
+      color: #ffffff;
+      border: none;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 15px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+      background: #b8124a;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(212, 20, 90, 0.25);
+    }
+
+    .mt-20 {
+      margin-top: 20px;
+    }
+
+    /* Card */
+    .card {
+      background: #ffffff;
+      border: none;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      margin-bottom: 25px;
+    }
+
+    .card-body {
+      padding: 30px;
+    }
+
+    /* Table Header */
+    .table-header {
+      font-size: 20px;
+      font-weight: 700;
+      color: #2d2d2d;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 3px solid #d4145a;
+    }
+
+    /* Table */
+    .table-responsive {
+      overflow-x: auto;
+    }
+
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 0;
+    }
+
+    .table thead {
+      background: linear-gradient(135deg, #d4145a, #b8124a) !important;
+    }
+
+    .table thead th {
+      padding: 15px 12px !important;
+      color: #ffffff !important;
+      font-weight: 600 !important;
+      font-size: 14px !important;
+      text-align: left !important;
+      border: none !important;
+    }
+
+    .table thead tr {
+      background: linear-gradient(135deg, #d4145a, #b8124a) !important;
+    }
+
+    .table thead tr th {
+      color: #ffffff !important;
+      background: transparent !important;
+    }
+
+    .table tbody tr {
+      border-bottom: 1px solid #f0f0f0;
+      transition: all 0.2s ease;
+    }
+
+    .table tbody tr:hover {
+      background-color: #f8f9fa;
+    }
+
+    .table tbody td {
+      padding: 15px 12px;
+      color: #4a4a4a;
+      font-size: 14px;
+      vertical-align: middle;
+    }
+
+    /* Brand Logo */
+    .brand-logo-cell {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 2px solid #e0e0e0;
+    }
+
+    .brand-logo-cell img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Badges */
+    .badge {
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      display: inline-block;
+    }
+
+    .alert-success {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    .alert-danger {
+      background: #f8d7da;
+      color: #721c24;
+    }
+
+    /* Buttons */
+    .btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-block;
+      text-align: center;
+      margin-right: 5px;
+      margin-bottom: 5px;
+    }
+
+    .btn a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .btn-success {
+      background: #28a745;
+      color: #ffffff;
+    }
+
+    .btn-success:hover {
+      background: #218838;
+      transform: scale(1.05);
+    }
+
+    .btn-danger {
+      background: #dc3545;
+      color: #ffffff;
+    }
+
+    .btn-danger:hover {
+      background: #c82333;
+      transform: scale(1.05);
+    }
+
+    /* Pagination */
+    .pagination-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 25px;
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+
+    .pagination {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .pagination a,
+    .pagination .current-page {
+      padding: 10px 16px;
+      border: 2px solid #e0e0e0;
+      border-radius: 6px;
+      text-decoration: none;
+      color: #4a4a4a;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      background: #ffffff;
+    }
+
+    .pagination a:hover {
+      background: #d4145a;
+      color: #ffffff;
+      border-color: #d4145a;
+    }
+
+    .pagination .current-page {
+      background: #d4145a;
+      color: #ffffff;
+      border-color: #d4145a;
+    }
+
+    .error-message {
+      color: #d4145a;
+      font-size: 13px;
+      margin-top: 5px;
+      font-weight: 500;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .content-main {
+        padding: 15px;
+      }
+
+      .card-body {
+        padding: 20px;
+      }
+
+      .table {
+        font-size: 12px;
+      }
+
+      .table thead th,
+      .table tbody td {
+        padding: 10px 8px;
+      }
+
+      .btn {
+        padding: 6px 12px;
+        font-size: 12px;
+      }
+
+      .modal-body {
+        padding: 20px 15px;
+      }
+    }
+  </style>
+</head>
+
+<section class="content-main">
+  <!-- Add Brand Button -->
+  <button class="add-brand-btn" onclick="openModal()">
+    <i class="fas fa-plus-circle"></i> Add New Brand
+  </button>
+
+  <!-- Add Brand Modal -->
+  <div id="brandModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Add New Brand</h3>
+        <button class="close-btn" onclick="closeModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form method="post" action="/admin/addBrand" onsubmit="handleFormSubmit(event)" enctype="multipart/form-data">
+          <div class="mb-4">
+            <label for="product_name" class="form-label">Brand Name</label>
+            <input
+              type="text"
+              name="name"
+              placeholder="Type here"
+              class="form-control"
+            />
+          </div>
+          <div id="name-error" class="error-message"></div>
+          <div class="mb-4">
+            <label for="product_name" class="form-label">Brand Image</label>
+            <div class="input-upload">
+              <img src="https://via.placeholder.com/100" alt=""/>
+              <input class="form-control" name="image" type="file" />
+            </div>
+          </div>
+          <div id="image-error" class="error-message"></div>
+          <div class="d-grid">
+            <button class="btn btn-primary mt-20" type="submit">
+              Add Brand
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Brands Table Card -->
+  <div class="card">
+    <div class="card-body">
+      <h3 class="table-header">Brands List</h3>
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Brand</th>
+              <th>Logo</th>
+              <th>Status</th>
+              <th>Block/Unblock/Delete</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% for( let i = 0; i < brand.length; i++ ) { %>
+               <tr>
+                  <td class="text-start"><%= brand[i].brandName  %></td>
+                  <td class="text-start">
+                    <div
+                      class="d-flex align-items-center justify-content-center"
+                      style="
+                        width: 40px;
+                        height: 40px;
+                        border-radius: 50%;
+                        overflow: hidden;
+                      "
+                    >
+                      <img
+                        src="/uploads/re-image/<%= brand[i].brandImage[0] %>"
+                        alt="<%= brand.brandName%>"
+                        class="img-fluid rounded-circle"
+                        style="width: 100%; height: auto"
+                      />
+                    </div>
+                  </td>
+                  <td class="text-start">
+                    <% if (brand[i].isBlocked === true) { %>
+                    <span
+                      class="badge rounded-pill alert-danger"
+                      style="width: 60px"
+                      >Blocked</span
+                    >
+                      <% } else { %>                      
+                    <span
+                      class="badge rounded-pill alert-success"
+                      style="width: 60px"
+                      >Active</span
+                    >
+                    <% } %>
+                  </td>
+                  <td class="text-start">
+                    <% if (brand[i].isBlocked === false) { %>
+
+                    <button class="btn btn-danger text-white" style="width: 90px" onclick="return blockBrand('<%= brand[i]._id%>')"> Block
+                    </button>
+                    <% } else { %>
+                    <button class="btn btn-success text-white" style="width: 90px" onclick="return unblockBrand('<%= brand[i]._id%>')"> Unblock
+                    </button>
+                    <% } %>
+
+                    <button
+                      class="btn btn-danger text-white"
+                      style="width: 90px"
+                      onclick="return deleteBrand('<%= brand[i]._id%>')"
+                    >Delete
+                    </button>
+                  </td>
+                </tr>
+
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+    <div class="container mt-3">
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center mb-20" style="margin-right: 200px;">
+                  <% for( let i = 1; i <= totalPages ; i++ ) { %>
+                    <li class="page-item <%= (i===currentPage) ? 'active' : '' %>">
+                      <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+                    </li>             
+                  <% } %>
+                </ul>
+            </nav>
+    </div>
+
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+<script>
+  // Modal Functions
+  function openModal() {
+    document.getElementById('brandModal').classList.add('show');
+  }
+
+  function closeModal() {
+    document.getElementById('brandModal').classList.remove('show');
+  }
+
+  // Close modal when clicking outside
+  window.onclick = function(event) {
+    const modal = document.getElementById('brandModal');
+    if (event.target == modal) {
+      closeModal();
+    }
+  }
+
+  // Close modal with Escape key
+  document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+      closeModal();
+    }
+  });
+
+  async function handleFormSubmit(event) {
+    event.preventDefault();
+
+    const nameInput = document.querySelector("input[name='name']");
+    const imageInput = document.querySelector("input[name='image']");
+    const name = nameInput.value.trim();
+
+    let isValid = true;
+
+    // Clear previous errors
+    document.getElementById("name-error").innerText = "";
+    document.getElementById("image-error").innerText = "";
+
+    // ---- NAME VALIDATION ----
+    if (!name) {
+        document.getElementById("name-error").innerText = "Name is required";
+        isValid = false;
+    } else if (name.length < 3) {
+        document.getElementById("name-error").innerText = "Name must be at least 3 characters";
+        isValid = false;
+    } else if (name.length > 50) {
+        document.getElementById("name-error").innerText = "Name cannot exceed 50 characters";
+        isValid = false;
+    } else if (!/^[A-Za-z\s]+$/.test(name)) {
+        document.getElementById("name-error").innerText = "Name must contain only letters and spaces";
+        isValid = false;
+    }
+
+    // ---- IMAGE VALIDATION ----
+    if (!imageInput.files || imageInput.files.length === 0) {
+        document.getElementById("image-error").innerText = "Image is required";
+        isValid = false;
+    }
+
+    if (!isValid) return;
+
+    // Using FormData for file upload
+    const formData = new FormData(event.target);
+
+    try {
+        const response = await fetch("/admin/addBrand", {
+            method: "POST",
+            body: formData
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops',
+                text: data.message || 'Something went wrong'
+            });
+            return;
+        }
+
+        Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: 'Brand added successfully'
+        }).then(() => {
+            location.reload();
+        });
+
+    } catch (error) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Network error'
+        });
+        console.log('Network error : ',error);
+        
+    }
+}
+    
+
+  async function blockBrand(brandId) {
+      const confirm = await Swal.fire({
+        title : "Are you sure?",
+        text : "Do you want to block this brand?",
+        icon : "warning",
+        showCancelButton : true,
+        confirmButtonText : "Yes, block",
+        cancelButtonText : "Cancel"
+      });
+      
+      if(!confirm.isConfirmed) return;
+
+      const response = await fetch(`/admin/blockBrand?id=${brandId}`, {
+        method : "GET"
+      })
+
+      if(response.redirected){
+        Swal.fire({
+          icon : 'success',
+          title: "Brand blocked succesfully",
+          text: "The brand has been blocked successfully!",
+          timer: 1500,
+          showConfirmButton: false          
+        }).then(()=>{
+          window.location.reload()
+        })
+      }
+    }
+
+  async function unblockBrand(brandId) {
+    const confirm = await Swal.fire({
+      title : "Are you sure?",
+      text : "Do you want to unblock this brand?",
+      icon : "warning",
+      showCancelButton : true,
+      confirmButtonText : "Yes, unblock",
+      cancelButtonText : "Cancel"
+    })
+    
+    if(!confirm.isConfirmed) return;
+
+    const response = await fetch(`/admin/unblockBrand?id=${brandId}`,{
+      method : 'GET'
+    })
+    if(response.redirected){
+      Swal.fire({
+        icon : 'success',
+        title: "Brand unblocked succesfully",
+        text: "The brand has been unblocked successfully!",
+        timer: 1500,
+        showConfirmButton: false          
+      }).then(()=>{
+        window.location.reload()
+      })
+    }
+  }
+
+
+  async function deleteBrand(brandId){
+    const confirm = await Swal.fire({
+      title : "Are you sure?",
+      text : "Do you want to delete this brand?",
+      icon : 'warning',
+      showCancelButton : true,
+      cancelButtonText : 'Cancel',
+      confirmButtonText : 'Yes, delete'
+    })
+    if(!confirm.isConfirmed) return;
+
+    const response = await fetch(`/admin/deleteBrand?id=${brandId}`,{
+      method : 'GET'
+    })
+    if(response.redirected){
+      Swal.fire({
+        icon : 'success',
+        title: "Brand deleted succesfully",
+        text: "The brand has been deleted successfully!",
+        timer: 1500,
+        showConfirmButton: false          
+      }).then(()=>{
+        window.location.reload()
+      })
+    }
+  }
+  
+   
+   
+</script>
+
+<%- include("../../views/partials/admin/footer") %>

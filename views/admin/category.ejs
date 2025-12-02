@@ -1,0 +1,900 @@
+<%- include("../../views/partials/admin/header") %>
+<head>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.css"/>
+  <style>
+    /* Main Content Area */
+    .content-main {
+      padding: 30px;
+      background-color: #f8f9fa;
+    }
+
+    /* Search Section */
+    .search-section {
+      background: #ffffff;
+      padding: 25px 30px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      margin-bottom: 25px;
+      text-align: center;
+    }
+
+    .search-form {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      max-width: 600px;
+      width: 100%;
+    }
+
+    .search-input {
+      flex: 1;
+      padding: 12px 20px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 15px;
+      transition: all 0.3s ease;
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: #d4145a;
+      box-shadow: 0 0 0 3px rgba(212, 20, 90, 0.1);
+    }
+
+    .search-btn {
+      padding: 12px 30px;
+      background: #d4145a;
+      color: #ffffff;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .search-btn:hover {
+      background: #b8124a;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(212, 20, 90, 0.25);
+    }
+
+    /* Main Card */
+    .card {
+      background: #ffffff;
+      border: none;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      margin-bottom: 25px;
+    }
+
+    .card-body {
+      padding: 0;
+    }
+
+    /* Add Category Button */
+    .add-category-btn {
+      padding: 12px 30px;
+      background: #d4145a;
+      color: #ffffff;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 15px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .add-category-btn:hover {
+      background: #b8124a;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(212, 20, 90, 0.25);
+    }
+
+    /* Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      /* z-index: 9999; */
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      animation: fadeIn 0.3s ease;
+    }
+
+    .modal.show {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    .modal-content {
+      background-color: #ffffff;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 500px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+      animation: slideDown 0.3s ease;
+    }
+
+    @keyframes slideDown {
+      from {
+        transform: translateY(-50px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .modal-header {
+      padding: 20px 25px;
+      border-bottom: 2px solid #f0f0f0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: linear-gradient(135deg, #d4145a 0%, #b8124a 100%);
+      border-radius: 12px 12px 0 0;
+    }
+
+    .modal-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #ffffff;
+      margin: 0;
+    }
+
+    .close-btn {
+      background: transparent;
+      border: none;
+      font-size: 28px;
+      color: #ffffff;
+      cursor: pointer;
+      padding: 0;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: all 0.3s ease;
+    }
+
+    .close-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: rotate(90deg);
+    }
+
+    .modal-body {
+      padding: 30px 25px;
+    }
+
+    /* Two Column Layout */
+    .row {
+      display: flex;
+      margin: 0;
+    }
+
+    /* Table Column - Full Width */
+    .col-md-12 {
+      flex: 1;
+      padding: 30px;
+    }
+
+    .section-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #2d2d2d;
+      margin-bottom: 25px;
+      padding-bottom: 12px;
+      border-bottom: 3px solid #d4145a;
+    }
+
+    .mb-4 {
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #4a4a4a;
+      font-size: 14px;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      font-family: 'Nunito Sans', sans-serif;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: #d4145a;
+      box-shadow: 0 0 0 3px rgba(212, 20, 90, 0.1);
+    }
+
+    textarea.form-control {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    .error-message {
+      color: #d4145a;
+      font-size: 13px;
+      margin-top: 5px;
+      font-weight: 500;
+    }
+
+    .d-grid {
+      margin-top: 25px;
+    }
+
+    .btn-primary {
+      width: 100%;
+      padding: 14px;
+      background: #d4145a;
+      color: #ffffff;
+      border: none;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 15px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+      background: #b8124a;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(212, 20, 90, 0.25);
+    }
+
+    /* Right Column - Table */
+    .col-md-8 {
+      flex: 1;
+      padding: 30px;
+    }
+
+    .table-header {
+      font-size: 20px;
+      font-weight: 700;
+      color: #2d2d2d;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 3px solid #d4145a;
+    }
+
+    .table-responsive {
+      overflow-x: auto;
+    }
+
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 0;
+    }
+
+    /* *************************************** */
+    /* === THEME-CONSISTENT TABLE HEADER === */
+    .table thead,
+    .table thead tr,
+    .table thead th {
+        background: linear-gradient(135deg, #d4145a 0%, #b8124a 100%) !important;
+        color: #ffffff !important;
+        font-weight: 700 !important;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+        border: none !important;
+    }
+
+    /* Extra protection against global CSS overrides */
+    .content-main .table thead th {
+        background: linear-gradient(135deg, #d4145a 0%, #b8124a 100%) !important;
+        color: #ffffff !important;
+    }
+    /* *********************************** */
+
+    .table thead tr th {
+      color: #ffffff !important;
+    }
+
+    .table tbody tr {
+      border-bottom: 1px solid #f0f0f0;
+      transition: all 0.2s ease;
+    }
+
+    .table tbody tr:hover {
+      background-color: #f8f9fa;
+    }
+
+    .table tbody td {
+      padding: 15px 12px;
+      color: #4a4a4a;
+      font-size: 14px;
+      vertical-align: middle;
+    }
+
+    /* Buttons */
+    .btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-block;
+      text-align: center;
+    }
+
+    .btn a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .btn-info {
+      background: #17a2b8;
+      color: #ffffff;
+      margin-bottom: 5px;
+    }
+
+    .btn-info:hover {
+      background: #138496;
+      transform: scale(1.05);
+    }
+
+    .btn-success {
+      background: #28a745;
+      color: #ffffff;
+    }
+
+    .btn-success:hover {
+      background: #218838;
+      transform: scale(1.05);
+    }
+
+    .btn-danger {
+      background: #dc3545;
+      color: #ffffff;
+      margin-bottom: 5px;
+    }
+
+    .btn-danger:hover {
+      background: #c82333;
+      transform: scale(1.05);
+    }
+
+    /* Badges */
+    .badge {
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      display: inline-block;
+    }
+
+    .alert-success {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    .alert-danger {
+      background: #f8d7da;
+      color: #721c24;
+    }
+
+    /* Pagination */
+    .pagination-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 25px;
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+
+    .pagination {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .pagination a,
+    .pagination .current-page {
+      padding: 10px 16px;
+      border: 2px solid #e0e0e0;
+      border-radius: 6px;
+      text-decoration: none;
+      color: #4a4a4a;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      background: #ffffff;
+    }
+
+    .pagination a:hover {
+      background: #d4145a;
+      color: #ffffff;
+      border-color: #d4145a;
+    }
+
+    .pagination .current-page {
+      background: #d4145a;
+      color: #ffffff;
+      border-color: #d4145a;
+    }
+
+    /* Responsive */
+    @media (max-width: 992px) {
+      .row {
+        flex-direction: column;
+      }
+
+      .col-md-12 {
+        width: 100%;
+      }
+
+      .modal-content {
+        width: 95%;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .content-main {
+        padding: 15px;
+      }
+
+      .col-md-12 {
+        padding: 20px;
+      }
+
+      .table {
+        font-size: 12px;
+      }
+
+      .table thead th,
+      .table tbody td {
+        padding: 10px 8px;
+      }
+
+      .btn {
+        padding: 6px 12px;
+        font-size: 12px;
+      }
+
+      .modal-body {
+        padding: 20px 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <section class="content-main">
+    <!-- Search Section -->
+    <div class="search-section">
+      <form action="/admin/category/" method="get" class="search-form">
+        <input 
+          type="text" 
+          class="search-input" 
+          placeholder="Search categories" 
+          name="search"
+        />
+        <button class="search-btn" type="submit">Search</button>
+      </form>
+    </div>
+
+    <!-- Add Category Button -->
+    <button class="add-category-btn" onclick="openModal()">
+      <i class="fas fa-plus-circle"></i> Add New Category
+    </button>
+
+    <!-- Add Category Modal -->
+    <div id="categoryModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title">Add New Category</h3>
+          <button class="close-btn" onclick="closeModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+          <form method="post" action="/admin/addCategory" id="categoryForm" onsubmit="return handleFormSubmit(event)">
+            <div class="mb-4">
+              <label for="product_name" class="form-label">Name</label>
+              <input 
+                type="text" 
+                name="name" 
+                placeholder="Type here" 
+                class="form-control" 
+                id="product_name" 
+              />
+              <div id="name-error" class="error-message"></div>
+            </div>
+            <div class="mb-4">
+              <label class="form-label">Description</label>
+              <textarea 
+                placeholder="Type here" 
+                name="description" 
+                class="form-control" 
+                id="descriptionId" 
+              ></textarea>
+              <div id="description-error" class="error-message"></div>
+            </div>
+            <div class="d-grid">
+              <button class="btn btn-primary" type="submit">
+                Create category
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Card -->
+    <div class="card">
+      <div class="card-body">
+        <div class="row">
+          <!-- Category List Table -->
+          <div class="col-md-12">
+            <h3 class="table-header">Category List</h3>
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead>
+                  <tr class="text-center">
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Offer Price</th>
+                    <th>Offer</th>
+                    <th>Status</th>
+                    <th>List/Unlist</th>
+                    <th>Edit</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% for( let i = 0; i < category.length; i++ ) { %>
+
+                    <% if (category.length === 0) { %>
+                      <tr>
+                        <td colspan="7" class="text-center">No categories found</td>
+                      </tr>
+                      <% } else { %>       
+                        <tr>
+                          <td class="text-start"><%= category[i].name  %></td>
+                          <td class="text-start"><%= category[i].description %></td>
+                          <td>
+                            <% if (category[i].categoryOffer) { %>
+                              <%= category[i].categoryOffer %>
+                             <% } else { %>
+                              0%
+                            <% } %>
+                          </td>
+                          <td class="text-start">
+                            <% if (category[i].categoryOffer === 0 ) { %>
+                                <button class="btn btn-info" style="width: 100px">
+                                  <a href="#" class="text-white" onclick="addCategoryOffer('<%=category[i]._id%>')">Add Offer</a>
+                                </button>
+                            <% } else { %>
+                                <button class="btn btn-info" style="width: 100px">
+                                  <a href="#" class="text-white" onclick="removeCategoryOffer('<%=category[i]._id%>')">Remove offer</a>
+                                </button>
+                            <% } %>
+                          </td>
+                          <td>
+                            <% if (category[i].isListed) { %>
+                             <span class="badge alert-success">Listed</span>
+                             <% } else { %>
+                              <span class="badge alert-danger">Unlisted</span>
+                            <% } %>
+                          </td>
+                          
+                          <td class="text-start">
+                            <% if (category[i].isListed) { %>
+                                <button class="btn btn-danger" style="width: 70px">
+                                  <a href="#" class="text-white" onclick="unlistCategory('<%=category[i]._id%>')">Unlist</a>
+                                </button>
+                            <% } else { %>    
+                                <button class="btn btn-success" style="width: 70px">
+                                  <a href="#" onclick="listCategory('<%=category[i]._id%>')" class="text-white">List</a>
+                                </button>
+                            <% } %>
+                          </td>
+                          <td class="text-start">
+                            <a href="/admin/editCategory/<%=category[i]._id%>" class="btn btn-info text-white">Edit</a>
+                          </td>
+                        </tr>
+                   <% } %>
+                  <% } %>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- Pagination -->
+    <div class="container mt-3">
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center mb-20" style="margin-right: 200px;">
+                  <% for( let i = 1; i <= totalPages ; i++ ) { %>
+                    <li class="page-item <%= (i===currentPage) ? 'active' : '' %>">
+                      <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+                    </li>             
+                  <% } %>
+                </ul>
+          </nav>
+    </div>
+
+  </section>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+  <script>
+    // Modal Functions
+    function openModal() {
+      document.getElementById('categoryModal').classList.add('show');
+    }
+
+    function closeModal() {
+      document.getElementById('categoryModal').classList.remove('show');
+    }
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+      const modal = document.getElementById('categoryModal');
+      if (event.target == modal) {
+        closeModal();
+      }
+    }
+
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape') {
+        closeModal();
+      }
+    });
+
+
+    async function handleFormSubmit(event) {
+        event.preventDefault(); // stop form from submitting
+
+        const name = document.getElementsByName("name")[0].value.trim();
+        const description = document.querySelector("#descriptionId").value
+
+        let isValid = true;
+
+        // Clear previous errors
+        document.getElementById("name-error").innerText = "";
+        document.getElementById("description-error").innerText = "";
+
+        // ---- NAME VALIDATION ----
+        if (!name) {
+            document.getElementById("name-error").innerText = "Name is required";
+            isValid = false;
+        } else if (name.length < 3) {
+            document.getElementById("name-error").innerText = "Name must be at least 3 characters";
+            isValid = false;
+        } else if (name.length > 50) {
+            document.getElementById("name-error").innerText = "Name cannot exceed 50 characters";
+            isValid = false;
+        } else if (!/^[A-Za-z\s]+$/.test(name)) {
+            document.getElementById("name-error").innerText = "Name must contain only letters and spaces";
+            isValid = false;
+        }
+
+        // ---- DESCRIPTION VALIDATION ----
+        if (!description) {
+            document.getElementById("description-error").innerText = "Description is required";
+            isValid = false;
+        } else if (description.length < 10) {
+            document.getElementById("description-error").innerText = "Description must be at least 10 characters long";
+            isValid = false;
+        } else if (description.length > 300) {
+            document.getElementById("description-error").innerText =
+                "Description cannot exceed 300 characters";
+            isValid = false;
+        }
+
+        if(!isValid) return;
+
+        try {
+          const response = await fetch ("/admin/addCategory", {
+            method : "POST",
+            headers : {"Content-Type" : "application/json"},
+            body : JSON.stringify({name, description})
+          });
+
+          const data = await response.json();
+
+          if(!response.ok){
+            Swal.fire({
+              icon : 'error',
+              title : 'Oops',
+              text : data.message || 'Something went wrong'
+            });
+            return;
+          }
+
+          Swal.fire({
+            icon : 'success',
+            title : 'Success',
+            text : 'Category added succesfully'
+          }).then(()=>{
+            location.reload();
+          });
+
+        } catch (error) {
+          Swal.fire({
+            icon : 'error',
+            text : 'Error',
+            text : 'Network error'
+          })
+        }
+    }
+
+
+    async function addCategoryOffer(categoryId) {
+      const {value : amount} = await Swal.fire({
+        title : "Offer in percentage",
+        input : "number",
+        inputLabel : "Percentage",
+        inputPlaceholder : "%"
+      })
+
+      try {
+        const response = await fetch("/admin/addCategoryOffer",{
+          method : "POST",
+          headers : {'content-type' : 'application/json'},
+          body : JSON.stringify({
+            percentage : amount,
+            categoryId : categoryId
+          })
+        });
+
+        const data = await response.json();
+
+        if(response.ok && data.success === true){
+          Swal.fire({
+            title : 'success',
+            text : 'Offer added succesfully',
+            icon : 'success'
+          })
+          .then(()=>{
+            location.reload();
+          })
+        }else{
+          Swal.fire({
+            icon : 'error',
+            title : 'Error',
+            text : 'Offer adding failed'
+          })
+        }      
+      } catch (error) {
+        Swal.fire({
+           icon : 'error',
+            title : 'Error',
+            text : 'An error occured while adding offer'
+        })
+        console.log('An error occured while adding offer', error);     
+      }    
+    }
+
+
+    async function removeCategoryOffer(categoryId) {
+      try {        
+        const response = await fetch("/admin/removeCategoryOffer", {
+          method : "POST",
+          headers : {'content-type' : 'application/json'},
+          body : JSON.stringify({ categoryId : categoryId})
+        })
+
+        const data = await response.json();
+
+        if(response.ok && data.success === true){
+          Swal.fire({
+            icon : 'success',
+            title : 'success',
+            text : 'Offer removed succesfully'
+          })
+          .then(()=>{
+            location.reload();
+          })
+        }else{
+          Swal.fire({
+            icon : 'error',
+            title : 'Error',
+            text : 'Offer removing failed'
+          })
+        }      
+      } catch (error) {
+        Swal.fire({
+          icon : 'error',
+          title : 'Error',
+          text : 'An error occured while removing offer'
+        })
+        console.error("An error occured while removing offer", error);       
+      }
+    }
+
+
+    async function listCategory(categoryId) {
+      const confirm = await Swal.fire({
+        title : "List category",
+        text : "Users will be able to view this category",
+        icon : "question",
+        showCancelButton : true,
+        confirmButtonText : "Yes, list",
+        cancelButtonText : "Cancel"
+      });
+      
+      if(!confirm.isConfirmed) return;
+
+      const response = await fetch(`/admin/listCategory?id=${categoryId}`, {
+        method : "GET"
+      })
+
+      if(response.redirected){
+        Swal.fire({
+          icon : 'success',
+          title: "Category Listed",
+          text: "The category has been listed successfully!",
+          timer: 1500,
+          showConfirmButton: false          
+        }).then(()=>{
+          window.location.href = response.url;
+        })
+      }
+    }
+
+
+    async function unlistCategory(categoryId) {
+      const confirm = await Swal.fire({
+        title: "Unlist this category?",
+        text: "Users will NOT be able to see this category",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes, unlist it!",
+        cancelButtonText: "Cancel"
+      })
+
+      if(!confirm.isConfirmed) return;
+
+      const response = await fetch(`/admin/unlistCategory?id=${categoryId}`,{
+        method : 'GET'
+      })
+
+      if(response.redirected){
+        Swal.fire({
+          icon: "success",
+          title: "Category Unlisted",
+          text: "The category has been unlisted successfully!",
+          timer: 1500,
+          showConfirmButton: false
+        }).then(() => {
+          window.location.href = response.url;
+        });
+      }
+      
+    }
+
+  </script>
+
+<%- include("../../views/partials/admin/footer") %>

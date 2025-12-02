@@ -1,14 +1,6 @@
  <style>
   
         /* Header Styles */
-        .top-bar {
-            background: #000;
-            color: #fff;
-            padding: 10px 0;
-            font-size: 14px;
-            text-align: center;
-        }
-
         header {
             background: #fff;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
@@ -80,12 +72,92 @@
             align-items: center;
             justify-content: center;
         }
-  </style> 
+        .auth-link {
+            font-weight: 600 !important;           
+            padding: 8px 20px;                     /* gives them button-like feel */
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
 
-  <!-- Top Bar -->
-    <div class="top-bar">
-        <p>🎉 Free Shipping on Orders Above ₹999 | Use Code: FREESHIP</p>
-    </div>
+        .signup-link {
+            background: #d4145a;
+            color: #fff !important;
+        }
+
+        .signup-link:hover {
+            background: #b8124a;
+            color: #fff;
+        }
+
+        /* Login button – white with pink border & text */
+        .login-link {
+            background: #fff;
+            color: #d4145a !important;
+            border: 2px solid #d4145a;
+        }
+
+        .login-link:hover {
+            background: #d4145a;
+            color: #fff !important;
+        }
+        /* Wrapper for username dropdown */
+        .user-dropdown {
+            position: relative;
+            list-style: none;
+            cursor: pointer;
+        }
+
+        /* Trigger section (icon + name + arrow) */
+        .user-trigger {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #333;
+            font-weight: 600;
+            border-radius: 6px;
+        }
+
+        .user-trigger:hover {
+            background-color: #f3f3f3;
+        }
+
+        /* Dropdown Menu */
+        .dropdown-menu {
+            position: absolute;
+            top: 40px;
+            right: 0;
+            background: white;
+            width: 150px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            padding: 8px 0;
+            display: none;
+            z-index: 100;
+        }
+
+        /* Menu items */
+        .dropdown-menu li {
+            list-style: none;
+        }
+
+        .dropdown-menu li a {
+            text-decoration: none;
+            display: block;
+            padding: 10px 15px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .dropdown-menu li a:hover {
+            background-color: #f5f5f5;
+        }
+
+        /* Rotate arrow when open */
+        .user-dropdown.open .dropdown-arrow {
+            transform: rotate(180deg);
+        }
+
+  </style> 
 
   <!-- Header -->
   <header>
@@ -96,6 +168,24 @@
                 <li><a href="/orders">Orders</a></li>
                 <li><a href="/contact-us">Contact us</a></li>
                 <li><a href="/about">About</a></li>
+
+                <% if ( !user ) { %>
+                    <li><a href="/signup" class="auth-link signup-link">Signup</a></li>
+                    <li><a href="/login" class="auth-link login-link">Login</a></li>
+                <% } else { %>
+                    <li class="user-dropdown">
+                        <div class="user-trigger">
+                            <i class="fas fa-user-circle"></i>
+                            <span><%= user.name %></span>
+                        </div>
+
+                        <ul class="dropdown-menu">
+                            <li><a href="/profile">Profile</a></li>
+                            <li><a href="/logout">Logout</a></li>
+                        </ul>
+                    </li>
+                <% } %>
+
             </ul>
             <div class="nav-icons">
                 <a href="/search"><i class="fas fa-search"></i></a>
@@ -108,3 +198,28 @@
             </div>
         </nav>
     </header>
+
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const userDropdown = document.querySelector(".user-dropdown");
+            const trigger = document.querySelector(".user-trigger");
+            const menu = document.querySelector(".dropdown-menu");
+
+            if (trigger) {
+                trigger.addEventListener("click", (e) => {
+                    e.stopPropagation();
+                    userDropdown.classList.toggle("open");
+                    menu.style.display = userDropdown.classList.contains("open") ? "block" : "none";
+                });
+            }
+
+            // Close dropdown when clicking outside
+            document.addEventListener("click", () => {
+                if (userDropdown) {
+                    userDropdown.classList.remove("open");
+                    menu.style.display = "none";
+                }
+            });
+        });
+    </script>

@@ -1,0 +1,379 @@
+<%- include("../../views/partials/admin/header") %>
+<head>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.css">
+    <style>
+        /* Main Content */
+        .content-main {
+            padding: 30px;
+            background-color: #f8f9fa;
+        }
+
+        /* Header Section */
+        .products-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #ffffff;
+            padding: 25px 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            margin-bottom: 25px;
+            gap: 20px;
+        }
+
+        .search-wrapper {
+            position: relative;
+            flex: 1;
+            max-width: 600px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 50px 12px 20px;
+            border: 2px solid #e8e8e8;
+            border-radius: 30px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            background: #fafafa;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #d4145a;
+            background: #ffffff;
+            box-shadow: 0 0 0 4px rgba(212, 20, 90, 0.1);
+        }
+
+        .search-btn {
+            position: absolute;
+            right: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: linear-gradient(135deg, #d4145a, #b8124a);
+            color: #ffffff;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .search-btn:hover {
+            transform: translateY(-50%) scale(1.05);
+            box-shadow: 0 4px 12px rgba(212, 20, 90, 0.3);
+        }
+
+        .add-product-btn {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #d4145a, #b8124a);
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .add-product-btn:hover {
+            background: linear-gradient(135deg, #b8124a, #a01040);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(212, 20, 90, 0.3);
+            color: #ffffff;
+        }
+
+        /* Remove old search section */
+        .search-section {
+            display: none;
+        }
+
+        /* Card */
+        .card {
+            background: #ffffff;
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            margin-bottom: 25px;
+        }
+
+        .card-body {
+            padding: 30px;
+        }
+
+        /* Table */
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 0;
+        }
+
+        .table thead {
+            background: linear-gradient(135deg, #d4145a, #b8124a) !important;
+        }
+
+        .table thead th {
+            padding: 15px 12px !important;
+            color: #ffffff !important;
+            font-weight: 600 !important;
+            font-size: 14px !important;
+            text-align: left !important;
+            border: none !important;
+            white-space: nowrap;
+        }
+
+        .table thead tr {
+            background: linear-gradient(135deg, #d4145a, #b8124a) !important;
+        }
+
+        .table thead tr th {
+            color: #ffffff !important;
+            background: transparent !important;
+        }
+
+        .table tbody tr {
+            border-bottom: 1px solid #f0f0f0;
+            transition: all 0.2s ease;
+        }
+
+        .table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .table tbody td {
+            padding: 15px 12px;
+            color: #4a4a4a;
+            font-size: 14px;
+            vertical-align: middle;
+        }
+
+        .table-striped tbody tr:nth-of-type(odd) {
+            background-color: rgba(0, 0, 0, 0.02);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-block;
+            text-align: center;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+
+        .btn a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .btn-info {
+            background: #17a2b8;
+            color: #ffffff;
+        }
+
+        .btn-info:hover {
+            background: #138496;
+            transform: scale(1.05);
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: #ffffff;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+            transform: scale(1.05);
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: #ffffff;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+            transform: scale(1.05);
+        }
+
+        /* Pagination */
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 25px;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .pagination {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .pagination a,
+        .pagination .current-page {
+            padding: 10px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            text-decoration: none;
+            color: #4a4a4a;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            background: #ffffff;
+        }
+
+        .pagination a:hover {
+            background: #d4145a;
+            color: #ffffff;
+            border-color: #d4145a;
+        }
+
+        .pagination .current-page {
+            background: #d4145a;
+            color: #ffffff;
+            border-color: #d4145a;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .content-main {
+                padding: 15px;
+            }
+
+            .products-header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+
+            .add-product-btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .card-body {
+                padding: 20px;
+            }
+
+            .table {
+                font-size: 12px;
+            }
+
+            .table thead th,
+            .table tbody td {
+                padding: 10px 8px;
+            }
+
+            .btn {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+
+            .search-wrapper {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<section class="content-main">
+    <!-- Header with Search and Add Button -->
+    <div class="products-header">
+        <form action="" method="get" class="search-wrapper">
+            <input 
+                type="text" 
+                class="search-input" 
+                placeholder="Search products or brands" 
+                name="search"
+            />
+            <button class="search-btn" type="submit">
+                <i class="fas fa-search"></i> Search
+            </button>
+        </form>
+        
+        <a href="/admin/addProducts" class="add-product-btn">
+            <i class="fas fa-plus-circle"></i> Add New Product
+        </a>
+    </div>
+
+    <!-- Products Table Card -->
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th scope="col">Product Name</th>
+                            <th scope="col">Brand</th>
+                            <th scope="col">Category</th>
+                            <th scope="col">Price</th>
+                            <th scope="col">Offer Price</th>
+                            <th scope="col">Offer</th>
+                            <th scope="col">Quantity</th>
+                            <th scope="col">Action</th>
+                            <th scope="col">Edit</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                      
+                      
+                        <tr>
+                            <td class="text-start"></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td>
+                                <button class="btn btn-info" style="width: 100px;">
+                                    <a href="#" class="text-white">Add Offer</a>
+                                </button>
+                                <button class="btn btn-info" style="width: 100px;">
+                                    <a href="#" class="text-white">Remove</a>
+                                </button>
+                            </td>
+                            <td></td>
+                            <td>
+                                <button class="btn btn-danger" style="width: 80px;">
+                                    <a href="#" class="text-white">Block</a>
+                                </button>
+                                <button class="btn btn-success" style="width: 80px;">
+                                    <a href="#" class="text-white">Unblock</a>
+                                </button>
+                            </td>
+                            <td>
+                                <button class="btn btn-info" style="width: 80px;">
+                                    <a href="#" class="text-white">Edit</a>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+<%- include("../../views/partials/admin/footer") %>

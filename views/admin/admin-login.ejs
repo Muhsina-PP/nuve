@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Login - NUVE</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800;900&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Nunito Sans', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      padding: 20px;
+    }
+
+    .login-wrapper {
+      display: flex;
+      max-width: 1000px;
+      width: 100%;
+      background: #fff;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+    }
+
+    .login-image {
+      flex: 1;
+      background: linear-gradient(135deg, #d4145a 0%, #b8124a 100%);
+      padding: 60px 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: #fff;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .login-image::before {
+      content: '';
+      position: absolute;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+      background-size: 30px 30px;
+      animation: moveBackground 20s linear infinite;
+    }
+
+    @keyframes moveBackground {
+      0% { transform: translate(0, 0); }
+      100% { transform: translate(30px, 30px); }
+    }
+
+    .login-image-content {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+    }
+
+    .login-image h1 {
+      font-size: 48px;
+      font-weight: 900;
+      margin-bottom: 20px;
+      letter-spacing: 2px;
+    }
+
+    .login-image p {
+      font-size: 18px;
+      opacity: 0.95;
+      line-height: 1.6;
+    }
+
+    .login-image i {
+      font-size: 80px;
+      margin-bottom: 30px;
+      opacity: 0.9;
+    }
+
+    .login-form-container {
+      flex: 1;
+      padding: 60px 50px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .login-header {
+      margin-bottom: 40px;
+    }
+
+    .login-header h2 {
+      font-size: 32px;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 10px;
+    }
+
+    .login-header p {
+      color: #666;
+      font-size: 15px;
+    }
+
+    .alert {
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-bottom: 25px;
+      background-color: #fee;
+      border-left: 4px solid #d4145a;
+      color: #c00;
+      font-size: 14px;
+    }
+
+    .form-group {
+      margin-bottom: 25px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #333;
+      font-size: 14px;
+    }
+
+    .input-wrapper {
+      position: relative;
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #999;
+      font-size: 16px;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 14px 15px 14px 45px;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      font-size: 15px;
+      font-family: 'Nunito Sans', sans-serif;
+      transition: all 0.3s ease;
+      background: #fafafa;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: #d4145a;
+      background: #fff;
+      box-shadow: 0 0 0 4px rgba(212, 20, 90, 0.1);
+    }
+
+    .error-message {
+      color: #d4145a;
+      font-size: 13px;
+      margin-top: 6px;
+      display: block;
+      font-weight: 500;
+    }
+
+    .btn-login {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, #d4145a 0%, #b8124a 100%);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .btn-login:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(212, 20, 90, 0.3);
+    }
+
+    .btn-login:active {
+      transform: translateY(0);
+    }
+
+    .back-home {
+      text-align: center;
+      margin-top: 25px;
+    }
+
+    .back-home a {
+      color: #d4145a;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 14px;
+      transition: color 0.3s;
+    }
+
+    .back-home a:hover {
+      color: #b8124a;
+      text-decoration: underline;
+    }
+
+    @media (max-width: 768px) {
+      .login-wrapper {
+        flex-direction: column;
+      }
+
+      .login-image {
+        padding: 40px 30px;
+      }
+
+      .login-image h1 {
+        font-size: 36px;
+      }
+
+      .login-image i {
+        font-size: 60px;
+      }
+
+      .login-form-container {
+        padding: 40px 30px;
+      }
+
+      .login-header h2 {
+        font-size: 26px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="login-wrapper">
+    <!-- Left Side - Branding -->
+    <div class="login-image">
+      <div class="login-image-content">
+        <i class="fas fa-shield-halved"></i>
+        <h1>NUVE</h1>
+        <p>Admin Dashboard Access<br/>Manage your women's clothing store</p>
+      </div>
+    </div>
+
+    <!-- Right Side - Login Form -->
+    <div class="login-form-container">
+      <div class="login-header">
+        <h2>Welcome Back</h2>
+        <p>Please login to access the admin dashboard</p>
+      </div>
+
+      <!-- Error Message Display -->
+      <div class="alert" style="display: none;" id="alertBox">
+        Invalid credentials. Please try again.
+      </div>
+
+      <form id="adminLoginForm" method="post" action="/admin/login">
+        <div class="form-group">
+          <label for="adminEmail">Email Address</label>
+          <div class="input-wrapper">
+            <i class="fas fa-envelope input-icon"></i>
+            <input
+              type="email"
+              class="form-control"
+              id="adminEmail"
+              name="email"
+              placeholder="admin@nuve.com"
+              
+            />
+          </div>
+          <span id="emailError" class="error-message"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="adminPassword">Password</label>
+          <div class="input-wrapper">
+            <i class="fas fa-lock input-icon"></i>
+            <input
+              type="password"
+              class="form-control"
+              id="adminPassword"
+              name="password"
+              placeholder="Enter your password"
+              
+            />
+          </div>
+          <span id="passwordError" class="error-message"></span>
+        </div>
+
+        <button type="submit" class="btn-login">
+          <i class="fas fa-sign-in-alt"></i> Log In
+        </button>
+      </form>
+
+      <div class="back-home">
+        <a href="/"><i class="fas fa-arrow-left"></i> Back to Home</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const adminLoginForm = document.getElementById("adminLoginForm");
+      const emailField = document.getElementById("adminEmail");
+      const passwordField = document.getElementById("adminPassword");
+      const emailError = document.getElementById("emailError");
+      const passwordError = document.getElementById("passwordError");
+      const alertBox = document.getElementById("alertBox");
+
+      adminLoginForm.addEventListener("submit", function (event) {
+        let isValid = true;
+        emailError.textContent = "";
+        passwordError.textContent = "";
+
+        const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+        if (!emailPattern.test(emailField.value)) {
+          emailError.textContent = "Please enter a valid email address";
+          isValid = false;
+        }
+
+        if (passwordField.value.length < 8) {
+          passwordError.textContent = "Password must be at least 8 characters";
+          isValid = false;
+        }
+
+        if (!isValid) {
+          event.preventDefault();
+        }
+      });
+
+      // Clear error messages on input
+      emailField.addEventListener("input", function() {
+        emailError.textContent = "";
+      });
+
+      passwordField.addEventListener("input", function() {
+        passwordError.textContent = "";
+      });
+    });
+  </script>
+</body>
+</html>

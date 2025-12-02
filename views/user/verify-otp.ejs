@@ -1,0 +1,541 @@
+<%-include("../../views/partials/user/header")%>
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>NUVE - Email Verification</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body,
+      html {
+        height: 100%;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: #f8f9fa;
+        overflow-y: auto;
+      }
+
+      .verification-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 40px 20px;
+      }
+
+      .verification-wrapper {
+        width: 100%;
+        max-width: 450px;
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .verification-header {
+        background: #fff;
+        padding: 30px 30px 20px 30px;
+        text-align: center;
+        color: #333;
+        border-bottom: 1px solid #f0f0f0;
+      }
+
+      .verification-header i {
+        font-size: 40px;
+        margin-bottom: 15px;
+        color: #667eea;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.1);
+        }
+      }
+
+      .verification-header h1 {
+        font-size: 24px;
+        font-weight: 700;
+        margin-bottom: 8px;
+        color: #333;
+      }
+
+      .verification-header p {
+        font-size: 14px;
+        color: #666;
+      }
+
+      .verification-body {
+        padding: 30px;
+      }
+
+      .form-group {
+        margin-bottom: 25px;
+      }
+
+      .form-group label {
+        display: block;
+        font-size: 15px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 10px;
+      }
+
+      .otp-input-wrapper {
+        position: relative;
+      }
+
+      .form-control {
+        width: 100%;
+        padding: 12px 20px;
+        font-size: 16px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        transition: all 0.3s;
+        text-align: center;
+        letter-spacing: 6px;
+        font-weight: 600;
+        color: #333;
+      }
+
+      .form-control:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+      }
+
+      .btn-verify {
+        width: 100%;
+        padding: 12px;
+        background: #d4145a;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        margin-top: 10px;
+      }
+
+      .btn-verify:hover {
+        background: #a81049;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(212, 20, 90, 0.3);
+      }
+
+      .btn-verify:active {
+        transform: translateY(0);
+      }
+
+      .timer-section {
+        text-align: center;
+        margin: 25px 0;
+        padding: 20px;
+        background: #f8f9fa;
+        border-radius: 8px;
+      }
+
+      .timer-circle {
+        display: inline-flex;
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        background: #667eea;
+        color: #fff;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        font-weight: 700;
+        box-shadow: 0 3px 10px rgba(102, 126, 234, 0.2);
+        margin-bottom: 12px;
+      }
+
+      .timer-circle.expired {
+        background: #dc3545;
+      }
+
+      .timer-text {
+        font-size: 14px;
+        color: #666;
+        margin-bottom: 15px;
+      }
+
+      .btn-resend {
+        width: 100%;
+        padding: 10px;
+        background: #6c757d;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+
+      .btn-resend:disabled {
+        background: #d3d3d3;
+        cursor: not-allowed;
+        opacity: 0.6;
+      }
+
+      .btn-resend:not(:disabled):hover {
+        background: #5a6268;
+        transform: translateY(-1px);
+        box-shadow: 0 3px 10px rgba(108, 117, 125, 0.2);
+      }
+
+      .alert-danger {
+        background: #fee;
+        color: #c33;
+        padding: 12px 15px;
+        border-radius: 8px;
+        margin-top: 15px;
+        text-align: center;
+        border-left: 3px solid #d4145a;
+        font-size: 14px;
+      }
+
+      @keyframes shake {
+        0%,
+        100% {
+          transform: translateX(0);
+        }
+        25% {
+          transform: translateX(-10px);
+        }
+        75% {
+          transform: translateX(10px);
+        }
+      }
+
+      .footer-text {
+        text-align: center;
+        padding: 20px 30px;
+        background: #fff;
+        color: #666;
+        font-size: 14px;
+        border-top: 1px solid #f0f0f0;
+      }
+
+      .footer-text a {
+        color: #d4145a;
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.3s;
+      }
+
+      .footer-text a:hover {
+        color: #a81049;
+      }
+
+      .input-icon {
+        position: absolute;
+        right: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #667eea;
+        font-size: 18px;
+      }
+
+      @media (max-width: 768px) {
+        .verification-wrapper {
+          margin: 10px;
+        }
+
+        .verification-header h1 {
+          font-size: 24px;
+        }
+
+        .verification-body {
+          padding: 30px 20px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="verification-container">
+      <div class="verification-wrapper">
+        <div class="verification-header">
+          <i class="fas fa-envelope-open-text"></i>
+          <h1>Email Verification</h1>
+          <p>We've sent a 6-digit code to your email</p>
+        </div>
+
+        <div class="verification-body">
+          <form
+            id="otpForm"
+            action="/verify-otp"
+            method="post"
+            onsubmit=" return validateOtpForm()"
+          >
+            <div class="form-group">
+              <label for="otp">Enter OTP</label>
+              <div class="otp-input-wrapper">
+                <input
+                  type="text"
+                  id="otp"
+                  name="otp"
+                  class="form-control"
+                  maxlength="6"
+                  pattern="\d*"
+                  placeholder="000000"
+                  autocomplete="off"
+                />
+                <i class="fas fa-key input-icon"></i>
+              </div>
+            </div>
+
+            <button type="submit" class="btn-verify">
+              <i class="fas fa-check-circle"></i> Verify Email
+            </button>
+
+            <div class="timer-section">
+              <div class="timer-circle" id="timerCircle">
+                <span id="timerValue">60</span>
+              </div>
+              <div class="timer-text">
+                Code expires in
+                <strong><span id="timerSeconds">60</span> seconds</strong>
+              </div>
+              <button
+                type="button"
+                class="btn-resend"
+                id="resendBtn"
+                disabled
+                onclick="resendOtp()"
+              >
+                <i class="fas fa-redo"></i> Resend OTP
+              </button>
+            </div>
+
+            <div id="errorMessage" style="display: none" class="alert-danger">
+              <i class="fas fa-exclamation-circle"></i>
+              <span id="errorText"></span>
+            </div>
+          </form>
+        </div>
+
+        <div class="footer-text">
+          Already verified?
+          <a href="/login"><i class="fas fa-sign-in-alt"></i> Login now</a>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+      // Focus on OTP input
+      document.getElementById("otp").focus();
+
+      let timer = 60;
+      let timerInterval;
+
+      function startTimer() {
+        const timerValueEl = document.getElementById("timerValue");
+        const timerSecondsEl = document.getElementById("timerSeconds");
+        const timerCircle = document.getElementById("timerCircle");
+        const otpInput = document.getElementById("otp");
+        const resendBtn = document.getElementById("resendBtn");
+
+        // Disable resend button at start
+        resendBtn.disabled = true;
+
+        timerInterval = setInterval(() => {
+          timer--;
+          timerValueEl.textContent = timer;
+          timerSecondsEl.textContent = timer;
+
+          if (timer <= 0) {
+            clearInterval(timerInterval);
+            timerCircle.classList.add("expired");
+            timerValueEl.textContent = "0";
+            timerSecondsEl.textContent = "0";
+            otpInput.disabled = true;
+            otpInput.style.opacity = "0.5";
+
+            // Enable resend button when timer expires
+            resendBtn.disabled = false;
+
+            Swal.fire({
+              icon: "warning",
+              title: "Code Expired",
+              text: "Your verification code has expired. Please request a new one.",
+              confirmButtonColor: "#d4145a",
+            });
+          }
+        }, 1000);
+      }
+
+      // Start timer on page load
+      startTimer();
+
+      // Resend OTP functionality
+      document
+        .getElementById("resendBtn")
+        .addEventListener("click", function () {
+          clearInterval(timerInterval);
+          timer = 60;
+          document.getElementById("otp").disabled = false;
+          document.getElementById("otp").style.opacity = "1";
+          document.getElementById("otp").value = "";
+          document.getElementById("timerCircle").classList.remove("expired");
+
+          // Disable resend button again
+          this.disabled = true;
+
+          Swal.fire({
+            icon: "success",
+            title: "Code Resent!",
+            text: "A new verification code has been sent to your email.",
+            timer: 2000,
+            showConfirmButton: false,
+          });
+
+          startTimer();
+        });
+
+      // Only allow numbers in OTP input
+      document.getElementById("otp").addEventListener("input", function (e) {
+        this.value = this.value.replace(/[^0-9]/g, "");
+      });
+
+      // Form submission handler
+      document
+        .getElementById("otpForm")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+
+          const otpValue = document.getElementById("otp").value;
+
+          if (otpValue.length !== 6) {
+            Swal.fire({
+              icon: "error",
+              title: "Invalid Code",
+              text: "Please enter a 6-digit verification code.",
+              confirmButtonColor: "#d4145a",
+            });
+            return;
+          }
+
+          // Submit the form (uncomment for actual submission)
+          // this.submit();
+
+          // Demo success message
+          Swal.fire({
+            icon: "success",
+            title: "Verified!",
+            text: "Your email has been successfully verified.",
+            confirmButtonColor: "#d4145a",
+          }).then(() => {
+            // window.location.href = '/login';
+          });
+        });
+
+      function validateOtpForm() {
+        const otpInput = document.getElementById("otp").value;
+
+        fetch("verify-otp", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ otp: otpInput }),
+        })
+          .then((res) => res.json())
+          .then((response) => {
+            if (response.success) {
+              Swal.fire({
+                icon: "success",
+                title: "Otp verified successfully",
+                showConfirmButton: false,
+                timer: 1500,
+              }).then(() => {
+                window.location.href = response.redirectUrl;
+              });
+            } else {
+              Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: response.message,
+              });
+            }
+          })
+          .catch(() => {
+            Swal.fire({
+              icon: "error",
+              title: "Invalid Otp",
+              text: "Plz try again",
+            });
+          });
+
+        return false;
+      }
+
+      function resendOtp() {
+        clearInterval(timerInterval);
+        timer = 60;
+        document.getElementById("otp").disabled = false;
+        document.getElementById("timerValue").classList.remove("expired");
+        startTimer();
+
+        $.ajax({
+          type: "POST",
+          url: "/resend-otp",
+          success: function (response) {
+            if (response.success) {
+              Swal.fire({
+                icon: "success",
+                title: "OTP resend succesfully",
+                showConfirmButton: false,
+                timer: 1500,
+              });
+            } else {
+              Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: "An error occurend while resending otp, please try again",
+              });
+            }
+          },
+        });
+        return false;
+      }
+    </script>
+  </body>
+</html>
