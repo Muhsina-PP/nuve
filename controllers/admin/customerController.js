@@ -2,14 +2,9 @@ const User = require("../../models/userSchema")
 
 const customerInfo = async( req, res) =>{
   try {
-    let search = "";
-    if(req.query.search){
-      search = req.query.search;
-    }
-    let page = 1;
-    if(req.query.page){
-      page = req.query.page;
-    }
+
+    let search = req.query.search?.trim() || "";
+    let page = parseInt(req.query.page) || 1;
     const limit = 5;
     
     const userData = await User.find({
@@ -21,6 +16,7 @@ const customerInfo = async( req, res) =>{
     })
     .limit(limit*1)
     .skip((page-1)*limit)
+    .sort({createdOn : -1})
     .exec()
 
     const count = await User.find({
@@ -31,11 +27,14 @@ const customerInfo = async( req, res) =>{
       ]
     }).countDocuments();
 
+    const noUserFound = search !== "" && userData.length === 0;
+
     res.render("customers" , {
       data : userData, 
       totalPages : Math.ceil(count/limit),
       currentPage : Number(page),
-      search : search
+      search : search,
+      noUserFound
     })
 
   } catch (error) {

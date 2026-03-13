@@ -265,16 +265,13 @@
         <!-- Left: Fashion Image -->
         <div class="login-image">
             <div class="image-overlay">
-                <h2>Welcome Back</h2>
-                <p>Log in to continue your fashion journey with NUVE.</p>
+                
             </div>
         </div>
 
         <!-- Right: Login Form -->
         <div class="login-form-container">
             <h1>Login</h1>
-            <p>Welcome back! Please login to your account.</p>
-
             <form id="loginForm" action="/login" method="POST">
                 <!-- Email -->
                 <div class="form-group">
@@ -315,59 +312,72 @@
     </div>
 </main>
 
-
-<script>
-
-    document.addEventListener("DOMContentLoaded", function(){
-        const loginForm = document.getElementById("loginForm");
-        const emailInput = document.getElementById("emailInput");
-        const passwordInput = document.getElementById("passwordInput");
-
-        const emailError = document.getElementById("emailError");
-        const passwordError = document.getElementById("passwordError");
-
-        loginForm.addEventListener("submit", function(e){
-            let isValid = true;
-
-            emailError.textContent = "";
-            passwordError.textContent = "";
-
-            const emailValue = emailInput.value.trim();
-            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-            if (emailValue === "") {
-                emailError.textContent = "Email is required";
-                isValid = false;
-            } else if (!emailPattern.test(emailValue)) {
-                emailError.textContent = "Please enter a valid email";
-                isValid = false;
-            }
-
-            const passwordValue = passwordInput.value.trim();
-            if (passwordValue === "") {
-                passwordError.textContent = "Password is required";
-                isValid = false;
-            }
-
-            if (!isValid) {
-                e.preventDefault(); 
-            }
-        
-        })
-    })
-
-</script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
-  <% if (typeof message !== "undefined" && message) { %>
-    Swal.fire({
-      icon: 'error',
-      title: 'Login Failed',
-      text: '<%= message %>',
-    });
-  <% } %>
-</script>
+document.addEventListener("DOMContentLoaded", function(){
 
+    const loginForm = document.getElementById("loginForm");
+    const emailInput = document.getElementById("emailInput");
+    const passwordInput = document.getElementById("passwordInput");
+
+    const emailError = document.getElementById("emailError");
+    const passwordError = document.getElementById("passwordError");
+
+    loginForm.addEventListener("submit", function(e){
+        let isValid = true;
+
+        emailError.textContent = "";
+        passwordError.textContent = "";
+
+        const emailValue = emailInput.value.trim();
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        if (emailValue === "") {
+            emailError.textContent = "Email is required";
+            isValid = false;
+        } else if (!emailPattern.test(emailValue)) {
+            emailError.textContent = "Please enter a valid email";
+            isValid = false;
+        }
+
+        const passwordValue = passwordInput.value.trim();
+        if (passwordValue === "") {
+            passwordError.textContent = "Password is required";
+            isValid = false;
+        }
+
+        if (!isValid) {
+            e.preventDefault(); 
+        }
+    });
+
+    // Login error message
+    <% if (typeof message !== "undefined" && message) { %>
+        Swal.fire({
+            icon: 'error',
+            title: 'Login Failed',
+            text: '<%= message %>'
+        });
+    <% } %>
+
+    // Password reset success message
+    const urlParams = new URLSearchParams(window.location.search);
+
+    if (urlParams.get('reset') === 'success') {
+        Swal.fire({
+            icon: 'success',
+            title: 'Password Reset Successful',
+            text: 'You can now login with your new password',
+            timer: 1500,
+            showConfirmButton: false
+        });
+
+        // remove query parameter so refresh won't show alert again
+        window.history.replaceState({}, document.title, "/login");
+    }
+
+});
+</script>
 </body>
 </html>

@@ -498,6 +498,9 @@
           name="search"
         />
         <button class="search-btn" type="submit">Search</button>
+        <% if(search && search.length > 0){ %>
+            <a href="/admin/category" class="btn btn-sm btn-outline-secondary">Clear</a>
+        <% } %>
       </form>
     </div>
 

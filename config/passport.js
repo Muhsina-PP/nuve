@@ -15,20 +15,25 @@ passport.use(
       try {
         let user = await User.findOne({ googleId: profile.id });
 
-        if(user.isBlocked){
-          return done(null, false, {message : "User is blocked by Admin"}) 
-        }
+        // If user exists
         if (user) {
-          return done(null, user);
-        } else {
-          user = new User({
-            name: profile.displayName,
-            email: profile.emails[0].value,
-            googleId: profile.id,
-          });
-          await user.save();
+          if (user.isBlocked) {
+            return done(null, false, { message: "User is blocked by Admin" });
+          }
           return done(null, user);
         }
+
+        // If user does not exist → create new user
+        user = new User({
+          name: profile.displayName,
+          email: profile.emails[0].value,
+          googleId: profile.id,
+        });
+
+        await user.save();
+
+        return done(null, user);
+
       } catch (error) {
         return done(error, null);
       }

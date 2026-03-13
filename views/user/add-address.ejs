@@ -1,0 +1,304 @@
+<%- include("../../views/partials/user/header") %>
+
+<style>
+  :root {
+    --primary: #d4145a;
+    --primary-dark: #a81049;
+    --light-bg: #f8f9fa;
+    --card-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    --transition: all 0.3s ease;
+  }
+
+  .address-container {
+    max-width: 900px;
+    margin: 60px auto;
+    padding: 0 20px;
+  }
+
+  .page-title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #333;
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
+  .address-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: var(--card-shadow);
+    overflow: hidden;
+    padding: 40px;
+  }
+
+  .form-group {
+    margin-bottom: 28px;
+    position: relative;
+  }
+
+  .form-label {
+    position: absolute;
+    top: 14px;
+    left: 20px;
+    color: #999;
+    font-size: 1rem;
+    transition: var(--transition);
+    pointer-events: none;
+  }
+
+  .form-control {
+    width: 100%;
+    padding: 20px 20px 8px;
+    border: 2px solid #e8e8e8;
+    border-radius: 12px;
+    font-size: 1rem;
+    transition: var(--transition);
+    background: #fafafa;
+  }
+
+  .form-control:focus {
+    border-color: var(--primary);
+    background: white;
+    box-shadow: 0 0 0 4px rgba(212, 20, 90, 0.1);
+    outline: none;
+  }
+
+  .form-control:focus + .form-label,
+  .form-control:not(:placeholder-shown) + .form-label {
+    top: 6px;
+    left: 18px;
+    font-size: 0.8rem;
+    color: var(--primary);
+    font-weight: 600;
+  }
+
+  /* Default Address Checkbox */
+  .default-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 20px 0 30px;
+  }
+
+  .default-checkbox input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    accent-color: var(--primary);
+    cursor: pointer;
+  }
+
+  .default-checkbox label {
+    font-size: 1.05rem;
+    font-weight: 500;
+    color: #444;
+    cursor: pointer;
+  }
+
+  .submit-btn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 14px 40px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    width: 100%;
+    max-width: 300px;
+    margin: 0 auto;
+    display: block;
+    transition: var(--transition);
+    box-shadow: 0 4px 12px rgba(212,20,90,0.2);
+    cursor: pointer;
+  }
+
+  .submit-btn:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(212,20,90,0.3);
+  }
+
+  .error-msg {
+    color: #e74c3c;
+    font-size: 0.9rem;
+    margin-top: 6px;
+    display: block;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+  }
+
+  @media (max-width: 768px) {
+    .address-card {
+      padding: 25px;
+    }
+    .page-title {
+      font-size: 1.8rem;
+    }
+  }
+</style>
+
+<div class="address-container">
+  <h2 class="page-title">Add New Address</h2>
+
+  <div class="address-card">
+    <form id="addressForm" action="/addAddress" method="POST">
+      <div class="form-row">
+        <div class="form-group">
+          <input type="text" class="form-control" id="addressType" name="addressType" placeholder=" " required>
+          <label for="addressType" class="form-label">Address Type (Home/Work/Other)</label>
+          <div id="addressType-error" class="error-msg"></div>
+        </div>
+
+        <div class="form-group">
+          <input type="text" class="form-control" id="name" name="name" placeholder=" " required>
+          <label for="name" class="form-label">Full Name</label>
+          <div id="name-error" class="error-msg"></div>
+        </div>
+
+        <div class="form-group">
+          <input type="text" class="form-control" id="city" name="city" placeholder=" " required>
+          <label for="city" class="form-label">City</label>
+          <div id="city-error" class="error-msg"></div>
+        </div>
+
+        <div class="form-group">
+          <input type="text" class="form-control" id="landMark" name="landMark" placeholder=" " required>
+          <label for="landMark" class="form-label">Landmark</label>
+          <div id="landMark-error" class="error-msg"></div>
+        </div>
+
+        <div class="form-group">
+          <input type="text" class="form-control" id="state" name="state" placeholder=" " required>
+          <label for="state" class="form-label">State</label>
+          <div id="state-error" class="error-msg"></div>
+        </div>
+
+        <div class="form-group">
+          <input type="number" class="form-control" id="pincode" name="pincode" placeholder=" " required>
+          <label for="pincode" class="form-label">Pincode</label>
+          <div id="pincode-error" class="error-msg"></div>
+        </div>
+
+        <div class="form-group">
+          <input type="number" class="form-control" id="phone" name="phone" placeholder=" " required>
+          <label for="phone" class="form-label">Phone Number</label>
+          <div id="phone-error" class="error-msg"></div>
+        </div>
+
+        <div class="form-group">
+          <input type="number" class="form-control" id="altPhone" name="altPhone" placeholder=" " required>
+          <label for="altPhone" class="form-label">Alternate Phone</label>
+          <div id="altPhone-error" class="error-msg"></div>
+        </div>
+      </div>
+
+      <!-- Set as Default Checkbox -->
+      <div class="default-checkbox">
+        <input type="checkbox" id="isDefault" name="isDefault">
+        <label for="isDefault">Set this as my default address</label>
+      </div>
+
+      <button type="submit" id="submitButton" class="submit-btn">
+        Save Address
+      </button>
+    </form>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+  document.getElementById('addressForm').addEventListener('submit', function(event) {
+    if (!validateForm()) {
+      event.preventDefault();
+    }
+  });
+
+  function validateForm() {
+    let isValid = true;
+    const fields = [
+      { id: "addressType", name: "Address Type" },
+      { id: "name", name: "Full Name" },
+      { id: "city", name: "City" },
+      { id: "landMark", name: "Landmark" },
+      { id: "state", name: "State" },
+      { id: "pincode", name: "Pincode" },
+      { id: "phone", name: "Phone Number" },
+      { id: "altPhone", name: "Alternate Phone" }
+    ];
+
+    fields.forEach(field => {
+      const input = document.getElementById(field.id);
+      const value = input.value.trim();
+      const errorElement = document.getElementById(field.id + '-error');
+
+      // Clear previous error
+      if (errorElement) errorElement.textContent = '';
+
+      if (!value) {
+        if (!errorElement) {
+          const err = document.createElement('div');
+          err.id = field.id + '-error';
+          err.className = 'error-msg';
+          err.textContent = `${field.name} is required.`;
+          input.parentNode.appendChild(err);
+        } else {
+          errorElement.textContent = `${field.name} is required.`;
+        }
+        isValid = false;
+      }
+    });
+
+    // Additional validations
+    const name = document.getElementById('name').value.trim();
+    const city = document.getElementById('city').value.trim();
+    const landMark = document.getElementById('landMark').value.trim();
+    const state = document.getElementById('state').value.trim();
+    const pincode = document.getElementById('pincode').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    const altPhone = document.getElementById('altPhone').value.trim();
+
+    const alphaPattern = /^[A-Za-z\s]+$/;
+    const pinPattern = /^\d{6}$/;
+    const phonePattern = /^\d{10}$/;
+
+    if (name && !alphaPattern.test(name)) {
+      Swal.fire({ icon: 'error', title: 'Invalid Name', text: 'Name should contain alphabets only.' });
+      isValid = false;
+    }
+    if (city && !alphaPattern.test(city)) {
+      Swal.fire({ icon: 'error', title: 'Invalid City', text: 'City should contain alphabets only.' });
+      isValid = false;
+    }
+    if (landMark && !alphaPattern.test(landMark)) {
+      Swal.fire({ icon: 'error', title: 'Invalid Landmark', text: 'Landmark should contain alphabets only.' });
+      isValid = false;
+    }
+    if (state && !alphaPattern.test(state)) {
+      Swal.fire({ icon: 'error', title: 'Invalid State', text: 'State should contain alphabets only.' });
+      isValid = false;
+    }
+    if (pincode && !pinPattern.test(pincode)) {
+      Swal.fire({ icon: 'error', title: 'Invalid Pincode', text: 'Pincode must be exactly 6 digits.' });
+      isValid = false;
+    }
+    if (phone && !phonePattern.test(phone)) {
+      Swal.fire({ icon: 'error', title: 'Invalid Phone', text: 'Phone number must be exactly 10 digits.' });
+      isValid = false;
+    }
+    if (altPhone && !phonePattern.test(altPhone)) {
+      Swal.fire({ icon: 'error', title: 'Invalid Alternate Phone', text: 'Alternate phone must be exactly 10 digits.' });
+      isValid = false;
+    }
+    if (phone && altPhone && phone === altPhone) {
+      Swal.fire({ icon: 'error', title: 'Duplicate Phone', text: 'Phone and Alternate Phone cannot be the same.' });
+      isValid = false;
+    }
+
+    return isValid;
+  }
+</script>
+
+<%- include("../../views/partials/user/footer") %>

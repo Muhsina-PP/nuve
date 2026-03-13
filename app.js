@@ -42,16 +42,6 @@ app.use(injectedUser)
 app.use("/", userRoutes)
 app.use("/admin", adminRoutes)
 
-//404 router
-// app.use((req,res,next) =>{
-//   res.status(404).render('page-404')
-// })
-// app.use((err, req, res, next) =>{
-//   console.log('SERVER ERROR : ',err);
-//   res.status(404).render('page-404')
-// })
-
-
 app.listen(process.env.PORT, ()=>{
   console.log(`Server running on 3000`);
 })
