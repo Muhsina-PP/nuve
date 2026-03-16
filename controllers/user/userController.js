@@ -273,8 +273,8 @@ const loadShopPage = async (req, res) =>{
     // filter values
     const selectedCategory = req.query.category?.trim()
     const selectedBrand = req.query.brand?.trim()
-    const minPrice = parseInt(req.query.minPrice)
-    const maxPrice = parseInt(req.query.maxPrice)
+    const minPrice = req.query.minPrice ? Number(req.query.minPrice) : undefined;
+    const maxPrice = req.query.maxPrice ? Number(req.query.maxPrice) : undefined;
 
 
     // query object 
@@ -293,11 +293,11 @@ const loadShopPage = async (req, res) =>{
       query.brand = selectedBrand
     }
 
-    if(minPrice && maxPrice){
-      query.salePrice = {$gte:minPrice,$lte:maxPrice}
+    if(minPrice !== undefined && maxPrice !== undefined){
+      query.salePrice = { $gte: minPrice, $lte: maxPrice }
     }
 
-    if(minPrice && !maxPrice){
+    else if(minPrice !== undefined && maxPrice === undefined){
       query.salePrice = { $gte: minPrice }
     }
 

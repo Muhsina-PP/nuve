@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const userController = require("../controllers/user/userController");
 const profileController = require("../controllers/user/profileController")
+const productController = require("../controllers/user/productController")
 const {userAuth , adminAuth} = require("../middlewares/auth")
 const passport = require("passport");
 const { ProfilingLevel } = require("mongodb");
@@ -69,6 +70,9 @@ router.post("/addAddress", userAuth, profileController.addAddress)
 router.get("/editAddress/:id", userAuth, profileController.getEditAddress)
 router.post("/editAddress", userAuth, profileController.editAddress)
 router.get("/deleteAddress/:id", userAuth, profileController.deleteAddress)
+
+// Product management
+router.get("/productDetails", userAuth, productController.productDetails)
 
 
 
