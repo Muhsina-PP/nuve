@@ -3,7 +3,11 @@ const router = express.Router();
 const userController = require("../controllers/user/userController");
 const profileController = require("../controllers/user/profileController")
 const productController = require("../controllers/user/productController")
+const cartController = require("../controllers/user/cartController")
+const checkoutController = require("../controllers/user/checkoutController")
 const {userAuth , adminAuth} = require("../middlewares/auth")
+const wishlistController = require("../controllers/user/wishlistController")
+const orderController = require("../controllers/user/orderController")
 const passport = require("passport");
 const { ProfilingLevel } = require("mongodb");
 const multer = require("multer")
@@ -65,6 +69,7 @@ router.get("/change-password", userAuth, profileController.getChangePassword)
 router.post("/change-password", userAuth, profileController.changePassword)
 
 // Address management
+
 router.get("/addAddress", userAuth, profileController.getAddAddress)
 router.post("/addAddress", userAuth, profileController.addAddress)
 router.get("/editAddress/:id", userAuth, profileController.getEditAddress)
@@ -74,6 +79,31 @@ router.get("/deleteAddress/:id", userAuth, profileController.deleteAddress)
 // Product management
 router.get("/productDetails", userAuth, productController.productDetails)
 
+// Wishlist management
+router.get("/wishlist",userAuth,wishlistController.loadWishlist)
+router.post('/addToWishlist',userAuth, wishlistController.addToWishlist)
+router.get('/removeFromWishlist', userAuth, wishlistController.removeFromWishlist)
 
+// Cart management
+router.get("/cart", userAuth, cartController.loadCart)
+router.post("/addToCart", userAuth, cartController.addToCart);
+router.get('/updateCart', userAuth, cartController.updateCart);
+router.get("/removeFromCart",userAuth, cartController.removeFromCart);
+
+
+// Checkout management
+router.get("/checkout", userAuth, checkoutController.loadCheckoutPage )
+router.post("/deleteAddress", userAuth, checkoutController.deleteAddress)
+router.post("/placeOrder", userAuth, checkoutController.placeOrder)
+router.get("/orderSuccess", userAuth, checkoutController.orderSuccess)
+
+
+// Order management
+router.get("/orders", userAuth, orderController.loadOrders)
+router.get("/order-details/:id", userAuth, orderController.loadOrderDetails)
+router.get("/download-invoice/:id", userAuth, orderController.downloadInvoice);
+router.post("/cancel-full-order", userAuth, orderController.cancelFullOrder);
+router.post("/cancel-order", userAuth, orderController.cancelSingleItem);
+router.patch("/return-item",userAuth, orderController.returnOrder)
 
 module.exports = router;

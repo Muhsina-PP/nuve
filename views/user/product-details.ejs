@@ -1,6 +1,8 @@
 <%- include("../../views/partials/user/header") %>
 
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <style>
   :root {
@@ -255,6 +257,92 @@
     background: var(--border);
     margin: 18px 0;
   }
+
+  /* wishlist */
+  /* Wishlist Button - Top Right Corner */
+  .nuve-wishlist-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: #fff;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    border: 1px solid #eee;
+    font-size: 14px;
+    color: #aaa;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  }
+
+  .nuve-wishlist-btn:hover {
+    background: #d4145a;
+    color: #fff;
+    border-color: #d4145a;
+    transform: scale(1.1);
+  }
+.wishlist-top-right {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    z-index: 999;
+    color: #a81049;
+}
+
+.wishlist-btn-top {
+    width: 42px;
+    height: 42px;
+    background: white;
+    border: 1px solid #eee;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.35rem;
+    color: #666;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.wishlist-btn-top:hover {
+    background: #fff0f5;
+    border-color: #d4145a;
+    transform: scale(1.08);
+    box-shadow: 0 4px 12px rgba(212, 20, 90, 0.15);
+}
+
+.wishlist-btn-top.active {
+    color: #d4145a;
+    background: #fff0f5;
+    border-color: #d4145a;
+}
+
+.wishlist-btn-top i {
+    transition: all 0.2s ease;
+}
+
+/* Optional: Heart fill animation */
+.wishlist-btn-top .fas {
+    animation: heartPop 0.3s ease;
+}
+
+@keyframes heartPop {
+    0% { transform: scale(0.8); }
+    50% { transform: scale(1.3); }
+    100% { transform: scale(1); }
+}
+
+/* Make info-col position relative so absolute positioning works */
+.info-col {
+    position: relative;
+    padding: 20px 25px;
+    overflow: visible;
+}
 
   /* Price */
   .price-row {
@@ -626,6 +714,12 @@
 
     <!-- ── Info Column ── -->
     <div class="info-col">
+      <!-- Wishlist Icon - Top Right Corner -->
+      <div class="wishlist-top-right">
+          <div class="nuve-wishlist-btn" onclick="addToWishlist('<%= product._id %>')">
+                <i class="far fa-heart"></i>
+              </div>
+      </div>
       <div class="info-brand"><%= product.brand?.brandName || 'NUVE' %></div>
       <h1 class="info-title"><%= product.productName %></h1>
 
@@ -700,7 +794,7 @@
       <!-- Action Buttons -->
       <div class="action-row">
         <% if(stockStatus === "Available"){ %>
-          <button class="btn-cart" id="cartBtn" onclick="handleCart()">
+          <button class="btn-cart" id="cartBtn" onclick="addToCart('<%= product._id %>')">
             <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
             Add to Cart
           </button>
@@ -709,7 +803,7 @@
             Buy Now
           </button>
         <% } else { %>
-          <button class="btn-cart" disabled>Add to Cart</button>
+          <button class="btn-cart"  disabled>Add to Cart</button>
           <button class="btn-buy" disabled>Buy Now</button>
         <% } %>
         <button class="btn-wish" id="wishBtn" onclick="toggleWishlist()">
@@ -803,6 +897,7 @@
   </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
 <script>
 
 let selectedSize = null;
@@ -986,6 +1081,93 @@ function switchTab(btn, panelId) {
   btn.classList.add('active');
   document.getElementById(panelId).classList.add('active');
 }
+
+function addToCart(productId ){
+
+
+   if (!requireSize()) return;
+  const qty = document.getElementById('quantity').value;
+  // TODO: wire up to your actual add-to-cart endpoint
+  // e.g. fetch('/cart/add', { method:'POST', body: JSON.stringify({ productId, size: selectedSize, qty }) })
+  console.log('Add to cart →', { size: selectedSize, qty });
+  // Visual feedback
+  const btn = document.getElementById('cartBtn');
+  btn.textContent = '✓ Added!';
+  setTimeout(() => {
+    btn.innerHTML = `<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg> Add to Cart`;
+  }, 1800);
+
+    let selectedBtn = document.querySelector('.size-btn.selected');
+
+  $.ajax({
+    url: '/addToCart',
+    method: 'POST',
+    data: { productId, selectedVariant : selectedBtn.textContent.trim(), quantity : qty},
+
+    success: (res) => {
+      if(res.success){
+        Swal.fire('Added!', res.message, 'success')
+      }else {
+        Swal.fire('Oops!', res.message, 'error');
+      }
+    }
+  })
+}
+
+
+   function addToWishlist(productId){
+    if (!requireSize()) return;
+      const qty = document.getElementById('quantity').value;
+      // TODO: wire up to your actual add-to-cart endpoint
+      // e.g. fetch('/cart/add', { method:'POST', body: JSON.stringify({ productId, size: selectedSize, qty }) })
+      console.log('Add to cart →', { size: selectedSize, qty });
+      // Visual feedback
+      const btn = document.getElementById('cartBtn');
+      btn.textContent = '✓ Added!';
+      setTimeout(() => {
+        btn.innerHTML = `<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg> Add to Cart`;
+      }, 1800);
+
+        let selectedBtn = document.querySelector('.size-btn.selected');
+
+    $.ajax({
+      url :'/addToWishlist',
+      method : 'POST',
+      data : {productId : productId,  variant : selectedBtn.textContent.trim()},
+      success : (response)=>{
+        if(response.success){
+          Swal.fire({
+            title: response.message,
+            icon: 'success',
+            timer: 2000
+          })
+        }else if(response.alreadyExists){
+          Swal.fire({
+            title: response.message,
+            icon: 'warning',
+            timer: 2000
+          })
+        }else {
+          Swal.fire({
+            title: 'Already in wishlist',
+            text: response.message,
+            icon: 'warning',
+            timer: 2000
+          })
+        }
+      },
+      error : (error)=>{
+        Swal.fire({
+          title : 'Error',
+          text :'An error occured while adding item to wishlist',
+          icon : 'error',
+          timer : 1500,
+        })
+        console.log('Error  while adding item to wishlist : ',error)
+      } 
+    })
+  }
+
 </script>
 
 <%- include("../../views/partials/user/footer") %>

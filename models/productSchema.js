@@ -62,6 +62,10 @@ const productSchema = new Schema({
     type: Boolean,
     default: false
   },
+  isListed: {
+    type: Boolean,
+    default: true
+  },
 
   rating: {
     type: Number,

@@ -1,0 +1,482 @@
+<%-include("../../views/partials/user/header")%>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Orders</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Sora:wght@600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --pink: #d4145a;
+      --pink-light: #fbeaf0;
+      --pink-mid: #f4c0d1;
+      --pink-dark: #a81049;
+      --green: #2e7d32;
+      --green-bg: #e8f5e9;
+      --text: #222;
+      --muted: #aaa;
+      --border: #f0f0f0;
+      --bg: #f4f4f4;
+      --white: #fff;
+      --radius: 12px;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── BREADCRUMB ── */
+    .breadcrumb-bar { background: var(--white); border-bottom: 1px solid #eee; padding: 12px 5%; }
+    .breadcrumb { font-size: 13px; color: var(--muted); display: flex; gap: 6px; align-items: center; list-style: none; }
+    .breadcrumb a { color: var(--pink); text-decoration: none; }
+    .breadcrumb span { color: #ddd; }
+
+    /* ── PAGE WRAP ── */
+    .page-wrap { max-width: 1200px; margin: 0 auto; padding: 30px 5%; }
+
+    /* ── PAGE HEADING ── */
+    .page-heading { margin-bottom: 24px; }
+    .page-heading h1 {
+      font-family: 'Sora', sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    .page-heading p { font-size: 13px; color: var(--muted); }
+
+    /* ── FILTERS BAR ── */
+    .filters-bar {
+      background: var(--white);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      padding: 18px 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .search-box {
+      position: relative;
+      flex: 1;
+      min-width: 240px;
+    }
+    .search-box input {
+      width: 100%;
+      padding: 10px 40px 10px 16px;
+      border: 1px solid #eee;
+      border-radius: 50px;
+      font-size: 13px;
+      font-family: 'DM Sans', sans-serif;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .search-box input:focus { border-color: var(--pink); }
+    .search-box input::placeholder { color: var(--muted); }
+    .search-box i {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      font-size: 13px;
+      pointer-events: none;
+    }
+
+    .filter-select {
+      padding: 10px 16px;
+      border: 1px solid #eee;
+      border-radius: 50px;
+      font-size: 13px;
+      font-family: 'DM Sans', sans-serif;
+      color: var(--text);
+      background: var(--white);
+      cursor: pointer;
+      outline: none;
+      transition: border-color 0.2s;
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23aaa' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 32px;
+    }
+    .filter-select:focus { border-color: var(--pink); }
+    .filters-bar {
+  background: #f8f9fa;
+  padding: 16px 20px;
+  border-radius: 12px;
+}
+
+.filters-bar form {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap; /* makes it responsive */
+}
+
+/* Search box */
+.search-box {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.search-box input {
+  padding: 10px 36px 10px 14px;
+  border-radius: 25px;
+  border: 1px solid #ddd;
+  min-width: 260px;
+}
+
+.search-box i {
+  position: absolute;
+  right: 12px;
+  color: #888;
+}
+
+/* Clear button */
+.clear-btn {
+  margin-left: 10px;
+  font-size: 14px;
+  color: #a81049;
+  text-decoration: none;
+}
+
+/* Dropdowns */
+.filter-select {
+  padding: 10px 14px;
+  border-radius: 25px;
+  border: 1px solid #ddd;
+  background: #fff;
+  cursor: pointer;
+}
+
+    /* ── TABLE CARD ── */
+    .table-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .table-wrap { overflow-x: auto; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 700px;
+    }
+
+    thead {
+      background: var(--pink-light);
+      border-bottom: 2px solid var(--pink-mid);
+    }
+
+    th {
+      padding: 14px 16px;
+      text-align: left;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--pink);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      white-space: nowrap;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background 0.18s;
+    }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: #fffafc; }
+
+    td {
+      padding: 16px;
+      vertical-align: middle;
+      font-size: 14px;
+    }
+
+    .order-id {
+      font-family: 'Sora', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--pink);
+    }
+
+    .user-name { font-weight: 500; color: var(--text); }
+
+    .order-date { font-size: 13px; color: var(--muted); white-space: nowrap; }
+    .order-date i { color: var(--pink); margin-right: 4px; font-size: 11px; }
+
+    /* ── STATUS BADGE ── */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 12px;
+      border-radius: 50px;
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .status-badge::before {
+      content: '';
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+      display: inline-block;
+    }
+    .status-pending    { background: #fff8e1; color: #f57f17; }
+    .status-processing { background: #e3f2fd; color: #1565c0; }
+    .status-shipped    { background: #ede7f6; color: #4527a0; }
+    .status-delivered  { background: var(--green-bg); color: var(--green); }
+    .status-cancelled  { background: #fce4ec; color: #c62828; }
+    .status-returned   { background: #f3e5f5; color: #6a1b9a; }
+
+    .items-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: var(--pink-light);
+      color: var(--pink);
+      padding: 4px 12px;
+      border-radius: 50px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .items-pill i { font-size: 10px; }
+
+    .price-val {
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--text);
+    }
+    .price-val::before { content: '₹'; font-size: 12px; color: var(--muted); margin-right: 1px; }
+
+    /* ── ACTION BUTTONS ── */
+    .action-btn-view {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 7px 16px;
+      background: var(--pink);
+      color: #fff;
+      border-radius: 50px;
+      font-size: 12px;
+      font-weight: 600;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .action-btn-view:hover { background: var(--pink-dark); }
+
+    /* ── EMPTY STATE ── */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+    }
+    .empty-icon {
+      width: 64px; height: 64px;
+      background: var(--pink-light);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 16px;
+      font-size: 24px; color: var(--pink);
+    }
+    .empty-title { font-size: 18px; font-weight: 600; color: #333; margin-bottom: 6px; }
+    .empty-sub   { font-size: 13px; color: var(--muted); }
+
+    /* ── PAGINATION ── */
+    .pagination {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 0 4px;
+    }
+    .page-btn {
+      width: 36px; height: 36px;
+      display: flex; align-items: center; justify-content: center;
+      border: 1px solid #eee;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #555;
+      background: var(--white);
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .page-btn:hover { border-color: var(--pink); color: var(--pink); }
+    .page-btn.active { background: var(--pink); color: #fff; border-color: var(--pink); }
+    .page-btn.disabled { opacity: 0.4; pointer-events: none; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      .filters-bar { flex-direction: column; align-items: stretch; }
+      .search-box  { min-width: auto; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- BREADCRUMB -->
+  <div class="breadcrumb-bar">
+    <ol class="breadcrumb">
+      <li><a href="/">Home</a></li>
+      <li><span>&#9656;</span></li>
+      <li><a href="/orders">My Orders</a></li>
+    </ol>
+  </div>
+
+  <div class="page-wrap">
+
+    <!-- HEADING -->
+    <div class="page-heading">
+      <h1><i class="fas fa-shopping-bag" style="color:var(--pink);margin-right:8px;font-size:18px;"></i>My Orders</h1>
+      <p>Track and manage all your orders</p>
+    </div>
+
+    <!-- FILTERS -->
+    <div class="filters-bar">
+      <form method="GET" action="/orders">
+      <div class="search-box">
+        <input type="text" id="searchInput" name="search" value="<%= search %>" placeholder="Search by Order ID or customer name…"/>
+        <i class="fas fa-search"></i>
+      </div>
+      <a href="/orders" class="clear-btn">Clear</a>
+      
+
+        <select name="status" class="filter-select" onchange="this.form.submit()">
+          <option value="">All Statuses</option>
+          <option value="Pending" <%= selectedStatus === "Pending" ? "selected" : "" %>>Pending</option>
+          <option value="Processing" <%= selectedStatus === "Processing" ? "selected" : "" %>>Processing</option>
+          <option value="Shipped" <%= selectedStatus === "Shipped" ? "selected" : "" %>>Shipped</option>
+          <option value="Delivered" <%= selectedStatus === "Delivered" ? "selected" : "" %>>Delivered</option>
+          <option value="Cancelled" <%= selectedStatus === "Cancelled" ? "selected" : "" %>>Cancelled</option>
+          <option value="Returned" <%= selectedStatus === "Returned" ? "selected" : "" %>>Returned</option>
+        </select>
+
+        <select name="date" class="filter-select" onchange="this.form.submit()">
+          <option value="">All Dates</option>
+          <option value="today" <%= selectedDate === "today" ? "selected" : "" %>>Today</option>
+          <option value="week" <%= selectedDate === "week" ? "selected" : "" %>>This Week</option>
+          <option value="month" <%= selectedDate === "month" ? "selected" : "" %>>This Month</option>
+        </select>
+      </form>
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-card">
+      <div class="table-wrap">
+        <table id="ordersTable">
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>Customer</th>
+              <th>Order Date</th>
+              <th>Status</th>
+              <th>Items</th>
+              <th>Total</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% orders.forEach(order =>{  %>
+            <!-- SAMPLE ROWS — replace with EJS forEach loop -->
+
+            <tr>
+              <td><span class="order-id">#<%= order.orderId.slice(0,8).toUpperCase() %></span></td>
+              <td><span class="user-name"><%= order.address.name %></span></td>
+              <td class="order-date"><i class="far fa-calendar-alt"></i><%= new Date(order.createdOn).toLocaleDateString() %></td>
+              <td><span class="status-badge status-shipped"><%= order.status %></span></td>
+              <td><span class="items-pill"><i class="fas fa-box"></i><%= order.orderedItems.length %> items</span></td>
+              <td><span class="price-val"><%= order.finalAmount %></span></td>
+              <td><a href="/order-details/<%= order._id %>" class="action-btn-view"><i class="far fa-eye"></i> View</a></td>
+            </tr>
+
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- EMPTY STATE (shown via JS when no rows match) -->
+      <div class="empty-state" id="emptyState" style="display:none;">
+        <div class="empty-icon"><i class="fas fa-shopping-bag"></i></div>
+        <div class="empty-title">No orders found</div>
+        <div class="empty-sub">Try adjusting your search or filters.</div>
+      </div>
+    </div>
+
+    <!-- PAGINATION -->
+    <div class="pagination">
+
+        <a href="/orders?page=<%= currentPage - 1 %>" 
+          class="page-btn <%= currentPage === 1 ? 'disabled' : '' %>">
+          <i class="fas fa-chevron-left"></i>
+        </a>
+
+        <% for (let i = 1; i <= totalPages; i++) { %>
+          <a href="/orders?page=<%= i %>" 
+            class="page-btn <%= currentPage === i ? 'active' : '' %>">
+            <%= i %>
+          </a>
+        <% } %>
+
+        <a href="/orders?page=<%= currentPage + 1 %>" 
+          class="page-btn <%= currentPage === totalPages ? 'disabled' : '' %>">
+          <i class="fas fa-chevron-right"></i>
+        </a>
+
+      </div>
+
+
+  </div><!-- /page-wrap -->
+
+  <script>
+    const searchInput  = document.getElementById('searchInput');
+    const statusFilter = document.getElementById('statusFilter');
+    const emptyState   = document.getElementById('emptyState');
+
+    function filterRows() {
+      const search = searchInput.value.toLowerCase();
+      const status = statusFilter.value.toLowerCase();
+      const rows   = document.querySelectorAll('#ordersTable tbody tr');
+      let visible  = 0;
+
+      rows.forEach(row => {
+        const id   = row.querySelector('.order-id')?.textContent.toLowerCase()  || '';
+        const name = row.querySelector('.user-name')?.textContent.toLowerCase() || '';
+        const st   = row.querySelector('.status-badge')?.textContent.trim().toLowerCase() || '';
+
+        const matchSearch = !search || id.includes(search) || name.includes(search);
+        const matchStatus = !status || st.includes(status);
+
+        if (matchSearch && matchStatus) { row.style.display = ''; visible++; }
+        else                            { row.style.display = 'none'; }
+      });
+
+      emptyState.style.display = visible === 0 ? 'block' : 'none';
+    }
+
+    searchInput.addEventListener('input',  filterRows);
+    statusFilter.addEventListener('change', filterRows);
+  </script>
+
+</body>
+</html>

@@ -394,7 +394,8 @@ const addAddress = async(req, res) =>{
       userAddress.address.push(newAddress)
       await userAddress.save()
     }
-    res.redirect("/userProfile?addsuccess=1")
+    // res.redirect("/userProfile?success=1")
+    res.json({ success: true });
   } catch (error) {
     console.log("Error adding address : ",error)
     res.status(500).json({
@@ -427,7 +428,7 @@ const getEditAddress = async (req, res) =>{
 const editAddress = async (req, res) =>{
   try {
     const userId = req.session.user;
-    const addressId = req.query.id;
+    const {addressId} = req.body;
     const {addressType, name, city, landMark, state, pincode, phone, altPhone, isDefault} = req.body;
     const addressData = await Address.findOne({userId : userId})
     const address = addressData.address.id(addressId)
@@ -448,7 +449,8 @@ const editAddress = async (req, res) =>{
       address.isDefault = true;
     }
     await addressData.save()
-    res.redirect("/userProfile?updatesuccess=1")
+    // res.redirect("/userProfile?updatesuccess=1")
+    res.json({ success: true });
     
   } catch (error) {
      console.log("Error updating address:", error)

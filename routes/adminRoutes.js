@@ -6,6 +6,7 @@ const categoryController = require("../controllers/admin/categoryController")
 const brandController = require("../controllers/admin/brandController")
 const productController = require("../controllers/admin/productController")
 const bannerController = require("../controllers/admin/bannerController")
+const orderController = require("../controllers/admin/orderController")
 const {userAuth , adminAuth} = require("../middlewares/auth");
 const { route } = require('./userRoutes');
 const multer = require("multer")
@@ -58,5 +59,13 @@ router.get("/banner", adminAuth, bannerController.getBannerPage)
 router.get("/addBanner", adminAuth, bannerController.getAddBannerPage)
 router.post("/addBanner", adminAuth, upload.single("image"), bannerController.addBanner)
 router.get("/deleteBanner", adminAuth, bannerController.deleteBanner)
+
+
+// Order management
+router.get("/orders", adminAuth,orderController.loadOrders )
+router.patch("/update-order-status/:orderId", adminAuth, orderController.updateOrderStatus);
+router.get("/order-details/:orderId", adminAuth, orderController.loadOrderDetails);
+router.get("/download-invoice/:id", adminAuth, orderController.downloadInvoice);
+
 
 module.exports = router

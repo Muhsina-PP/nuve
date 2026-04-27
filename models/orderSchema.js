@@ -13,9 +13,16 @@ const orderSchema = new Schema ({
       ref : "Product",
       required : true
     },
+     variant: {                 // ✅ ADD THIS
+      type: String,
+      required: true
+    },
     quantity : {
       type : Number,
       required : true
+    },
+    regularPrice :{
+      type : Number
     },
     price : {
       type : Number,
@@ -25,10 +32,10 @@ const orderSchema = new Schema ({
         type: String,
         enum: ["Ordered", "Cancelled","Delivered","Return Requested","Return Rejected","Return Approved", "Returned"],
         default: "Ordered"
-      },
-      returnReason: {
+    },
+    returnReason: {
         type: String 
-      },
+    },
   }],
   totalPrice : {
     type : Number,
@@ -71,7 +78,7 @@ const orderSchema = new Schema ({
       type : String,
       required : true
     },
-    altphone : {
+    altPhone : {
       type : String,
       required : true
     },

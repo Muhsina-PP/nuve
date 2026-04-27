@@ -47,10 +47,6 @@ const userSchema = new Schema ({
     type : String,
     default : "/img/hero/hero-2.jpg"
   },
-  wishlist : [{
-    type : Schema.Types.ObjectId,
-    ref : "Wishlist"
-  }],
   orderHistory : [{
     type : Schema.Types.ObjectId,
     ref : "Order"

@@ -147,49 +147,49 @@
     <form id="addressForm" action="/addAddress" method="POST">
       <div class="form-row">
         <div class="form-group">
-          <input type="text" class="form-control" id="addressType" name="addressType" placeholder=" " required>
+          <input type="text" class="form-control" id="addressType" name="addressType" placeholder=" " >
           <label for="addressType" class="form-label">Address Type (Home/Work/Other)</label>
           <div id="addressType-error" class="error-msg"></div>
         </div>
 
         <div class="form-group">
-          <input type="text" class="form-control" id="name" name="name" placeholder=" " required>
+          <input type="text" class="form-control" id="name" name="name" placeholder=" " >
           <label for="name" class="form-label">Full Name</label>
           <div id="name-error" class="error-msg"></div>
         </div>
 
         <div class="form-group">
-          <input type="text" class="form-control" id="city" name="city" placeholder=" " required>
+          <input type="text" class="form-control" id="city" name="city" placeholder=" " >
           <label for="city" class="form-label">City</label>
           <div id="city-error" class="error-msg"></div>
         </div>
 
         <div class="form-group">
-          <input type="text" class="form-control" id="landMark" name="landMark" placeholder=" " required>
+          <input type="text" class="form-control" id="landMark" name="landMark" placeholder=" " >
           <label for="landMark" class="form-label">Landmark</label>
           <div id="landMark-error" class="error-msg"></div>
         </div>
 
         <div class="form-group">
-          <input type="text" class="form-control" id="state" name="state" placeholder=" " required>
+          <input type="text" class="form-control" id="state" name="state" placeholder=" " >
           <label for="state" class="form-label">State</label>
           <div id="state-error" class="error-msg"></div>
         </div>
 
         <div class="form-group">
-          <input type="number" class="form-control" id="pincode" name="pincode" placeholder=" " required>
+          <input type="number" class="form-control" id="pincode" name="pincode" placeholder=" " >
           <label for="pincode" class="form-label">Pincode</label>
           <div id="pincode-error" class="error-msg"></div>
         </div>
 
         <div class="form-group">
-          <input type="number" class="form-control" id="phone" name="phone" placeholder=" " required>
+          <input type="number" class="form-control" id="phone" name="phone" placeholder=" " >
           <label for="phone" class="form-label">Phone Number</label>
           <div id="phone-error" class="error-msg"></div>
         </div>
 
         <div class="form-group">
-          <input type="number" class="form-control" id="altPhone" name="altPhone" placeholder=" " required>
+          <input type="number" class="form-control" id="altPhone" name="altPhone" placeholder=" " >
           <label for="altPhone" class="form-label">Alternate Phone</label>
           <div id="altPhone-error" class="error-msg"></div>
         </div>
@@ -210,11 +210,37 @@
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+
   document.getElementById('addressForm').addEventListener('submit', function(event) {
+    alert("hhiiii")
     if (!validateForm()) {
       event.preventDefault();
     }
+    const endpoint = addressId ? '/editAddress' : '/addAddress';
+
+  fetch(endpoint, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.success) {
+      Swal.fire({
+        icon: 'success',
+        title: addressId ? 'Address updated!' : 'Address added!',
+        timer: 1500,
+        showConfirmButton: false
+      }).then(() => location.reload());
+    } else {
+      Swal.fire({ icon: 'error', title: data.message || 'Something went wrong' });
+    }
+  })
+  .catch(() => {
+    Swal.fire({ icon: 'error', title: 'Network error' });
   });
+  });
+  
 
   function validateForm() {
     let isValid = true;

@@ -1,0 +1,336 @@
+<%- include("../../views/partials/admin/header") %>
+
+<style>
+  :root {
+    --primary: #d4145a;
+    --primary-dark: #a81049;
+    --light-bg: #f8f9fa;
+    --card-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    --transition: all 0.3s ease;
+  }
+
+  .content-main {
+    padding: 30px;
+    background-color: var(--light-bg);
+  }
+
+  .order-header {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: var(--card-shadow);
+    margin-bottom: 30px;
+  }
+
+  .order-id {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #333;
+  }
+
+  .status-badge {
+    padding: 8px 20px;
+    border-radius: 30px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .status-pending { background: #fff3cd; color: #856404; }
+  .status-shipped { background: #d1ecf1; color: #0c5460; }
+  .status-outfordelivery { background: #d4edda; color: #155724; }
+  .status-delivered { background: #d4edda; color: #155724; }
+  .status-cancelled { background: #f8d7da; color: #721c24; }
+
+  .card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: var(--card-shadow);
+    margin-bottom: 25px;
+  }
+
+  .card-header {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+    padding: 18px 25px;
+    border-radius: 12px 12px 0 0;
+    font-weight: 600;
+  }
+
+  .card-body {
+    padding: 25px;
+  }
+
+  .info-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .info-row:last-child {
+    border-bottom: none;
+  }
+
+  .info-label {
+    color: #666;
+    font-weight: 500;
+  }
+
+  .info-value {
+    font-weight: 600;
+    color: #333;
+  }
+
+  .product-item {
+    display: flex;
+    gap: 20px;
+    padding: 15px 0;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .product-item:last-child {
+    border-bottom: none;
+  }
+
+  .product-img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8px;
+  }
+
+  .btn-status {
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+  }
+
+  .btn-primary {
+    background: var(--primary);
+    color: white;
+    border: none;
+  }
+
+  .btn-primary:hover {
+    background: var(--primary-dark);
+  }
+
+  .return-section {
+    background: #fffaf0;
+    border: 1px solid #ffeaa7;
+    border-radius: 12px;
+    padding: 20px;
+  }
+</style>
+
+<section class="content-main">
+  <div class="order-header">
+    <div class="d-flex justify-content-between align-items-center">
+      <div>
+        <h2 class="order-id"><%= order.orderId.slice(0,8).toUpperCase() %></h2>
+        <p class="text-muted mb-0">Placed on <%= new Date(order.createdOn).toLocaleDateString() %></p>
+      </div>
+      <div>
+        <span class="status-badge status-pending"><%= order.status %></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <!-- Left Column: Order Details -->
+    <div class="col-lg-8">
+      <!-- Customer Information -->
+      <div class="card">
+        <div class="card-header">Customer Information</div>
+        <div class="card-body">
+          <div class="info-row">
+            <span class="info-label">Name</span>
+            <span class="info-value"><%= order.address.name %></span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Phone</span>
+            <span class="info-value"><%= order.address.phone %></span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Address</span>
+            <span class="info-value">
+              <%= order.address.addressType %>, 
+              <%= order.address.landMark %>, 
+              <%= order.address.city %>, 
+              <%= order.address.state %> - 
+              <%= order.address.pincode %>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Order Items -->
+      <div class="card">
+        <div class="card-header">Order Items (<%= order.orderedItems.length %>)</div>
+        <div class="card-body">
+          <% order.orderedItems.forEach(item =>{ %>
+          <div class="product-item">
+            <img src="/uploads/product-images/<%= item.product?.productImage?.[0] || 'https://via.placeholder.com/80' %>" alt="Product" class="product-img">
+            <div style="flex:1">
+              <h5><%= item.product?.productName || "Product" %></h5>
+              <p class="text-muted">
+                Size: <%= item.variant %> • 
+                Qty: <%= item.quantity %>
+              </p>
+            </div>
+            <div class="text-end">
+              <strong>₹<%= item.price %></strong>
+            </div>
+          </div>
+          <% }) %>
+        </div>
+      </div>
+
+      <!-- Return Request Section (if any) -->
+       <% 
+          const returnItems = order.orderedItems.filter(item => 
+            item.status === "Return Requested"
+          );
+        %>
+
+        <% if (returnItems.length > 0) { %>
+      <div class="return-section">
+        <h5>Return Request</h5>
+         <% returnItems.forEach(item => { %>
+          <div style="margin-bottom:15px;">
+            <p>
+              <strong>Product:</strong> 
+              <%= item.product?.productName || "Product" %>
+            </p>
+            <p>
+              <strong>Reason:</strong> 
+              <%= item.returnReason || "No reason provided" %>
+            </p>
+            <p>
+              <strong>Status:</strong> 
+              <%= item.status %>
+            </p>
+            <button 
+              class="btn btn-primary mt-2"
+              onclick="verifyReturn('<%= order._id %>', '<%= item._id %>')"
+            >
+              Accept Return & Refund
+            </button>
+
+          </div>
+          <hr>
+         <% }) %>
+      </div>
+      <% } %>
+    </div>
+
+    <!-- Right Column: Order Summary & Actions -->
+    <div class="col-lg-4">
+      
+      <%
+        const shipping = order.totalPrice < 999 ? 99 : 0;
+        const grandTotal = order.finalAmount + shipping; // or recompute if needed
+      %>
+
+      <div class="card">
+        <div class="card-header">Order Summary</div>
+        <div class="card-body">
+          <div class="info-row">
+            <span class="info-label">Order Total</span>
+            <span class="info-value">
+              ₹<%= order.totalPrice.toLocaleString("en-IN") %>
+            </span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Shipping</span>
+            <span class="info-value"><%= shipping === 0 ? "Free" : "₹" + shipping %></span>
+          </div>
+          <div class="info-row">
+            <span class="info-label"><strong>Grand Total</strong></span>
+            <span class="info-value">
+              <strong>₹<%= order.totalPrice - (order.discount || 0) + shipping %></strong>
+            </span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Payment Method</span>
+            <span class="info-value">Cash on Delivery</span>
+          </div>
+          <hr>
+          <div class="info-row">
+            <span class="info-label"><strong>Grand Total</strong></span>
+            <strong>₹<%= order.totalPrice - (order.discount || 0) + shipping %></strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- Change Status -->
+      <div class="card">
+        <div class="card-header">Update Order Status</div>
+        <div class="card-body">
+          <select class="form-control mb-3" id="statusSelect">
+            <option value="Pending">Pending</option>
+            <option value="Shipped">Shipped</option>
+            <option value="Out for Delivery">Out for Delivery</option>
+            <option value="Delivered">Delivered</option>
+            <option value="Cancelled">Cancelled</option>
+          </select>
+          <button class="btn btn-primary w-100" onclick="updateOrderStatus()">Update Status</button>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="card">
+        <div class="card-header">Actions</div>
+        <div class="card-body">
+          <button class="btn btn-sm btn-success w-100 mb-2" onclick="handleDownload()">Download Invoice</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+  function updateOrderStatus() {
+    const status = document.getElementById('statusSelect').value;
+    Swal.fire({
+      title: `Change status to ${status}?`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, Update'
+    }).then(result => {
+      if (result.isConfirmed) {
+        Swal.fire('Updated!', `Order status changed to ${status}`, 'success');
+      }
+    });
+  }
+
+  function verifyReturn() {
+    Swal.fire({
+      title: 'Accept Return?',
+      text: "This will refund the amount to user's wallet.",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, Accept & Refund'
+    }).then(result => {
+      if (result.isConfirmed) {
+        Swal.fire('Success!', 'Return accepted. Amount refunded to wallet.', 'success');
+      }
+    });
+  }
+
+
+  function handleDownload() {
+      const urlParts = window.location.pathname.split('/');
+      const orderId  = urlParts[urlParts.length - 1];
+      if (orderId) {
+        window.location.href = `/admin/download-invoice/${orderId}`;
+      } else {
+        Swal.fire({ icon: 'error', title: 'Order ID not found in URL', confirmButtonColor: '#d4145a' });
+      }
+    }
+</script>
+
+<%- include("../../views/partials/admin/footer") %>

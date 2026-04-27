@@ -1,6 +1,7 @@
 <%- include("../../views/partials/user/header") %>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <style>
   /* ── NUVE Shop Page ── */
@@ -584,10 +585,10 @@
                   alt="<%= products[i].productName %>"
                 />
               </a>
-              <span class="nuve-product-badge">NEW</span>
-              <div class="nuve-wishlist-btn" onclick="">
+              <!-- <span class="nuve-product-badge">NEW</span>
+              <div class="nuve-wishlist-btn" onclick="addToWishlist('<%= products[i]._id %>')">
                 <i class="far fa-heart"></i>
-              </div>
+              </div> -->
             </div>
 
             <div class="nuve-product-info">
@@ -599,7 +600,10 @@
                   <span class="nuve-price-original">₹<%= products[i].regularPrice %></span>
                 </div>
               </a>
-              <button class="nuve-add-cart-btn" onclick="">Add to Cart</button>
+              <% if (products[i].stockStatus === 'Out of stock') { %>
+                <p style="color:red; font-size: 15px; text-align: center;">Out of Stock</p>
+              <% } %>
+              <!-- <button class="nuve-add-cart-btn" onclick="addToCart('<%= products[i]._id %>')">Add to Cart</button> -->
             </div>
 
           </div>
@@ -643,6 +647,62 @@
       }
     });
   });
+
+   function addToWishlist(productId){
+    $.ajax({
+      url :'/addToWishlist',
+      method : 'POST',
+      data : {productId : productId},
+      success : (response)=>{
+        if(response.success){
+          Swal.fire({
+            title: response.message,
+            icon: 'success',
+            timer: 2000
+          })
+        }else if(response.alreadyExists){
+          Swal.fire({
+            title: response.message,
+            icon: 'warning',
+            timer: 2000
+          })
+        }else {
+          Swal.fire({
+            title: 'Already in wishlist',
+            text: response.message,
+            icon: 'warning',
+            timer: 2000
+          })
+        }
+      },
+      error : (error)=>{
+        Swal.fire({
+          title : 'Error',
+          text :'An error occured while adding item to wishlist',
+          icon : 'error',
+          timer : 1500,
+        })
+        console.log('Error  while adding item to wishlist : ',error)
+      } 
+    })
+  }
+
+  function addToCart(productId){
+  $.ajax({
+    url: '/addToCart',
+    method: 'POST',
+    data: { productId },
+
+    success: (res) => {
+      if(res.success){
+        Swal.fire('Added!', res.message, 'success')
+      }else {
+        Swal.fire('Oops!', res.message, 'error');
+      }
+    }
+  })
+}
 </script>
 
 <%- include("../../views/partials/user/footer") %>
+

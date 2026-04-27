@@ -51,13 +51,11 @@ const securePsssword = async (password) => {
 const loadHomepage = async (req, res) => {
   try {
     const user = req.session.user;
-   
     const today = new Date().toISOString();
     const findBanner = await Banner.find({
       startDate : {$lt: new Date(today)},
       endDate : {$gt: new Date(today)}
     })
-    console.log("Banner : ",findBanner);
     
     const categories = await Category.find({isListed : true});
     const productsData = await Product.find({
@@ -74,8 +72,6 @@ const loadHomepage = async (req, res) => {
     }else{
       res.render("home", {products : productsData, banner : findBanner || []})
     }
-
-    console.log("PRODUCTS : ", productsData)
 
   } catch (error) {
     console.log(`Error loading home page : `, error);
@@ -254,6 +250,106 @@ const logout = async (req,res) =>{
   }
 }
 
+// const loadShopPage = async (req, res) =>{
+//   try {
+//     const user = req.session.user;
+//     const userData = await User.findOne({_id : user})
+
+//     const categories = await Category.find({isListed : true})
+//     const brands = await Brand.find({isBlocked : false})
+    
+//     const categoryIds = categories.map((category) => category._id)
+
+//     const search = req.query.search || "";
+
+//     const page = parseInt(req.query.page) ||1;
+//     const limit = 6;
+//     const skip = (page-1) * limit;
+
+//     // filter values
+//     const selectedCategory = req.query.category?.trim()
+//     const selectedBrand = req.query.brand?.trim()
+//     const minPrice = req.query.minPrice ? Number(req.query.minPrice) : undefined;
+//     const maxPrice = req.query.maxPrice ? Number(req.query.maxPrice) : undefined;
+
+
+//     // query object 
+//     let query = {
+//       productName : {$regex : search, $options : 'i'},
+//       isBlocked : false,
+//       category : {$in : categoryIds},
+//       variants: { $elemMatch: { stock: { $gt: 0 } } }
+//     }
+
+//    if(selectedCategory){
+//       query.category = selectedCategory
+//     }
+
+//     if(selectedBrand){
+//       query.brand = selectedBrand
+//     }
+
+//     if(minPrice !== undefined && maxPrice !== undefined){
+//       query.salePrice = { $gte: minPrice, $lte: maxPrice }
+//     }
+
+//     else if(minPrice !== undefined && maxPrice === undefined){
+//       query.salePrice = { $gte: minPrice }
+//     }
+
+//      // sorting value
+//     const sort = req.query.sort || "";
+//     const sortOption = req.query.sort || ""
+//     let sortQuery = {_id : -1};
+
+//     if(sortOption === "priceLow"){
+//       sortQuery = {salePrice : 1}
+//     }
+//     else if(sortOption === "priceHigh"){
+//       sortQuery = {salePrice : -1}
+//     }
+//     else if(sortOption === "a-z"){
+//       sortQuery = {productName : 1}
+//     }
+//     else if(sortOption === "z-a"){
+//       sortQuery = {productName : -1}
+//     }
+
+//     const products = await Product.find(query)
+//     .populate('brand')
+//     .sort(sortQuery)
+//     .skip(skip)
+//     .limit(limit)
+    
+
+//     const totalProducts = await Product.countDocuments(query)
+//     const totalPages = Math.ceil(totalProducts / limit)
+//     const categoryWithIds = categories.map(category => ({ 
+//       _id : category._id,
+//       name : category.name
+//     }))
+
+//     res.render("shop",{
+//       user : userData,
+//       products : products ,
+//       category : categoryWithIds,
+//       brand : brands,
+//       totalProducts : totalProducts,
+//       currentPage : page,
+//       totalPages : totalPages,
+//       search : search,
+//       sortOption,
+//       selectedCategory,
+//       selectedBrand,
+//       minPrice,
+//       maxPrice,
+//       sort
+//     })
+//   } catch (error) {
+//     console.log("Cannot get shop page : ",error);
+//     res.redirect("/pageNotFound")
+//   }
+// }
 const loadShopPage = async (req, res) =>{
   try {
     const user = req.session.user;
@@ -281,8 +377,7 @@ const loadShopPage = async (req, res) =>{
     let query = {
       productName : {$regex : search, $options : 'i'},
       isBlocked : false,
-      category : {$in : categoryIds},
-      variants: { $elemMatch: { stock: { $gt: 0 } } }
+      category : {$in : categoryIds}
     }
 
    if(selectedCategory){
@@ -324,6 +419,14 @@ const loadShopPage = async (req, res) =>{
     .sort(sortQuery)
     .skip(skip)
     .limit(limit)
+
+    const productsWithStockStatus  = products.map( p => {
+      const totalStock = p.variants.reduce((sum,v)=>sum+v.stock,0);
+      return{
+        ...p._doc,
+        stockStatus:totalStock === 0 ? 'Out of stock' : 'Available'
+      }
+    })
     
 
     const totalProducts = await Product.countDocuments(query)
@@ -335,7 +438,7 @@ const loadShopPage = async (req, res) =>{
 
     res.render("shop",{
       user : userData,
-      products : products ,
+      products : productsWithStockStatus ,
       category : categoryWithIds,
       brand : brands,
       totalProducts : totalProducts,
