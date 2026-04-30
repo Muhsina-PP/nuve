@@ -123,6 +123,46 @@
     border-radius: 12px;
     padding: 20px;
   }
+  .item-status {
+  display: inline-block;
+  margin-top: 4px;
+  padding: 3px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: 20px;
+  text-transform: capitalize;
+}
+
+/* Status colors */
+.item-status.pending {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.item-status.processing {
+  background-color: #d1ecf1;
+  color: #0c5460;
+}
+
+.item-status.shipped {
+  background-color: #cce5ff;
+  color: #004085;
+}
+
+.item-status.delivered {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.item-status.cancelled {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.item-status.returned {
+  background-color: #e2e3e5;
+  color: #383d41;
+}
 </style>
 
 <section class="content-main">
@@ -179,7 +219,11 @@
                 Size: <%= item.variant %> • 
                 Qty: <%= item.quantity %>
               </p>
+              <p class="item-status <%= item.status?.toLowerCase() %>">
+                <%= item.status %>
+              </p>
             </div>
+           
             <div class="text-end">
               <strong>₹<%= item.price %></strong>
             </div>
@@ -266,7 +310,7 @@
       </div>
 
       <!-- Change Status -->
-      <div class="card">
+      <!-- <div class="card">
         <div class="card-header">Update Order Status</div>
         <div class="card-body">
           <select class="form-control mb-3" id="statusSelect">
@@ -278,7 +322,7 @@
           </select>
           <button class="btn btn-primary w-100" onclick="updateOrderStatus()">Update Status</button>
         </div>
-      </div>
+      </div> -->
 
       <!-- Actions -->
       <div class="card">
@@ -307,7 +351,7 @@
     });
   }
 
-  function verifyReturn() {
+  function verifyReturn(orderId, itemId) {
     Swal.fire({
       title: 'Accept Return?',
       text: "This will refund the amount to user's wallet.",
@@ -316,7 +360,25 @@
       confirmButtonText: 'Yes, Accept & Refund'
     }).then(result => {
       if (result.isConfirmed) {
-        Swal.fire('Success!', 'Return accepted. Amount refunded to wallet.', 'success');
+
+        fetch('/admin/verifyReturn', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ orderId, itemId })
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            Swal.fire('Success!', 'Return accepted & refunded.', 'success')
+              .then(() => location.reload());
+          } else {
+            Swal.fire('Error!', data.message, 'error');
+          }
+        })
+        .catch(() => {
+          Swal.fire('Error!', 'Network error', 'error');
+        });
+
       }
     });
   }

@@ -69,7 +69,6 @@ router.get("/change-password", userAuth, profileController.getChangePassword)
 router.post("/change-password", userAuth, profileController.changePassword)
 
 // Address management
-
 router.get("/addAddress", userAuth, profileController.getAddAddress)
 router.post("/addAddress", userAuth, profileController.addAddress)
 router.get("/editAddress/:id", userAuth, profileController.getEditAddress)

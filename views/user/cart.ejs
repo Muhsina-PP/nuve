@@ -314,7 +314,7 @@
             const discountPct = Math.round(((regularPrice - salePrice) / regularPrice) * 100);
           %>
 
-          <div class="cart-item">
+          <div class="cart-item"  data-id="<%= item.productId._id %>">
 
             <img
               src="/uploads/product-images/<%= item.productId.productImage?.[0] %>"
@@ -344,18 +344,13 @@
               </div>
               <div class="qty-row">
                 <span class="qty-label">Quantity:</span>
-                <!-- <div class="qty-ctrl">
-                  <button class="qty-btn"
-                  onclick="updateQty('<%= item.productId._id %>', '<%= item.variant %>', -1, this)">−</button>
-                  <input class="qty-val" value="<%= quantity %>" >
-                  <button class="qty-btn"
-                  onclick="updateQty('<%= item.productId._id %>', '<%= item.variant %>', 1, this)">+</button>
-                </div> -->
+
 
                 <div class="qty-ctrl">
                 <button class="qty-btn"
                   <% if(item.isOutOfStock){ %> disabled <% } %>
-                  onclick="updateQty('<%= item.productId._id %>', '<%= item.variant %>', -1, this)">
+                  onclick="updateQty('<%= item.productId._id %>', '<%= item.variant %>', -1, this, <%= salePrice %>
+                  )">
                   −
                 </button>
 
@@ -366,7 +361,7 @@
 
                 <button class="qty-btn"
                   <% if(item.isOutOfStock){ %> disabled <% } %>
-                  onclick="updateQty('<%= item.productId._id %>', '<%= item.variant %>', 1, this)">
+                  onclick="updateQty('<%= item.productId._id %>', '<%= item.variant %>', 1, this, <%= salePrice %>)">
                   +
                 </button>
               </div>
@@ -420,7 +415,7 @@
 
         <div class="summary-row">
           <span>Price (<%= cartItems.length %> items)</span>
-          <span>₹<%= totalMRP.toLocaleString('en-IN') %></span>
+          <span class="cart-mrp">₹<%= totalMRP.toLocaleString('en-IN') %></span>
         </div>
         <div class="summary-row discount">
           <span>Discount</span>
@@ -440,7 +435,7 @@
 
         <div class="summary-row total">
           <span>Total Amount</span>
-          <span>₹<%= grandTotal.toLocaleString('en-IN') %></span>
+          <span class="grand-total">₹<%= grandTotal.toLocaleString('en-IN') %></span>
         </div>
 
         <a href="/checkout" class="checkout-btn">Proceed to Checkout</a>
@@ -459,11 +454,10 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-  function updateQty(itemId, variant, change, btn) {
+  function updateQty(itemId, variant, change, btn, price) {
     const input = btn.parentElement.querySelector('.qty-val');
      let currentQty = parseInt(input.value) || 1;
      let newQty = currentQty + change;
-
      if(newQty >10){
        Swal.fire({
         icon: 'warning',
@@ -479,7 +473,35 @@
     }
 
      input.value = newQty;
-    window.location.href = '/updateCart?id=' + itemId + '&quantity=' + newQty + '&variant=' + variant;
+     fetch(`/updateCart?id=${itemId}&quantity=${newQty}&variant=${variant}`)
+      .then(res => res.json())
+      .then(data => {
+        if (!data.success) {
+          Swal.fire({
+            icon: 'error',
+            title: data.message || 'Update failed'
+          });
+        }else{
+            const cartItem = btn.closest('.cart-item');
+            const subtotalEl = cartItem.querySelector('.item-total');
+
+            subtotalEl.textContent = '₹' + (price * newQty).toLocaleString('en-IN');
+
+            const totalPrice = document.querySelector('.cart-mrp');
+            const grandTotal = document.querySelector('.grand-total');
+
+            totalPrice.textContent = '₹' + data.finalAmount.toLocaleString('en-IN');
+            grandTotal.textContent = '₹' + data.finalAmount.toLocaleString('en-IN');
+        }
+      })
+      .catch(() => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Network error'
+        });
+      });
+   
+    // window.location.href = '/updateCart?id=' + itemId + '&quantity=' + newQty + '&variant=' + variant;
 
   }
 

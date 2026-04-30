@@ -340,11 +340,12 @@ const returnOrder = async (req, res) => {
   }
 };
 
+
 module.exports = {
   loadOrders,
   loadOrderDetails,
   downloadInvoice,
   cancelFullOrder,
   cancelSingleItem,
-  returnOrder
+  returnOrder,
 }

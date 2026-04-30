@@ -142,6 +142,23 @@
         .forgot-password:hover {
             text-decoration: underline;
         }
+        .password-wrapper {
+            position: relative;
+        }
+
+        .password-wrapper input {
+            width: 100%;
+            padding-right: 40px; /* space for icon */
+        }
+
+        .eye-icon {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            font-size: 18px;
+        }
 
         /* Submit Button */
         .submit-btn {
@@ -281,11 +298,14 @@
                 </div>
 
                 <!-- Password -->
-                <div class="form-group">
-                    <input type="password" name="password" id="passwordInput" >
+               <div class="form-group password-wrapper">
+                    <input type="password" name="password" id="passwordInput">
                     <label>Password</label>
-                    <div class="error-msg" id="passwordError"></div>
 
+                    <!-- Eye Icon -->
+                    <span id="togglePassword" class="eye-icon">👁️</span>
+
+                    <div class="error-msg" id="passwordError"></div>
                 </div>
 
                 <!-- Forgot Password -->
@@ -315,6 +335,17 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
+const togglePassword = document.getElementById("togglePassword");
+const passwordInput = document.getElementById("passwordInput");
+
+togglePassword.addEventListener("click", function () {
+    const type = passwordInput.type === "password" ? "text" : "password";
+    passwordInput.type = type;
+
+    // Optional: change icon
+    this.textContent = type === "password" ? "👁️" : "🙈";
+});
+
 document.addEventListener("DOMContentLoaded", function(){
 
     const loginForm = document.getElementById("loginForm");

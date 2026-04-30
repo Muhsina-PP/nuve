@@ -930,14 +930,14 @@ function selectSize(btn) {
 ──────────────────────────────────────────────────── */
 function adjustQty(delta) {
   const input = document.getElementById('quantity');
-  const max = selectedStock || 99;
+  const max = selectedStock || 10;
   let val = parseInt(input.value) + delta;
   val = Math.max(1, Math.min(val, max));
   input.value = val;
 }
 function clampQty() {
   const input = document.getElementById('quantity');
-  const max = selectedStock || 99;
+  const max = selectedStock || 10;
   let val = parseInt(input.value);
   if (isNaN(val) || val < 1) val = 1;
   if (val > max) val = max;
@@ -1081,12 +1081,22 @@ function switchTab(btn, panelId) {
   btn.classList.add('active');
   document.getElementById(panelId).classList.add('active');
 }
-
+ 
 function addToCart(productId ){
 
 
    if (!requireSize()) return;
+   
   const qty = document.getElementById('quantity').value;
+  
+  if(Number(qty) > 10){
+    Swal.fire({
+      icon : 'warning',
+      title : 'Warning',
+      text : 'Cannot add more than 10 items for an user'
+    })
+    return
+  }
   // TODO: wire up to your actual add-to-cart endpoint
   // e.g. fetch('/cart/add', { method:'POST', body: JSON.stringify({ productId, size: selectedSize, qty }) })
   console.log('Add to cart →', { size: selectedSize, qty });

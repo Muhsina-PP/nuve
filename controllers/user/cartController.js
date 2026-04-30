@@ -171,6 +171,7 @@ const addToCart = async (req, res) => {
           item.variant === finalVariant
       );
 
+      console.log("index : ",index)
       if (index > -1) {
 
         if (cart.items[index].quantity >= variantData.stock) {
@@ -264,8 +265,10 @@ const updateCart = async (req, res) => {
     }
 
     await cart.save();
+    let finalAmount = cart.items.reduce((acc,item) => acc + item.totalPrice, 0)
 
-    return res.redirect('/cart');
+    // return res.redirect('/cart');
+    return res.status(200).json({success : true, message : 'Updated succesfully', finalAmount})
 
   } catch (error) {
     console.log("Error updating cart:", error);

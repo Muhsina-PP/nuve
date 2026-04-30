@@ -144,7 +144,7 @@
   <h2 class="page-title">Add New Address</h2>
 
   <div class="address-card">
-    <form id="addressForm" action="/addAddress" method="POST">
+    <form id="addressForm" >
       <div class="form-row">
         <div class="form-group">
           <input type="text" class="form-control" id="addressType" name="addressType" placeholder=" " >
@@ -210,37 +210,103 @@
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+  
 
   document.getElementById('addressForm').addEventListener('submit', function(event) {
-    alert("hhiiii")
-    if (!validateForm()) {
-      event.preventDefault();
-    }
-    const endpoint = addressId ? '/editAddress' : '/addAddress';
+  event.preventDefault(); 
 
-  fetch(endpoint, {
+  if (!validateForm()) return;
+
+  const payload = {
+    addressType: document.getElementById('addressType').value.trim(),
+    name: document.getElementById('name').value.trim(),
+    city: document.getElementById('city').value.trim(),
+    landMark: document.getElementById('landMark').value.trim(),
+    state: document.getElementById('state').value.trim(),
+    pincode: document.getElementById('pincode').value.trim(),
+    phone: document.getElementById('phone').value.trim(),
+    altPhone: document.getElementById('altPhone').value.trim(),
+    isDefault: document.getElementById('isDefault').checked
+  };
+
+  console.log("Submitting:", payload); 
+
+  fetch('/addAddress', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload)
   })
-  .then(r => r.json())
+  .then(res => res.json())
   .then(data => {
+    console.log("Response:", data);
+
     if (data.success) {
       Swal.fire({
         icon: 'success',
-        title: addressId ? 'Address updated!' : 'Address added!',
+        title: 'Address added!',
         timer: 1500,
         showConfirmButton: false
-      }).then(() => location.reload());
+      }).then(() => {
+        window.location.href = '/userProfile';
+      });
     } else {
-      Swal.fire({ icon: 'error', title: data.message || 'Something went wrong' });
+      Swal.fire({ icon: 'error', title: data.message });
     }
   })
-  .catch(() => {
+  .catch(err => {
+    console.log("Error:", err);
     Swal.fire({ icon: 'error', title: 'Network error' });
   });
+});
+ 
+
+const fieldIds = [
+  "addressType",
+  "name",
+  "city",
+  "landMark",
+  "state",
+  "pincode",
+  "phone",
+  "altPhone"
+];
+
+fieldIds.forEach(id => {
+  const input = document.getElementById(id);
+
+  input.addEventListener("input", function () {
+    const errorElement = document.getElementById(id + "-error");
+    if (!errorElement) return;
+
+    const value = input.value.trim();
+
+    const alphaPattern = /^[A-Za-z\s]+$/;
+    const pinPattern = /^\d{6}$/;
+    const phonePattern = /^\d{10}$/;
+
+    let isValid = true;
+
+    if (!value) isValid = false;
+
+    if (["name", "city", "landMark", "state"].includes(id)) {
+      if (value && !alphaPattern.test(value)) isValid = false;
+    }
+
+    if (id === "pincode" && value && !pinPattern.test(value)) {
+      isValid = false;
+    }
+
+    if (["phone", "altPhone"].includes(id)) {
+      if (value && !phonePattern.test(value)) {
+        isValid = false;
+      }
+    }
+
+    if (isValid) {
+      errorElement.textContent = ""; 
+    }
   });
-  
+});
 
   function validateForm() {
     let isValid = true;

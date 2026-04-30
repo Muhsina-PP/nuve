@@ -364,9 +364,11 @@ const getAddAddress = async (req, res) =>{
 
 const addAddress = async(req, res) =>{
   try {
+    console.log("hhhooooooooooo")
     const userId = req.session.user;
     const userData = await User.findById(userId)
     const {addressType, name, city, landMark, state, pincode, phone, altPhone, isDefault} = req.body;
+    console.log("BOSY : ",req.body)
     const userAddress = await Address.findOne({userId : userData._id})
     if(!userAddress){
       const newAddress = new Address({
@@ -375,10 +377,9 @@ const addAddress = async(req, res) =>{
       })
       await newAddress.save();
     }else{
-      if(isDefault === 'on'){
-        for(let i=0; i<userAddress.address.length ; i++){
-          userAddress.address[i].isDefault = false
-        }
+     
+      if (isDefault) {
+        userAddress.address.forEach(addr => addr.isDefault = false);
       }
       const newAddress = {
           addressType,
@@ -389,13 +390,13 @@ const addAddress = async(req, res) =>{
           pincode,
           phone,
           altPhone,
-          isDefault: isDefault === 'on'
+          isDefault: isDefault
       }
       userAddress.address.push(newAddress)
       await userAddress.save()
     }
     // res.redirect("/userProfile?success=1")
-    res.json({ success: true });
+    res.status(200).json({ success: true });
   } catch (error) {
     console.log("Error adding address : ",error)
     res.status(500).json({
@@ -428,7 +429,8 @@ const getEditAddress = async (req, res) =>{
 const editAddress = async (req, res) =>{
   try {
     const userId = req.session.user;
-    const {addressId} = req.body;
+    const { addressId } = req.body;
+    console.log("Address id : ",addressId)
     const {addressType, name, city, landMark, state, pincode, phone, altPhone, isDefault} = req.body;
     const addressData = await Address.findOne({userId : userId})
     const address = addressData.address.id(addressId)
@@ -442,15 +444,19 @@ const editAddress = async (req, res) =>{
     address.phone = phone
     address.altPhone = altPhone
 
-    if(isDefault === 'on'){
-      for(let i=0 ; i<addressData.address.length ; i++){
-        addressData.address[i].isDefault = false;
-      }
+    // if(isDefault === 'on'){
+    //   for(let i=0 ; i<addressData.address.length ; i++){
+    //     addressData.address[i].isDefault = false;
+    //   }
+    //   address.isDefault = true;
+    // }
+    if (isDefault) {
+      addressData.address.forEach(addr => addr.isDefault = false);
       address.isDefault = true;
     }
     await addressData.save()
     // res.redirect("/userProfile?updatesuccess=1")
-    res.json({ success: true });
+    res.status(200).json({ success: true });
     
   } catch (error) {
      console.log("Error updating address:", error)

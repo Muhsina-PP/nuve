@@ -66,6 +66,8 @@ router.get("/orders", adminAuth,orderController.loadOrders )
 router.patch("/update-order-status/:orderId", adminAuth, orderController.updateOrderStatus);
 router.get("/order-details/:orderId", adminAuth, orderController.loadOrderDetails);
 router.get("/download-invoice/:id", adminAuth, orderController.downloadInvoice);
+console.log("verifyReturn:", orderController.verifyReturn);
+
 
 
 module.exports = router

@@ -524,6 +524,9 @@
                 <td>
                   <% if (item.status === "Cancelled") { %>
                     <span class="badge cancelled-badge">Cancelled</span>
+                    <% } else if (item.status === "Return Requested") { %>
+                      <span class="badge return-badge">Return Requested</span>
+    
                     <% } else if (order.status === "Delivered") { %>
                        
                     <button class="item-action-btn return-btn"

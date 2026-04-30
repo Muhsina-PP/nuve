@@ -220,11 +220,56 @@
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+  // document.getElementById('addressForm').addEventListener('submit', function(event) {
+  //   if (!validateForm()) {
+  //     event.preventDefault();
+  //   }
+  // });
+
+  // const addressId  = '<%= address._id %>'
+
   document.getElementById('addressForm').addEventListener('submit', function(event) {
-    if (!validateForm()) {
-      event.preventDefault();
+  event.preventDefault(); // ✅ ALWAYS stop
+
+  if (!validateForm()) return;
+
+  const payload = {
+    addressId: '<%= address._id %>',
+    addressType: document.getElementById('addressType').value.trim(),
+    name: document.getElementById('name').value.trim(),
+    city: document.getElementById('city').value.trim(),
+    landMark: document.getElementById('landMark').value.trim(),
+    state: document.getElementById('state').value.trim(),
+    pincode: document.getElementById('pincode').value.trim(),
+    phone: document.getElementById('phone').value.trim(),
+    altPhone: document.getElementById('altPhone').value.trim(),
+    isDefault: document.getElementById('isDefault').checked
+  };
+
+  fetch('/editAddress', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      Swal.fire({
+        icon: 'success',
+        title: 'Address updated!',
+        timer: 1500,
+        showConfirmButton: false
+      }).then(() => {
+        window.location.href = '/userProfile';
+      });
+    } else {
+      Swal.fire({ icon: 'error', title: data.message });
     }
+  })
+  .catch(() => {
+    Swal.fire({ icon: 'error', title: 'Network error' });
   });
+});
 
   function validateForm() {
     let isValid = true;
