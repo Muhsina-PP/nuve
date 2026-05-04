@@ -1,0 +1,534 @@
+<%- include("../../views/partials/user/header") %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Wallet</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --rose: #d4145a;
+      --rose-deep: #e96495;
+      --rose-pale: #fce8f0;
+      --rose-blush: #f9d0e0;
+      --rose-mist: #fff5f8;
+      --ink: #1a1a2e;
+      --ink-soft: #3d3d5c;
+      --muted: #8a8aa0;
+      --off-white: #f7f4f5;
+      --border: #eedde5;
+      --sidebar-w: 260px;
+      --radius: 16px;
+      --radius-sm: 10px;
+      --trans: all 0.22s ease;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--off-white);
+      font-family: 'DM Sans', sans-serif;
+      color: var(--ink);
+      min-height: 100vh;
+    }
+
+    .pa-shell {
+      display: flex;
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 32px 24px 60px;
+      gap: 28px;
+      align-items: flex-start;
+    }
+
+    /* ── Sidebar ── */
+    .pa-sidebar {
+      width: var(--sidebar-w);
+      flex-shrink: 0;
+      position: sticky;
+      top: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .sb-avatar-card {
+      background: white;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      padding: 28px 20px 22px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .sb-avatar-wrap { position: relative; width: 88px; height: 88px; }
+
+    .sb-avatar-wrap img {
+      width: 100%; height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid white;
+      outline: 2.5px solid var(--rose-blush);
+      display: block;
+    }
+
+    .sb-name { font-size: 1.05rem; font-weight: 600; color: var(--ink); text-align: center; }
+    .sb-email { font-size: 0.78rem; color: var(--muted); text-align: center; }
+
+    .sb-member-chip {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: var(--rose-pale); color: var(--rose);
+      font-size: 0.72rem; font-weight: 600; letter-spacing: 0.04em;
+      padding: 4px 12px; border-radius: 50px; margin-top: 6px;
+    }
+
+    .sb-nav {
+      background: white;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    .sb-nav a {
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px 20px;
+      font-size: 0.88rem; font-weight: 500; color: var(--ink-soft);
+      text-decoration: none;
+      border-bottom: 1px solid #f5f0f2;
+      transition: var(--trans);
+      position: relative;
+    }
+
+    .sb-nav a:last-child { border-bottom: none; }
+    .sb-nav a:hover { background: var(--rose-mist); color: var(--rose); }
+
+    .sb-nav a.active {
+      background: var(--rose-mist);
+      color: var(--rose);
+      font-weight: 600;
+    }
+
+    .sb-nav a.active::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 8px; bottom: 8px;
+      width: 3px;
+      border-radius: 0 4px 4px 0;
+      background: var(--rose);
+    }
+
+    .sb-nav a i { width: 18px; text-align: center; font-size: 0.88rem; flex-shrink: 0; }
+
+    .sb-logout { background: white; border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; }
+    .sb-logout a {
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px 20px;
+      font-size: 0.88rem; font-weight: 500; color: #c0392b;
+      text-decoration: none; transition: var(--trans);
+    }
+    .sb-logout a:hover { background: #fdecea; }
+
+    /* ── Main ── */
+    .pa-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 20px; }
+
+    .breadcrumb {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 0.8rem; color: var(--muted); margin-bottom: 4px;
+    }
+    .breadcrumb a { color: var(--rose); text-decoration: none; }
+    .breadcrumb a:hover { text-decoration: underline; }
+
+    .pa-heading h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2rem; font-weight: 600; color: var(--ink);
+    }
+    .pa-heading h1 span { color: var(--rose); }
+
+    .card {
+      background: white;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      padding: 28px 30px;
+    }
+
+    .card-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 22px; padding-bottom: 16px;
+      border-bottom: 1px solid #f5f0f2;
+    }
+
+    .card-title-group { display: flex; align-items: center; gap: 10px; }
+
+    .card-icon {
+      width: 36px; height: 36px; border-radius: 9px;
+      background: var(--rose-pale); color: var(--rose);
+      display: flex; align-items: center; justify-content: center; font-size: 0.85rem;
+    }
+
+    .card-title { font-size: 1rem; font-weight: 600; color: var(--ink); }
+
+    /* Balance banner */
+    .wallet-banner {
+      display: flex; align-items: center; justify-content: space-between;
+      background: linear-gradient(120deg, var(--rose) 0%, #b30048 100%);
+      border-radius: 14px;
+      padding: 24px 28px;
+      color: white;
+      margin-bottom: 24px;
+    }
+
+    .wallet-banner .label {
+      font-size: 0.78rem; font-weight: 500;
+      opacity: 0.75; text-transform: uppercase;
+      letter-spacing: 0.08em; margin-bottom: 6px;
+    }
+
+    .wallet-banner .amount {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.4rem; font-weight: 700; line-height: 1;
+    }
+
+    .wallet-banner .wallet-icon {
+      width: 56px; height: 56px; border-radius: 50%;
+      background: rgba(255,255,255,0.15);
+      display: flex; align-items: center; justify-content: center; font-size: 1.5rem;
+    }
+
+    /* Transactions table */
+    .txn-table { width: 100%; border-collapse: separate; border-spacing: 0 6px; }
+
+    .txn-table thead th {
+      font-size: 0.7rem; text-transform: uppercase;
+      letter-spacing: 0.1em; color: var(--muted); font-weight: 600;
+      padding: 6px 14px 12px; text-align: left;
+      border-bottom: 1.5px solid var(--border);
+    }
+    .wallet-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 12px;
+}
+
+.wallet-table thead th {
+  text-align: left;
+  font-size: 12px;
+  color: #888;
+  letter-spacing: 1px;
+  padding: 10px;
+}
+
+.wallet-table tbody tr {
+  background: #f5f5f5;
+  border-radius: 12px;
+}
+
+.wallet-table td {
+  padding: 14px;
+  font-size: 14px;
+}
+
+/* Badge styles */
+.badge {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.badge.credit {
+  background: #e6f7ec;
+  color: #1a7f37;
+}
+
+.badge.debit {
+  background: #fdecea;
+  color: #d93025;
+}
+
+/* Amount colors */
+.amount.credit {
+  color: #1a7f37;
+  font-weight: 600;
+}
+
+.amount.debit {
+  color: #d93025;
+  font-weight: 600;
+}
+.reason-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.reason-title {
+  font-weight: 500;
+  color: #333;
+}
+
+.reason-sub {
+  font-size: 12px;
+  color: #888;
+}
+
+.reason-sub a {
+  color: #6c63ff;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.reason-sub a:hover {
+  text-decoration: underline;
+}
+
+    .txn-table tbody tr { background: var(--off-white); transition: var(--trans); }
+    .txn-table tbody tr:hover { background: var(--rose-mist); }
+
+    .txn-table tbody td { padding: 13px 14px; font-size: 0.87rem; color: var(--ink-soft); }
+    .txn-table tbody td:first-child { border-radius: var(--radius-sm) 0 0 var(--radius-sm); }
+    .txn-table tbody td:last-child  { border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
+
+    .txn-amount { font-weight: 700; font-size: 0.92rem; }
+    .txn-amount.credit { color: #1a7a46; }
+    .txn-amount.debit  { color: #c0392b; }
+
+    .badge-txn {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 4px 12px; border-radius: 50px;
+      font-size: 0.75rem; font-weight: 600;
+    }
+    .badge-txn.credit { background: #e8f8ef; color: #1a7a46; }
+    .badge-txn.debit  { background: #fdecea; color: #c0392b; }
+
+    /* Empty state */
+    .empty-panel {
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 52px 20px; text-align: center; gap: 8px;
+    }
+    .empty-panel__icon {
+      width: 68px; height: 68px; border-radius: 50%;
+      background: var(--rose-mist);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.6rem; color: var(--rose-blush); margin-bottom: 4px;
+    }
+    .empty-panel h3 { font-size: 1rem; font-weight: 700; color: var(--ink); }
+    .empty-panel p  { font-size: 0.85rem; color: var(--muted); }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .pa-shell { flex-direction: column; padding: 20px 16px 48px; }
+      .pa-sidebar { width: 100%; position: static; flex-direction: row; flex-wrap: wrap; gap: 10px; }
+      .sb-avatar-card { flex-direction: row; text-align: left; padding: 16px 18px; gap: 14px; flex: 1 1 100%; }
+      .sb-name, .sb-email { text-align: left; }
+      .sb-nav { display: flex; flex: 1 1 100%; }
+      .sb-nav a { flex: 1; justify-content: center; font-size: 0.75rem; padding: 11px 8px; flex-direction: column; gap: 4px; text-align: center; }
+      .sb-nav a::before { display: none; }
+      .card { padding: 20px 18px; }
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .pa-sidebar { animation: fadeUp 0.4s ease both; }
+    .pa-main > * { animation: fadeUp 0.4s ease both; }
+    .pa-main > *:nth-child(2) { animation-delay: 0.08s; }
+    .pa-main > *:nth-child(3) { animation-delay: 0.15s; }
+  </style>
+</head>
+<body>
+
+<div class="pa-shell">
+
+  <!-- ── Sidebar ── -->
+  <aside class="pa-sidebar">
+    <div class="sb-avatar-card">
+      <div class="sb-avatar-wrap">
+        <img src="<%= user.profileImage || 'images/heroin.jpg' %>" alt="Profile Photo">
+      </div>
+      <div>
+        <div class="sb-name"><%= user.name %></div>
+        <div class="sb-email"><%= user.email %></div>
+       
+      </div>
+    </div>
+
+    <nav class="sb-nav">
+      <a href="/userProfile"><i class="fas fa-user"></i> My Profile</a>
+      <a href="/orders"><i class="fas fa-shopping-bag"></i> Orders</a>
+      <a href="/wishlist"><i class="fas fa-heart"></i> Wishlist</a>
+      <a href="/wallet" class="active"><i class="fas fa-wallet"></i> Wallet</a>
+    </nav>
+
+    <div class="sb-logout">
+      <a href="/logout"><i class="fas fa-sign-out-alt"></i> Sign Out</a>
+    </div>
+  </aside>
+
+  <!-- ── Main ── -->
+  <main class="pa-main">
+
+    <div class="pa-heading">
+      <div class="breadcrumb">
+        <a href="/userProfile">My Account</a>
+        <i class="fas fa-chevron-right" style="font-size:0.65rem;"></i>
+        <span>Wallet</span>
+      </div>
+      <h1>My <span>Wallet</span></h1>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title-group">
+          <div class="card-icon"><i class="fas fa-wallet"></i></div>
+          <span class="card-title">Wallet Overview</span>
+        </div>
+      </div>
+
+      <!-- Balance Banner -->
+      <div class="wallet-banner">
+        <div>
+          <div class="label">Available Balance</div>
+          <div class="amount" id="balance-display">₹<%= wallet?.balance || 0 %></div>
+        </div>
+        <div class="wallet-icon"><i class="fas fa-wallet"></i></div>
+      </div>
+      <table class="wallet-table">
+  <thead>
+    <tr>
+      <th>DATE</th>
+      <th>TYPE</th>
+      <th>AMOUNT</th>
+      <th>REASON</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% if (wallet && wallet.transactions.length > 0) { %>
+
+      <% wallet.transactions.slice().reverse().forEach(tx => { %>
+        <tr>
+
+          <!-- DATE -->
+          <td>
+            <%= new Date(tx.date).toLocaleDateString('en-IN', {
+              day: '2-digit',
+              month: 'short',
+              year: 'numeric'
+            }) %>
+          </td>
+
+          <!-- TYPE -->
+          <td>
+            <% if (tx.type === 'credit') { %>
+              <span class="badge credit">
+                ↓ Credit
+              </span>
+            <% } else { %>
+              <span class="badge debit">
+                ↑ Debit
+              </span>
+            <% } %>
+          </td>
+
+          <!-- AMOUNT -->
+          <td>
+            <% if (tx.type === 'credit') { %>
+              <span class="amount credit">
+                + ₹<%= tx.amount.toLocaleString('en-IN') %>
+              </span>
+            <% } else { %>
+              <span class="amount debit">
+                - ₹<%= tx.amount.toLocaleString('en-IN') %>
+              </span>
+            <% } %>
+          </td>
+
+          <td class="reason-cell">
+  <div class="reason-title">
+    <%= tx.reason %>
+  </div>
+
+  <% if (tx.orderId) { %>
+    <div class="reason-sub">
+      Order 
+      <a href="/orderDetails/<%= tx.orderId %>">
+        #<%= tx.orderId.toString().slice(-6).toUpperCase() %>
+      </a>
+    </div>
+  <% } %>
+</td>
+
+        </tr>
+      <% }) %>
+
+    <% } else { %>
+      <tr>
+        <td colspan="4" style="text-align:center; padding: 20px;">
+          No transactions yet
+        </td>
+      </tr>
+    <% } %>
+  </tbody>
+</table>
+
+      <!-- Transactions populated by JS -->
+      <div id="txn-container"></div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+ 
+  // ── Render balance ──
+  document.getElementById('balance-display').textContent =
+    '₹' + (walletData.balance || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 });
+
+  // ── Render transactions ──
+  const container = document.getElementById('txn-container');
+
+  if (!walletData.transactions || walletData.transactions.length === 0) {
+    container.innerHTML = `
+      <div class="empty-panel">
+        <div class="empty-panel__icon"><i class="fas fa-receipt"></i></div>
+        <h3>No transactions yet</h3>
+        <p>Your wallet activity will appear here once you make a purchase or receive a refund.</p>
+      </div>`;
+  } else {
+    const rows = [...walletData.transactions].reverse().map(txn => {
+      const date = new Date(txn.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+      const isCredit = txn.type === 'credit';
+      const typeClass = isCredit ? 'credit' : 'debit';
+      const icon = isCredit ? 'fa-arrow-down' : 'fa-arrow-up';
+      const sign = isCredit ? '+' : '-';
+      const label = txn.type.charAt(0).toUpperCase() + txn.type.slice(1);
+      return `
+        <tr>
+          <td style="color:var(--muted);font-size:0.82rem;">${date}</td>
+          <td><span class="badge-txn ${typeClass}"><i class="fas ${icon}" style="font-size:0.65rem;"></i> ${label}</span></td>
+          <td><span class="txn-amount ${typeClass}">${sign} ₹${Number(txn.amount).toLocaleString('en-IN')}</span></td>
+          <td style="color:var(--ink-soft);">${txn.reason}</td>
+        </tr>`;
+    }).join('');
+
+    container.innerHTML = `
+      <div class="table-responsive">
+        <table class="txn-table">
+          <thead>
+            <tr>
+              <th>Date</th><th>Type</th><th>Amount</th><th>Reason</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>`;
+  }
+</script>
+</body>
+</html>

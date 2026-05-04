@@ -11,9 +11,9 @@ const productSchema = new Schema({
     required: true
   },
   brand: {
-    type: String,
-    required: true
-  },
+  type: Schema.Types.ObjectId,
+  ref: "Brand"
+  }, 
   category: {
     type: Schema.Types.ObjectId,
     ref: "Category",
@@ -27,6 +27,11 @@ const productSchema = new Schema({
     type: Number,
     required: false
   },
+  productOffer: {
+    type: Number,
+    default: 0
+  },
+
 
   variants: [
     {
@@ -57,6 +62,10 @@ const productSchema = new Schema({
     type: Boolean,
     default: false
   },
+  isListed: {
+    type: Boolean,
+    default: true
+  },
 
   rating: {
     type: Number,
@@ -66,10 +75,6 @@ const productSchema = new Schema({
   numberOfReviews: {
     type: Number,
     default: 0
-  },
-  createdAt : {
-    type : Date,
-    default : Date.now()
   },
   status: {
     type: String,

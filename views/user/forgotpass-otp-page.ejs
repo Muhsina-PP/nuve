@@ -1,0 +1,383 @@
+<%- include("../../views/partials/user/header") %>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: #f9f9f9;
+        height: 100vh;
+        overflow: hidden;
+    }
+
+    main {
+        height: calc(100vh - 80px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 15px;
+    }
+
+    .login-container {
+        display: flex;
+        width: 900px;
+        height: 100%;
+        max-height: 100%;
+        max-width: 95vw;
+        background: #fff;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+    }
+
+    /* Left Side - Fashion Image */
+    .login-image {
+        flex: 1;
+        background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.4)),
+                    url('https://images.unsplash.com/photo-1483985988355-763728e1935b?w=800&q=80') center/cover no-repeat;
+        display: flex;
+        align-items: flex-end;
+        padding: 30px;
+        color: #fff;
+    }
+
+    /* Right Side */
+    .login-form-container {
+        flex: 1;
+        padding: 30px 40px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        background: #fff;
+    }
+
+    .icon-wrap {
+        text-align: center;
+        margin-bottom: 16px;
+    }
+
+    .icon-wrap i {
+        font-size: 42px;
+        color: #d4145a;
+        opacity: 0.85;
+    }
+
+    .login-form-container h1 {
+        font-size: 30px;
+        color: #333;
+        margin-bottom: 8px;
+        text-align: center;
+    }
+
+    .helper-text {
+        text-align: center;
+        color: #888;
+        font-size: 13px;
+        margin-bottom: 24px;
+        line-height: 1.6;
+    }
+
+    /* OTP Input */
+    .form-group {
+        margin-bottom: 18px;
+        position: relative;
+    }
+
+    .form-group input {
+        width: 100%;
+        padding: 12px 14px;
+        border: 1.5px solid #ddd;
+        border-radius: 10px;
+        font-size: 18px;
+        letter-spacing: 6px;
+        text-align: center;
+        transition: all 0.3s;
+    }
+
+    .form-group input:focus {
+        outline: none;
+        border-color: #d4145a;
+        box-shadow: 0 0 0 3px rgba(212, 20, 90, 0.1);
+    }
+
+    .form-group label {
+        display: block;
+        font-size: 13px;
+        font-weight: 600;
+        color: #555;
+        margin-bottom: 8px;
+        text-align: center;
+    }
+
+    .error-msg {
+        color: red;
+        font-size: 11px;
+        text-align: center;
+        margin-top: 5px;
+        min-height: 16px;
+    }
+
+    /* Timer */
+    .timer-row {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        margin-bottom: 16px;
+    }
+
+    .otp-timer {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 52px;
+        height: 52px;
+        border-radius: 50%;
+        border: 2.5px solid #d4145a;
+        font-size: 14px;
+        font-weight: 700;
+        color: #d4145a;
+        background: #fff5f8;
+    }
+
+    .timer-label {
+        font-size: 13px;
+        color: #888;
+    }
+
+    /* Buttons */
+    .submit-btn {
+        width: 100%;
+        padding: 13px;
+        background: #d4145a;
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        margin-bottom: 12px;
+    }
+
+    .submit-btn:hover {
+        background: #b8124a;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(212, 20, 90, 0.3);
+    }
+
+    .resend-btn {
+        width: 100%;
+        padding: 11px;
+        background: #fff;
+        color: #d4145a;
+        border: 1.5px solid #d4145a;
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        margin-bottom: 18px;
+    }
+
+    .resend-btn:hover:not(:disabled) {
+        background: #fdf2f5;
+    }
+
+    .resend-btn:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+        border-color: #ccc;
+        color: #aaa;
+    }
+
+    .back-link {
+        text-align: center;
+        font-size: 14px;
+        color: #666;
+    }
+
+    .back-link a {
+        color: #d4145a;
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .back-link a:hover { text-decoration: underline; }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+        .login-container { flex-direction: column; }
+        .login-image { min-height: 200px; padding: 25px; }
+        .login-form-container { padding: 30px 25px; }
+    }
+
+    @media (max-width: 500px) {
+        main { padding: 10px; }
+        .login-form-container { padding: 25px 20px; }
+        .login-image { min-height: 180px; }
+        .login-form-container h1 { font-size: 26px; }
+    }
+</style>
+
+<main>
+    <div class="login-container">
+
+        <!-- Left: Fashion Image -->
+        <div class="login-image"></div>
+
+        <!-- Right: OTP Form -->
+        <div class="login-form-container">
+
+            <div class="icon-wrap">
+                <i class="fas fa-shield-halved"></i>
+            </div>
+
+            <h1>Email Verification</h1>
+            <p class="helper-text">
+                We've sent a 6-digit OTP to your email.<br>Enter it below to verify your account.
+            </p>
+
+            <form id="otpForm" action="verify-passForgot-otp" method="POST" onsubmit="return validateOtp()">
+                <div class="form-group">
+                    <label for="otp">Enter OTP</label>
+                    <input type="text" id="otp" name="otp" maxlength="6" placeholder="— — — — — —" autocomplete="one-time-code">
+                    <div class="error-msg" id="otpError"></div>
+                </div>
+
+                <button type="submit" class="submit-btn">
+                    <i class="fas fa-check-circle" style="margin-right:8px;"></i>Verify OTP
+                </button>
+            </form>
+
+            <div class="timer-row">
+                <div class="otp-timer" id="otpTimer">60s</div>
+                <span class="timer-label">Resend available after timer</span>
+            </div>
+
+            <button type="button" class="resend-btn" id="resendBtn" onclick="resendOtp()" disabled>
+                <i class="fas fa-rotate-right" style="margin-right:6px;"></i>Resend OTP
+            </button>
+
+            <% if (locals.message && message.length > 0) { %>
+             <div class="alert alert-danger mt-3">
+              <%=message%>
+             </div>
+            <% } %>
+
+            <div class="back-link">
+                Already verified? <a href="/login">Login now</a>
+            </div>
+
+        </div>
+    </div>
+</main>
+
+<script>
+    // OTP Validation
+    function validateOtp() {
+        const otpInput = document.getElementById('otp');
+        const otpError = document.getElementById('otpError');
+        const value = otpInput.value.trim();
+
+        otpError.textContent = '';
+        otpInput.style.borderColor = '';
+
+        if (value === '') {
+            otpError.textContent = 'Please enter the OTP.';
+            otpInput.style.borderColor = 'red';
+            return false;
+        } else if (!/^\d{6}$/.test(value)) {
+            otpError.textContent = 'OTP must be a 6-digit number.';
+            otpInput.style.borderColor = 'red';
+            return false;
+        }
+
+        $.ajax({
+          type : 'POST',
+          url : '/verify-passForgot-otp',
+          data : { otp : otpInput.value},
+          success : function (response){
+            if(response.success){
+              Swal.fire({
+                icon : 'success',
+                title : 'OTP verified succesfully',
+                timer : 1500,
+                showConfirmButton : false
+              }).then(()=>{
+                window.location.href = response.redirectUrl;
+              })
+            }else{
+              Swal.fire({
+                icon : 'error',
+                title : 'Error',
+                text : 'Invalid OTP'
+              })
+            }
+          },
+          error : function(){
+            Swal.fire({
+              icon : 'error',
+              title : 'Error',
+              text : 'Failed to verify otp, please try again'
+            })
+          }
+        })
+
+        return false;
+    }
+
+    // Countdown Timer
+    let seconds = 60;
+    const timerEl = document.getElementById('otpTimer');
+    const resendBtn = document.getElementById('resendBtn');
+
+    const countdown = setInterval(() => {
+        seconds--;
+        timerEl.textContent = seconds + 's';
+        if (seconds <= 0) {
+            clearInterval(countdown);
+            timerEl.textContent = '0s';
+            resendBtn.disabled = false;
+        }
+    }, 1000);
+
+     // ── Resend OTP ───────────────────────────────────────────────
+    function resendOtp() {
+        const resendBtn = document.getElementById('resendBtn');
+        resendBtn.disabled = true;
+
+        $.ajax({
+            type: 'POST',
+            url: '/resend-forgot-otp',        
+            success: function (response) {
+                if (response.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'OTP Resent!',
+                        text: 'A new OTP has been sent to your email.',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                    document.getElementById('otp').value        = '';
+                    document.getElementById('otpError').textContent = '';
+                    startCountdown(); // restart 60s timer
+                } else {
+                    Swal.fire({ icon: 'error', title: 'Error', text: response.message || 'Could not resend OTP.' });
+                    resendBtn.disabled = false;
+                }
+            },
+            error: function () {
+                Swal.fire({ icon: 'error', title: 'Error', text: 'Failed to resend OTP. Please try again.' });
+                resendBtn.disabled = false;
+            }
+        });
+    }
+
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<%- include("../../views/partials/user/footer") %>

@@ -94,7 +94,7 @@ const blockBrand = async(req,res) =>{
 
 const unblockBrand = async(req,res) =>{
   try {
-    const id = req.query.id;
+    const id = req.params.id;
     await Brand.updateOne({_id : id},{$set : {isBlocked : false}});
     res.redirect("/admin/brands")
   } catch (error) {

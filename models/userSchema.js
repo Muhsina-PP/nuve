@@ -1,5 +1,4 @@
 const mongoose = require ("mongoose")
-
 const {Schema} = mongoose
 
 const userSchema = new Schema ({
@@ -44,14 +43,10 @@ const userSchema = new Schema ({
     type: Number,
     default : 0
   },
-  // profileImage :{
-  //   type : String,
-  //   default : "/img/hero/hero-2.jpg"
-  // },
-  wishlist : [{
-    type : Schema.Types.ObjectId,
-    ref : "Wishlist"
-  }],
+  profileImage :{
+    type : String,
+    default : "/img/hero/hero-2.jpg"
+  },
   orderHistory : [{
     type : Schema.Types.ObjectId,
     ref : "Order"

@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NUVE - Women's Fashion Store</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
         * {
             margin: 0;
@@ -34,10 +35,21 @@
 
         .hero-content {
             text-align: center;
+            font-family :Georgia, 'Times New Roman', Times, serif;
+            margin-top: 5rem;
             color: #fff;
             z-index: 2;
             animation: fadeInUp 1s ease;
         }
+   
+
+    .hero-slide{
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background-size: cover;
+        background-position: center;
+    }
 
         .hero h1 {
             font-size: 56px;
@@ -298,6 +310,38 @@
         .newsletter-form button:hover {
             background: #a81049;
         }
+        .product-rating {
+            display: flex;
+            align-items: center;
+            gap: 12px;          /* ← increased a bit for breathing room */
+            flex-wrap: wrap;    /* ← prevents squeezing on smaller cards */
+        }
+
+        .btn-add-to-cart {
+            background: #d4145a;                /* same as your primary brand color */
+            color: white;
+            padding: 8px 18px;                  /* smaller than .btn-primary — fits better in card */
+            border-radius: 50px;                /* matches your pill-shaped buttons */
+            font-size: 14px;                    /* readable but not too dominant */
+            font-weight: 600;
+            text-decoration: none;
+            white-space: nowrap;                /* keeps text in one line */
+            transition: all 0.3s ease;
+            line-height: 1.4;
+        }
+
+        .btn-add-to-cart:hover,
+        .btn-add-to-cart:focus {
+            background: #a81049;                /* same hover as .btn-primary */
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(212, 20, 90, 0.25);
+            outline: none;
+        }
+
+        .btn-add-to-cart:active {
+            transform: translateY(0);
+            box-shadow: 0 3px 8px rgba(212, 20, 90, 0.2);
+        }
 
 
         /* Responsive */
@@ -324,259 +368,79 @@
   
 
     <!-- Hero Section -->
-    <section class="hero">
-        <div class="hero-content">
-            <h1>New Collection 2025</h1>
-            <p>Discover the latest trends in women's fashion</p>
-            <a href="/shop" class="btn-primary">Shop Now</a>
-        </div>
+        <section class="hero">
+        <% if(banner.length > 0){ %>
+
+            <% for( let i = 0; i < banner.length; i++ ) { %>
+
+                <div class="hero-slide" style="background-image: url('/uploads/product-images/<%= banner[i].image %>')">
+                    <div class="hero-content">
+                        <h1><%= banner[i].title || "New Collection 2026" %></h1>
+                        <p><%= banner[i].description || "Discover the latest trends in women's fashion" %></p>
+                        <a href="<%= banner[i].link && banner[i].link.startsWith('http') ? banner[i].link : 'https://' + banner[i].link %>" 
+                            class="btn-primary"
+                            target="_blank"
+                            >
+                            Shop Now
+                            </a>
+                    </div>
+                </div>
+
+            <% } %>
+
+        <% } else { %>
+
+            <!-- fallback if no banner -->
+            <div class="hero-slide" style="background-image: url('/images/heroin.jpg')">
+                <div class="hero-content">
+                    <h1>New Collection 2026</h1>
+                    <p>Discover the latest trends in women's fashion</p>
+                    <a href="/shop" class="btn-primary">Shop Now</a>
+                </div>
+            </div>
+
+        <% } %>
     </section>
 
-    <!-- Categories Section -->
-    <section class="categories">
-        <h2 class="section-title">Shop by Category</h2>
-        <div class="category-grid">
-            <div class="category-card">
-                <img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=500" alt="Dresses">
-                <div class="category-overlay">
-                    <h3>Dresses</h3>
-                    <p>Elegant & Comfortable</p>
-                </div>
-            </div>
-            <div class="category-card">
-                <img src="https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?w=500" alt="Tops">
-                <div class="category-overlay">
-                    <h3>Tops & Blouses</h3>
-                    <p>Chic & Stylish</p>
-                </div>
-            </div>
-            <div class="category-card">
-                <img src="https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=500" alt="Bottoms">
-                <div class="category-overlay">
-                    <h3>Bottoms</h3>
-                    <p>Comfort Meets Style</p>
-                </div>
-            </div>
-            <div class="category-card">
-                <img src="https://images.unsplash.com/photo-1539533018447-63fcce2678e3?w=500" alt="Accessories">
-                <div class="category-overlay">
-                    <h3>Accessories</h3>
-                    <p>Complete Your Look</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
+    
     <!-- Featured Products -->
+     
+
+    
     <section class="featured-products">
         <h2 class="section-title">Featured Products</h2>
+        
         <div class="product-grid">
-            <div class="product-card">
-                <div class="product-image">
-                    <img src="https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=400" alt="Floral Dress">
-                    <span class="product-badge">NEW</span>
-                    <div class="wishlist-btn">
-                        <i class="far fa-heart"></i>
+            <% for( let i = 0; i < products.length; i++ ) { %>
+                <div class="product-card">
+                    <div class="product-image">
+                        <a href="/productDetails?id=<%=products[i]._id%>">
+                            <img src="/uploads/product-images/<%=products[i].productImage?.[0]%>" alt="<%=products[i].productName%>">
+                        </a>
+                        <span class="product-badge">NEW</span>
+                        <div class="wishlist-btn">
+                            <i class="far fa-heart"><a href="/addToWishlist?id=<%=products[i]._id%>"></a></i>
+                        </div>
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-title"><%=products[i].productName%></h3>
+                        <div class="product-price">
+                            <span class="current-price">₹<%=products[i].salePrice%></span>
+                            <span class="original-price">₹<%=products[i].regularPrice%></span>
+                        </div>
+                        <div class="product-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star-half-alt"></i>
+                            <span style="color: #666;">(4.5)</span>
+                            <a href="/addToCart?id=<%=products[i]._id%>" class="btn-add-to-cart">Add To Cart</a>
+                        </div>
                     </div>
                 </div>
-                <div class="product-info">
-                    <h3 class="product-title">Floral Summer Dress</h3>
-                    <div class="product-price">
-                        <span class="current-price">₹1,999</span>
-                        <span class="original-price">₹2,999</span>
-                    </div>
-                    <div class="product-rating">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star-half-alt"></i>
-                        <span style="color: #666;">(4.5)</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="product-card">
-                <div class="product-image">
-                    <img src="https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?w=400" alt="Casual Top">
-                    <span class="product-badge">SALE</span>
-                    <div class="wishlist-btn">
-                        <i class="far fa-heart"></i>
-                    </div>
-                </div>
-                <div class="product-info">
-                    <h3 class="product-title">Casual Comfort Top</h3>
-                    <div class="product-price">
-                        <span class="current-price">₹899</span>
-                        <span class="original-price">₹1,499</span>
-                    </div>
-                    <div class="product-rating">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="far fa-star"></i>
-                        <span style="color: #666;">(4.0)</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="product-card">
-                <div class="product-image">
-                    <img src="https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=400" alt="Denim Jacket">
-                    <div class="wishlist-btn">
-                        <i class="far fa-heart"></i>
-                    </div>
-                </div>
-                <div class="product-info">
-                    <h3 class="product-title">Classic Denim Jacket</h3>
-                    <div class="product-price">
-                        <span class="current-price">₹2,499</span>
-                    </div>
-                    <div class="product-rating">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <span style="color: #666;">(5.0)</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="product-card">
-                <div class="product-image">
-                    <img src="https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=400" alt="Maxi Dress">
-                    <span class="product-badge">TRENDING</span>
-                    <div class="wishlist-btn">
-                        <i class="far fa-heart"></i>
-                    </div>
-                </div>
-                <div class="product-info">
-                    <h3 class="product-title">Elegant Maxi Dress</h3>
-                    <div class="product-price">
-                        <span class="current-price">₹3,299</span>
-                        <span class="original-price">₹4,999</span>
-                    </div>
-                    <div class="product-rating">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star-half-alt"></i>
-                        <span style="color: #666;">(4.7)</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="product-card">
-                <div class="product-image">
-                    <img src="https://images.unsplash.com/photo-1562137369-1a1a0bc66744?w=400" alt="Silk Blouse">
-                    <span class="product-badge">NEW</span>
-                    <div class="wishlist-btn">
-                        <i class="far fa-heart"></i>
-                    </div>
-                </div>
-                <div class="product-info">
-                    <h3 class="product-title">Silk Blouse</h3>
-                    <div class="product-price">
-                        <span class="current-price">₹1,599</span>
-                        <span class="original-price">₹2,299</span>
-                    </div>
-                    <div class="product-rating">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <span style="color: #666;">(4.8)</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="product-card">
-                <div class="product-image">
-                    <img src="https://images.unsplash.com/photo-1509631179647-0177331693ae?w=400" alt="Wide Leg Pants">
-                    <div class="wishlist-btn">
-                        <i class="far fa-heart"></i>
-                    </div>
-                </div>
-                <div class="product-info">
-                    <h3 class="product-title">Wide Leg Pants</h3>
-                    <div class="product-price">
-                        <span class="current-price">₹1,799</span>
-                    </div>
-                    <div class="product-rating">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="far fa-star"></i>
-                        <span style="color: #666;">(4.2)</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="product-card">
-                <div class="product-image">
-                    <img src="https://images.unsplash.com/photo-1591369822096-ffd140ec948f?w=400" alt="Blazer">
-                    <span class="product-badge">SALE</span>
-                    <div class="wishlist-btn">
-                        <i class="far fa-heart"></i>
-                    </div>
-                </div>
-                <div class="product-info">
-                    <h3 class="product-title">Professional Blazer</h3>
-                    <div class="product-price">
-                        <span class="current-price">₹2,999</span>
-                        <span class="original-price">₹4,499</span>
-                    </div>
-                    <div class="product-rating">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star-half-alt"></i>
-                        <span style="color: #666;">(4.6)</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="product-card">
-                <div class="product-image">
-                    <img src="https://images.unsplash.com/photo-1596783074918-c84cb06531ca?w=400" alt="Sweater">
-                    <span class="product-badge">TRENDING</span>
-                    <div class="wishlist-btn">
-                        <i class="far fa-heart"></i>
-                    </div>
-                </div>
-                <div class="product-info">
-                    <h3 class="product-title">Cozy Knit Sweater</h3>
-                    <div class="product-price">
-                        <span class="current-price">₹1,899</span>
-                        <span class="original-price">₹2,799</span>
-                    </div>
-                    <div class="product-rating">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <span style="color: #666;">(4.9)</span>
-                    </div>
-                </div>
-            </div>
+            <% } %>
         </div>
-    </section>
-
-    <!-- Newsletter Section -->
-    <section class="newsletter">
-        <h2>Join Our Newsletter</h2>
-        <p>Subscribe to get special offers, free giveaways, and exclusive deals</p>
-        <form class="newsletter-form" action="/newsletter/subscribe" method="POST">
-            <input type="email" name="email" placeholder="Enter your email" required>
-            <button type="submit">Subscribe</button>
-        </form>
     </section>
 
    
@@ -625,6 +489,24 @@
                 // window.location.href = '/category/' + categoryName;
             });
         });
+    </script>
+    <script>
+        let slides = document.querySelectorAll(".hero-slide")
+        let index = 0
+
+        function showSlide(){
+            slides.forEach((slide,i)=>{
+                slide.style.opacity = i === index ? "1" : "0"
+            })
+
+            index++
+            if(index >= slides.length){
+                index = 0
+            }
+        }
+
+        setInterval(showSlide,5000)
+        showSlide()
     </script>
 </body>
 </html>

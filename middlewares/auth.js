@@ -1,5 +1,6 @@
 const User = require("../models/userSchema")
 
+// to automatically add the logged-in users to all views
 const injectedUser = async (req, res, next)=>{
   if(req.session.user){
     res.locals.user = await User.findById(req.session.user).lean();
@@ -32,6 +33,7 @@ const adminAuth = async (req, res, next) => {
     res.status(500).send("Internal Server Error");
   }
 };
+
 
 module.exports = {
   injectedUser,

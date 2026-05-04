@@ -1,0 +1,1053 @@
+<%- include("../../views/partials/user/header") %>
+
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<style>
+  :root {
+    --rose: #d4145a;
+    --rose-deep: #e96495;
+    --rose-pale: #fce8f0;
+    --rose-blush: #f9d0e0;
+    --rose-mist: #fff5f8;
+    --ink: #1a1a2e;
+    --ink-soft: #3d3d5c;
+    --muted: #8a8aa0;
+    --surface: #ffffff;
+    --off-white: #f7f4f5;
+    --border: #eedde5;
+    --sidebar-w: 260px;
+    --radius: 16px;
+    --radius-sm: 10px;
+    --trans: all 0.22s ease;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--off-white);
+    font-family: 'DM Sans', sans-serif;
+    color: var(--ink);
+    min-height: 100vh;
+  }
+
+  /* ── Layout shell ── */
+  .pa-shell {
+    display: flex;
+    min-height: calc(100vh - 70px);
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 32px 24px 60px;
+    gap: 28px;
+    align-items: flex-start;
+  }
+
+  /* ══════════════════════════
+     SIDEBAR
+  ══════════════════════════ */
+  .pa-sidebar {
+    width: var(--sidebar-w);
+    flex-shrink: 0;
+    position: sticky;
+    top: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  /* Avatar card */
+  .sb-avatar-card {
+    background: white;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    padding: 28px 20px 22px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .sb-avatar-wrap {
+    position: relative;
+    width: 88px;
+    height: 88px;
+  }
+
+  .sb-avatar-wrap img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid white;
+    outline: 2.5px solid var(--rose-blush);
+    display: block;
+  }
+
+  .sb-avatar-edit {
+    position: absolute;
+    bottom: 1px;
+    right: 1px;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--rose);
+    color: white;
+    border: 2px solid white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.65rem;
+    transition: var(--trans);
+  }
+
+  .sb-avatar-edit:hover { background: var(--ink); }
+
+  .sb-name {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--ink);
+    text-align: center;
+    line-height: 1.3;
+  }
+
+  .sb-email {
+    font-size: 0.78rem;
+    color: var(--muted);
+    text-align: center;
+    word-break: break-all;
+  }
+
+  .sb-member-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: var(--rose-pale);
+    color: var(--rose);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    padding: 4px 12px;
+    border-radius: 50px;
+  }
+
+  /* Nav list */
+  .sb-nav {
+    background: white;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+
+  .sb-nav a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 20px;
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: var(--ink-soft);
+    text-decoration: none;
+    border-bottom: 1px solid #f5f0f2;
+    transition: var(--trans);
+    position: relative;
+  }
+
+  .sb-nav a:last-child { border-bottom: none; }
+
+  .sb-nav a:hover {
+    background: var(--rose-mist);
+    color: var(--rose);
+  }
+
+  .sb-nav a.active {
+    background: var(--rose-mist);
+    color: var(--rose);
+    font-weight: 600;
+  }
+
+  .sb-nav a.active::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 8px; bottom: 8px;
+    width: 3px;
+    border-radius: 0 4px 4px 0;
+    background: var(--rose);
+  }
+
+  .sb-nav a i {
+    width: 18px;
+    text-align: center;
+    font-size: 0.88rem;
+    flex-shrink: 0;
+  }
+
+  .sb-nav-badge {
+    margin-left: auto;
+    background: var(--rose);
+    color: white;
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 50px;
+    line-height: 1.5;
+  }
+
+  /* Logout btn */
+  .sb-logout {
+    background: white;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+
+  .sb-logout a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 20px;
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: #c0392b;
+    text-decoration: none;
+    transition: var(--trans);
+  }
+
+  .sb-logout a:hover { background: #fdecea; }
+
+  /* ══════════════════════════
+     MAIN CONTENT
+  ══════════════════════════ */
+  .pa-main {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  /* Page heading row */
+  .pa-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 4px;
+  }
+
+  .pa-heading h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--ink);
+    line-height: 1.2;
+  }
+
+  .pa-heading h1 span {
+    color: var(--rose);
+  }
+
+  /* Stat strip */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+
+  .stat-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 22px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    transition: var(--trans);
+  }
+
+  .stat-card:hover {
+    border-color: var(--rose-blush);
+    transform: translateY(-2px);
+  }
+
+  .stat-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: var(--rose-pale);
+    color: var(--rose);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+
+  .stat-text .val {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--rose);
+    line-height: 1;
+  }
+
+  .stat-text .lbl {
+    font-size: 0.75rem;
+    color: var(--muted);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-top: 3px;
+  }
+
+  /* Generic card */
+  .card {
+    background: white;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    padding: 28px 30px;
+    transition: var(--trans);
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 22px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #f5f0f2;
+  }
+
+  .card-title-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .card-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 9px;
+    background: var(--rose-pale);
+    color: var(--rose);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+  }
+
+  .card-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .card-action {
+    font-size: 0.8rem;
+    color: var(--rose);
+    font-weight: 600;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 7px 16px;
+    border-radius: 8px;
+    border: 1.5px solid var(--rose-blush);
+    transition: var(--trans);
+  }
+
+  .card-action:hover {
+    background: var(--rose);
+    color: white;
+    border-color: var(--rose);
+  }
+
+  /* Info rows */
+  .info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 13px 0;
+    border-bottom: 1px solid #f8f3f5;
+  }
+
+  .info-row:last-child { border-bottom: none; }
+
+  .info-label {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    font-weight: 500;
+  }
+
+  .info-value {
+    font-size: 0.9rem;
+    color: var(--ink);
+    font-weight: 500;
+    text-align: right;
+  }
+
+  .info-value.password {
+    color: var(--muted);
+    font-family: monospace;
+    letter-spacing: 0.2em;
+  }
+
+  /* Action buttons */
+  .action-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 6px;
+  }
+
+  .btn-rose {
+    padding: 11px 28px;
+    border-radius: 50px;
+    background: var(--rose);
+    color: white;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    font-size: 0.85rem;
+    border: none;
+    cursor: pointer;
+    transition: var(--trans);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+  }
+
+  .btn-rose:hover {
+    background: var(--ink);
+    color: white;
+    transform: translateY(-1px);
+  }
+
+  .btn-ghost {
+    padding: 11px 28px;
+    border-radius: 50px;
+    background: white;
+    color: var(--ink-soft);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    font-size: 0.85rem;
+    border: 1.5px solid var(--border);
+    cursor: pointer;
+    transition: var(--trans);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+  }
+
+  .btn-ghost:hover {
+    border-color: var(--rose);
+    color: var(--rose);
+    transform: translateY(-1px);
+  }
+
+  /* ══ Address cards ══ */
+  .addr-add-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 18px;
+    border-radius: 8px;
+    border: 1.5px solid var(--rose);
+    color: var(--rose);
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: var(--trans);
+    background: transparent;
+  }
+
+  .addr-add-btn:hover {
+    background: var(--rose);
+    color: white;
+  }
+
+  .addr-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+  }
+
+  .addr-card {
+    position: relative;
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    background: #fff;
+    transition: var(--trans);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .addr-card:hover {
+    border-color: var(--rose-blush);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(212,20,90,0.08);
+  }
+
+  .addr-card--default { border-color: var(--rose); background: var(--rose-mist); }
+
+  .addr-card__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .addr-type-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--rose-pale);
+    color: var(--rose);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 50px;
+  }
+
+  .addr-default-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--rose);
+    background: rgba(212,20,90,0.08);
+    border: 1px solid rgba(212,20,90,0.18);
+    padding: 3px 10px;
+    border-radius: 50px;
+  }
+
+  .addr-card__body { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+
+  .addr-name { font-size: 0.95rem; font-weight: 700; color: var(--ink); margin: 0; }
+  .addr-line { font-size: 0.85rem; color: var(--ink-soft); margin: 0; line-height: 1.5; }
+  .addr-landmark, .addr-phone { color: var(--muted); font-size: 0.8rem; display: flex; align-items: center; gap: 5px; }
+
+  .addr-card__actions {
+    display: flex;
+    gap: 8px;
+    padding-top: 12px;
+    border-top: 1px solid #f0eaec;
+  }
+
+  .addr-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 14px;
+    border-radius: 7px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: var(--trans);
+    cursor: pointer;
+    line-height: 1;
+  }
+
+  .addr-btn--edit { background: #eef2ff; color: #3b5bdb; border: 1.5px solid #c5d0fa; }
+  .addr-btn--edit:hover { background: #3b5bdb; color: white; border-color: #3b5bdb; }
+  .addr-btn--delete { background: #fff0f0; color: #c0392b; border: 1.5px solid #f5c0bb; }
+  .addr-btn--delete:hover { background: #c0392b; color: white; border-color: #c0392b; }
+
+  .addr-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 20px;
+    text-align: center;
+    gap: 8px;
+  }
+
+  .addr-empty__icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: var(--rose-mist);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: var(--rose-blush);
+    margin-bottom: 4px;
+  }
+
+  .addr-empty__title { font-size: 1rem; font-weight: 700; color: var(--ink); margin: 0; }
+  .addr-empty__sub { font-size: 0.85rem; color: var(--muted); margin: 0 0 8px; }
+  .addr-add-btn--lg { padding: 11px 26px; font-size: 0.88rem; border-radius: 50px; }
+
+  /* ══ Orders table ══ */
+  .orders-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 6px;
+  }
+
+  .orders-table thead th {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    font-weight: 600;
+    padding: 6px 14px 12px;
+    text-align: left;
+    border-bottom: 1.5px solid var(--border);
+  }
+
+  .orders-table tbody tr { background: var(--off-white); transition: var(--trans); }
+  .orders-table tbody tr:hover { background: var(--rose-mist); }
+
+  .orders-table tbody td {
+    padding: 13px 14px;
+    font-size: 0.87rem;
+    color: var(--ink-soft);
+  }
+
+  .orders-table tbody td:first-child {
+    border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .orders-table tbody td:last-child { border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
+
+  .badge-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 12px;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .badge-status::before {
+    content: '';
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .badge-delivered { background: #e8f8ef; color: #1a7a46; }
+  .badge-delivered::before { background: #1a7a46; }
+  .badge-pending { background: #fff4e0; color: #a06000; }
+  .badge-pending::before { background: #f59e0b; }
+  .badge-cancelled { background: #fdecea; color: #c0392b; }
+  .badge-cancelled::before { background: #c0392b; }
+
+  .view-link {
+    color: var(--rose);
+    text-decoration: none;
+    font-size: 0.8rem;
+    font-weight: 600;
+    transition: var(--trans);
+  }
+
+  .view-link:hover { color: var(--ink); }
+
+  /* Placeholder panels */
+  .empty-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 56px 20px;
+    text-align: center;
+    gap: 10px;
+  }
+
+  .empty-panel__icon {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: var(--rose-mist);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.7rem;
+    color: var(--rose-blush);
+    margin-bottom: 4px;
+  }
+
+  .empty-panel h3 { font-size: 1rem; font-weight: 700; color: var(--ink); }
+  .empty-panel p { font-size: 0.85rem; color: var(--muted); max-width: 260px; }
+
+  /* Wallet balance chip */
+  .wallet-balance {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(120deg, var(--rose) 0%, #b30048 100%);
+    border-radius: 14px;
+    padding: 22px 26px;
+    color: white;
+    margin-bottom: 20px;
+  }
+
+  .wallet-balance .label {
+    font-size: 0.78rem;
+    font-weight: 500;
+    opacity: 0.75;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 6px;
+  }
+
+  .wallet-balance .amount {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.2rem;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .wallet-balance .wallet-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+  }
+
+  /* Divider between sections */
+  .section-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 4px 0;
+  }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    .pa-shell { flex-direction: column; padding: 20px 16px 48px; }
+    .pa-sidebar { width: 100%; position: static; flex-direction: row; flex-wrap: wrap; gap: 10px; }
+    .sb-avatar-card { flex-direction: row; text-align: left; padding: 16px 18px; gap: 14px; flex: 1 1 100%; }
+    .sb-nav { display: flex; flex: 1 1 100%; }
+    .sb-nav a { flex: 1; justify-content: center; font-size: 0.78rem; padding: 11px 8px; flex-direction: column; gap: 4px; text-align: center; }
+    .sb-nav a::before { display: none; }
+    .sb-nav-badge { margin: 0 auto; }
+    .stats-row { grid-template-columns: 1fr 1fr; }
+  }
+
+  @media (max-width: 560px) {
+    .stats-row { grid-template-columns: 1fr; }
+    .addr-grid { grid-template-columns: 1fr; }
+    .action-row { flex-direction: column; }
+  }
+
+  /* Fade-in */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .pa-sidebar { animation: fadeUp 0.4s ease both; }
+  .pa-main > * { animation: fadeUp 0.4s ease both; }
+  .pa-main > *:nth-child(1) { animation-delay: 0.05s; }
+  .pa-main > *:nth-child(2) { animation-delay: 0.12s; }
+  .pa-main > *:nth-child(3) { animation-delay: 0.18s; }
+  .pa-main > *:nth-child(4) { animation-delay: 0.24s; }
+  .pa-main > *:nth-child(5) { animation-delay: 0.30s; }
+</style>
+
+<div class="pa-shell">
+
+  <!-- ══════════════ SIDEBAR ══════════════ -->
+  <aside class="pa-sidebar">
+
+    <!-- Avatar + Name -->
+    <div class="sb-avatar-card">
+      <div class="sb-avatar-wrap">
+        <img
+          src="<%= user.profileImage || 'images/heroin.jpg' %>"
+          alt="Profile Photo"
+          id="currentPhoto"
+        >
+        <label for="photoUpload" class="sb-avatar-edit" title="Change photo">
+          <i class="fas fa-camera"></i>
+        </label>
+        <input type="file" id="photoUpload" name="image" accept="image/*" hidden>
+      </div>
+      <div>
+        <div class="sb-name"><%= user.name %></div>
+        <div class="sb-email"><%= user.email %></div>
+        
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="sb-nav">
+      <a href="/profile" class="active">
+        <i class="fas fa-user"></i> My Profile
+      </a>
+      <a href="/orders">
+        <i class="fas fa-shopping-bag"></i> Orders
+        <span class="sb-nav-badge"><%= totalOrders %></span>
+      </a>
+      <a href="/wishlist">
+        <i class="fas fa-heart"></i> Wishlist
+      </a>
+      <a href="/wallet">
+        <i class="fas fa-wallet"></i> Wallet
+      </a>
+    </nav>
+
+    <!-- Logout -->
+    <div class="sb-logout">
+      <a href="/logout">
+        <i class="fas fa-sign-out-alt"></i> Sign Out
+      </a>
+    </div>
+
+  </aside>
+
+  <!-- ══════════════ MAIN CONTENT ══════════════ -->
+  <main class="pa-main">
+
+    <!-- Page heading -->
+    <div class="pa-heading">
+      <h1>Welcome back, <span><%= user.name.split(' ')[0] %></span></h1>
+    </div>
+
+    <!-- Stats row -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-box"></i></div>
+        <div class="stat-text">
+          <div class="val"><%= totalOrders  %></div>
+          <div class="lbl">Total Orders</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+        <div class="stat-text">
+          <div class="val"><%= deliveredOrders %></div>
+          <div class="lbl">Delivered</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-clock"></i></div>
+        <div class="stat-text">
+          <div class="val"><%= pendingOrders %></div>
+          <div class="lbl">Pending</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Personal Info card -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title-group">
+          <div class="card-icon"><i class="fas fa-user"></i></div>
+          <span class="card-title">Personal Info</span>
+        </div>
+        <a href="/edit-profile" class="card-action" data-bs-toggle="modal" data-bs-target="#editModal">
+          <i class="fas fa-pen"></i> Edit
+        </a>
+      </div>
+
+      <div class="info-row">
+        <span class="info-label">Full Name</span>
+        <span class="info-value"><%= user.name %></span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Email</span>
+        <span class="info-value"><%= user.email %></span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Phone</span>
+        <span class="info-value"><%= user.phone || '— Not set —' %></span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Password</span>
+        <span class="info-value password">••••••••••</span>
+      </div>
+
+      <div class="action-row" style="margin-top:18px;">
+        <a href="/edit-profile" class="btn-rose" data-bs-toggle="modal" data-bs-target="#editModal">
+          <i class="fas fa-pen"></i> Edit Profile
+        </a>
+        <a href="/change-password" class="btn-ghost" data-bs-toggle="modal" data-bs-target="#passwordModal">
+          <i class="fas fa-lock"></i> Change Password
+        </a>
+      </div>
+    </div>
+
+    <!-- Delivery Addresses card -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title-group">
+          <div class="card-icon"><i class="fas fa-map-marker-alt"></i></div>
+          <span class="card-title">Delivery Addresses</span>
+        </div>
+        <a href="/addAddress" class="addr-add-btn">
+          <i class="fas fa-plus"></i> Add Address
+        </a>
+      </div>
+
+      <% if (userAddress && userAddress.length > 0) { %>
+        <div class="addr-grid">
+          <% userAddress.forEach(addr => { %>
+            <div class="addr-card <%= addr.isDefault ? 'addr-card--default' : '' %>">
+
+              <div class="addr-card__top">
+                <div class="addr-type-pill">
+                  <i class="fas <%= addr.addressType === 'Work' ? 'fa-briefcase' : 'fa-home' %>"></i>
+                  <%= addr.addressType || 'Home' %>
+                </div>
+                <% if (addr.isDefault) { %>
+                  <div class="addr-default-chip">
+                    <i class="fas fa-check-circle"></i> Default
+                  </div>
+                <% } %>
+              </div>
+
+              <div class="addr-card__body">
+                <p class="addr-name"><%= addr.name %></p>
+                <p class="addr-line">
+                  <%= addr.city %>, <%= addr.state %> &mdash; <strong><%= addr.pincode %></strong>
+                </p>
+                <% if (addr.landMark) { %>
+                  <p class="addr-landmark">
+                    <i class="fas fa-map-pin"></i> <%= addr.landMark %>
+                  </p>
+                <% } %>
+                <p class="addr-phone">
+                  <i class="fas fa-phone"></i> <%= addr.phone %>
+                  <% if (addr.altPhone) { %>
+                    &nbsp;&middot;&nbsp;<%= addr.altPhone %>
+                  <% } %>
+                </p>
+              </div>
+
+              <div class="addr-card__actions">
+                <a href="/editAddress/<%= addr._id %>" class="addr-btn addr-btn--edit">
+                  <i class="fas fa-pen"></i> Edit
+                </a>
+                <a href="/deleteAddress/<%= addr._id %>"
+                   class="addr-btn addr-btn--delete"
+                   onclick="confirmDelete(event, '<%= addr._id %>');">
+                  <i class="fas fa-trash-alt"></i> Delete
+                </a>
+              </div>
+
+            </div>
+          <% }) %>
+        </div>
+
+      <% } else { %>
+        <div class="addr-empty">
+          <div class="addr-empty__icon">
+            <i class="fas fa-map-marker-alt"></i>
+          </div>
+          <p class="addr-empty__title">No addresses saved yet</p>
+          <p class="addr-empty__sub">Add a delivery address to make checkout faster</p>
+          <a href="/addAddress" class="addr-add-btn addr-add-btn--lg">
+            <i class="fas fa-plus"></i> Add New Address
+          </a>
+        </div>
+      <% } %>
+    </div>
+
+    <!-- Wallet card -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title-group">
+          <div class="card-icon"><i class="fas fa-wallet"></i></div>
+          <span class="card-title">Wallet</span>
+        </div>
+        <a href="/wallet" class="card-action">
+          Details <i class="fas fa-arrow-right" style="font-size:0.7rem;"></i>
+        </a>
+      </div>
+      <div class="wallet-balance">
+        <div>
+          <div class="label">Available Balance</div>
+          <div class="amount">₹<%= wallet?.balance || 0 %></div>
+        </div>
+        <div class="wallet-icon"><i class="fas fa-wallet"></i></div>
+      </div>
+      
+    </div>
+
+  </main>
+</div>
+
+
+<script>
+  document.getElementById('photoUpload').addEventListener('change', async function (e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = ev => {
+      document.getElementById('currentPhoto').src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+
+    const formData = new FormData();
+    formData.append("image", file);
+
+    try {
+      const response = await fetch("/edit-profileImage", {
+        method: "POST",
+        body: formData
+      });
+      const data = await response.json();
+      if (data.success) {
+        Swal.fire({ icon: "success", title: "Profile photo updated successfully" });
+      }
+    } catch (error) {
+      console.log("Upload error:", error);
+    }
+  });
+
+  const params = new URLSearchParams(window.location.search);
+  if (params.get("success")) {
+    Swal.fire({ icon: "success", title: "Profile Updated Successfully", showConfirmButton: false, timer: 2000 });
+  }
+  if (params.get("passsuccess")) {
+    Swal.fire({ icon: "success", title: "Password Updated Successfully", showConfirmButton: false, timer: 2000 });
+  }
+  if (params.get("success")) {
+    Swal.fire({ icon: "success", title: "Address added Successfully", showConfirmButton: false, timer: 2000 });
+  }
+  if (params.get("updatesuccess")) {
+    Swal.fire({ icon: "success", title: "Address updated Successfully", showConfirmButton: false, timer: 2000 });
+  }
+  if (params.get("deletesuccess")) {
+    Swal.fire({ icon: "success", title: "Address deleted Successfully", showConfirmButton: false, timer: 2000 });
+  }
+
+
+  function confirmDelete(event, id) {
+    event.preventDefault();
+
+    Swal.fire({
+      title: "Delete this address?",
+      text: "This action cannot be undone.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#6c757d",
+      confirmButtonText: "Yes, delete it!"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        window.location.href = "/deleteAddress/" + id;
+      }
+    });
+  }
+</script>

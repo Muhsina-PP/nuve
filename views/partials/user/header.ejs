@@ -1,203 +1,320 @@
  <style>
-  
-        /* Header Styles */
-        header {
-            background: #fff;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
+/* Header */
+.site-header {
+    background: #fff;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    border-bottom: 1px solid #eee;
+}
 
-        nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem 5%;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
+.main-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 1rem 5%;
+}
 
-        .logo {
-            font-size: 28px;
-            font-weight: bold;
-            color: #d4145a;
-            text-decoration: none;
-        }
+.logo {
+    font-size: 2.1rem;
+    font-weight: 800;
+    color: #d4145a;
+    text-decoration: none;
+    letter-spacing: -1px;
+}
 
-        .nav-links {
-            display: flex;
-            list-style: none;
-            gap: 2rem;
-        }
+/* Main nav links – no underline, elegant hover */
+.nav-links {
+    display: flex;
+    list-style: none;
+    gap: 2.5rem;
+    margin: 0;
+}
 
-        .nav-links a {
-            text-decoration: none;
-            color: #333;
-            font-weight: 500;
-            transition: color 0.3s;
-        }
+.nav-links a {
+    color: #333;
+    font-weight: 500;
+    text-decoration: none;
+    font-size: 1.05rem;
+    transition: color 0.25s ease, transform 0.25s ease;
+    position: relative;
+}
 
-        .nav-links a:hover {
-            color: #d4145a;
-        }
+.nav-links a:hover,
+.nav-links a.active {
+    color: #d4145a;
+    transform: translateY(-1px);
+}
 
-        .nav-icons {
-            display: flex;
-            gap: 1.5rem;
-            font-size: 20px;
-        }
+/* Right side (auth + icons) */
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 1.8rem;
+}
 
-        .nav-icons a {
-            color: #333;
-            position: relative;
-            transition: color 0.3s;
-        }
+/* Auth buttons – pill style, no underline, no dots */
+.auth-btn {
+    padding: 0.65rem 1.6rem;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 0.98rem;
+    text-decoration: none;
+    transition: all 0.25s ease;
+    border: none;
+    cursor: pointer;
+}
 
-        .nav-icons a:hover {
-            color: #d4145a;
-        }
+.signup {
+    background: #d4145a;
+    color: white;
+}
 
-        .cart-count {
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            background: #d4145a;
-            color: #fff;
-            border-radius: 50%;
-            width: 18px;
-            height: 18px;
-            font-size: 11px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .auth-link {
-            font-weight: 600 !important;           
-            padding: 8px 20px;                     /* gives them button-like feel */
-            border-radius: 6px;
-            transition: all 0.3s ease;
-        }
+.signup:hover {
+    background: #b30f4d;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(212,20,90,0.25);
+}
 
-        .signup-link {
-            background: #d4145a;
-            color: #fff !important;
-        }
+.login {
+    background: white;
+    color: #d4145a;
+    border: 2px solid #d4145a;
+}
 
-        .signup-link:hover {
-            background: #b8124a;
-            color: #fff;
-        }
+.login:hover {
+    background: #d4145a;
+    color: white;
+    transform: translateY(-1px);
+}
 
-        /* Login button – white with pink border & text */
-        .login-link {
-            background: #fff;
-            color: #d4145a !important;
-            border: 2px solid #d4145a;
-        }
+/* Icons */
+.nav-icons {
+    display: flex;
+    gap: 1.6rem;
+    font-size: 1.35rem;
+}
 
-        .login-link:hover {
-            background: #d4145a;
-            color: #fff !important;
-        }
-        /* Wrapper for username dropdown */
-        .user-dropdown {
-            position: relative;
-            list-style: none;
-            cursor: pointer;
-        }
+.nav-icons a {
+    color: #444;
+    position: relative;
+    transition: color 0.25s;
+}
 
-        /* Trigger section (icon + name + arrow) */
-        .user-trigger {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            color: #333;
-            font-weight: 600;
-            border-radius: 6px;
-        }
+.nav-icons a:hover {
+    color: #d4145a;
+}
 
-        .user-trigger:hover {
-            background-color: #f3f3f3;
-        }
+.cart-icon {
+    position: relative;
+}
 
-        /* Dropdown Menu */
-        .dropdown-menu {
-            position: absolute;
-            top: 40px;
-            right: 0;
-            background: white;
-            width: 150px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            padding: 8px 0;
-            display: none;
-            z-index: 100;
-        }
+.cart-count {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: #d4145a;
+    color: white;
+    font-size: 0.68rem;
+    font-weight: 600;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
-        /* Menu items */
-        .dropdown-menu li {
-            list-style: none;
-        }
+/* User dropdown */
+.user-profile.visible {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
 
-        .dropdown-menu li a {
-            text-decoration: none;
-            display: block;
-            padding: 10px 15px;
-            color: #333;
-            font-weight: 500;
-        }
+.user-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #333;
+    text-decoration: none;
+    font-weight: 500;
+    padding: 8px 12px;
+    border-radius: 50px;
+    transition: background 0.2s;
+}
 
-        .dropdown-menu li a:hover {
-            background-color: #f5f5f5;
-        }
+.user-link:hover {
+    background: #f8f8f8;
+}
 
-        /* Rotate arrow when open */
-        .user-dropdown.open .dropdown-arrow {
-            transform: rotate(180deg);
-        }
+.user-name {
+    font-size: 1rem;
+    color: #333;
+    white-space: nowrap;
+}
+
+.user-dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    min-width: 160px;
+    padding: 8px 0;
+    display: none;
+    z-index: 100;
+    margin-top: 4px;
+}
+
+.user-profile:hover .user-dropdown-menu {
+    display: block;
+}
+
+.user-dropdown-menu li a {
+    display: block;
+    padding: 10px 20px;
+    color: #333;
+    text-decoration: none;
+}
+
+.user-dropdown-menu li a:hover {
+    background: #f5f5f5;
+}
+.user-trigger {
+    color: #d4145a;
+    font-size: 1.6rem;
+    padding: 8px;
+    border-radius: 50%;
+    background: rgba(212,20,90,0.08);
+}
+
+.user-trigger span {
+    display: none; /* hide name until hover if you want */
+}
+
+.user-trigger:hover span {
+    display: inline;
+}
+.user-menu {
+    position: relative;
+}
+
+.user-trigger {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: none;
+    border: none;
+    color: #333;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    transition: background 0.25s;
+}
+
+.user-trigger:hover {
+    background: #f8f8f8;
+}
+
+.dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    min-width: 160px;
+    padding: 8px 0;
+    margin-top: 8px;
+    display: none;
+    z-index: 1000;
+}
+.user-dropdown-menu {
+    list-style: none;
+    margin: 0;
+    padding: 8px 0;
+}
+
+.user-menu:hover .dropdown {
+    display: block;
+}
+
+.dropdown li a {
+    display: block;
+    padding: 10px 20px;
+    color: #333;
+    text-decoration: none;
+    font-size: 0.95rem;
+}
+
+.dropdown li a:hover {
+    background: #f5f5f5;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+    .nav-links {
+        gap: 1.5rem;
+    }
+    .auth-btn {
+        padding: 0.55rem 1.3rem;
+        font-size: 0.95rem;
+    }
+}
 
   </style> 
 
   <!-- Header -->
-  <header>
-        <nav>
-            <a href="/" class="logo">NUVE</a>
-            <ul class="nav-links">
-                <li><a href="/shop">Shop</a></li>
-                <li><a href="/orders">Orders</a></li>
-                <li><a href="/contact-us">Contact us</a></li>
-                <li><a href="/about">About</a></li>
+  <!-- Header -->
+<header class="site-header">
+<link rel="stylesheet" href="/css/user-header.css">  
+    <nav class="main-nav">
+        <a href="/" class="logo">NUVE</a>
 
-                <% if ( !user ) { %>
-                    <li><a href="/signup" class="auth-link signup-link">Signup</a></li>
-                    <li><a href="/login" class="auth-link login-link">Login</a></li>
-                <% } else { %>
-                    <li class="user-dropdown">
-                        <div class="user-trigger">
-                            <i class="fas fa-user-circle"></i>
-                            <span><%= user.name %></span>
-                        </div>
+        <ul class="nav-links">
+            <li><a href="/shop">Shop</a></li>
+            <li><a href="/orders">Orders</a></li>
+            <li><a href="/contact-us">Contact us</a></li>
+            <li><a href="/about">About</a></li>
+        </ul>
 
-                        <ul class="dropdown-menu">
-                            <li><a href="/profile">Profile</a></li>
-                            <li><a href="/logout">Logout</a></li>
-                        </ul>
-                    </li>
-                <% } %>
-
-            </ul>
+        <div class="nav-right">
+            <!-- Auth buttons (no underline, pill style) -->
+           <% if (!user) { %>
+                <a href="/signup" class="auth-btn signup">Sign up</a>
+                <a href="/login" class="auth-btn login">Log in</a>
+            <% } else { %>
+                <div class="user-profile visible">
+                    <a href="#" class="user-link">
+                        <i class="fas fa-user-circle"></i>
+                        <span class="user-name"><%= user.name.split(' ')[0] %></span> <!-- shows first name only -->
+                    </a>
+                    <ul class="user-dropdown-menu">
+                        <li><a href="/userProfile">Profile</a></li>
+                        <li><a href="/orders">My Orders</a></li>
+                        <li><a href="/logout">Logout</a></li>
+                    </ul>
+                </div>
+            <% } %>
+            <!-- Icons -->
             <div class="nav-icons">
-                <a href="/search"><i class="fas fa-search"></i></a>
-                <a href="/profile"><i class="fas fa-user"></i></a>
-                <a href="/wishlist"><i class="fas fa-heart"></i></a>
-                <a href="/cart">
+                <a href="/search" title="Search"><i class="fas fa-search"></i></a>
+                <a href="/wishlist" title="Wishlist"><i class="fas fa-heart"></i></a>
+                <a href="/cart" class="cart-icon" title="Cart">
                     <i class="fas fa-shopping-bag"></i>
-                    <span class="cart-count">3</span>
+                    <!-- <span class="cart-count"></span> -->
                 </a>
             </div>
-        </nav>
-    </header>
+        </div>
+    </nav>
+</header>
 
 
     <script>
@@ -213,6 +330,7 @@
                     menu.style.display = userDropdown.classList.contains("open") ? "block" : "none";
                 });
             }
+        
 
             // Close dropdown when clicking outside
             document.addEventListener("click", () => {
