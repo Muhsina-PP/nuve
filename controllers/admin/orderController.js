@@ -2,6 +2,7 @@ const Order = require("../../models/orderSchema");
 const User = require("../../models/userSchema");
 const Product = require("../../models/productSchema");
 const PDFDocument = require("pdfkit");
+const { creditWallet, debitWallet } = require("../../helpers/wallet");
 
 
 const loadOrders = async  (req, res)=>{
@@ -262,7 +263,86 @@ const downloadInvoice = async (req, res) => {
   }
 };
 
+const verifyReturn = async (req, res)  =>{
+  try {
+    
+    const { orderId, itemId} = req.body;
 
+    const order = await Order.findById( orderId )
+      .populate('orderedItems.product')
+
+    if(!order){
+      return res.status(400).json({success : false, message : 'This order not found'})
+    }
+    
+
+    const item = order.orderedItems.find(
+      i => i._id.toString() === itemId
+    )
+
+    if (!item) {
+      return res.status(404).json({
+        success: false,
+        message: "Item not found"
+      });
+    }
+
+    if(item.status !== "Return Requested"){
+      return res.status(400).json({
+        success: false,
+        message: "Return not requested"
+      });
+    }
+
+
+    item.status = 'Returned';
+    
+     //  Restore stock
+    await Product.findOneAndUpdate(
+      {
+      _id : item.product._id,
+      'variants.size' : item.variant
+      },
+      {
+        $inc  : { 'variants.$.stock' : item.quantity }
+      }
+    )
+
+    const itemAmount = item.quantity * item.price;
+
+    if(item.status === 'Returned'){
+        await creditWallet(
+          order.userId,
+          itemAmount,
+          "Item Returned",
+          order._id
+        )
+    }
+
+    const allReturned  = order.orderedItems.every(
+      i => i.status === 'Returned'
+    )
+
+    if(allReturned){
+      order.status = 'Returned'
+    }
+
+    console.log("Crediting wallet:", order.userId, itemAmount);
+
+    await order.save();
+
+    res.json({
+      success: true
+    });
+
+  } catch (error) {
+      console.error("verifyReturn error:", error);
+      res.status(500).json({
+        success: false,
+        message: "Server error"
+      });
+  }
+}
 
 
 
@@ -271,4 +351,5 @@ module.exports = {
   updateOrderStatus,
   loadOrderDetails,
   downloadInvoice,
+  verifyReturn
 }

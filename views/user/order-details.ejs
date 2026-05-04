@@ -276,6 +276,16 @@
       font-size: 11px;
       font-weight: 600;
     }
+    .return-badge {
+      display: inline-block;
+      padding: 5px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #2e7d32;
+      background-color: #e8f5e9; /* light green background */
+      border-radius: 20px; /* makes it pill-shaped */
+      border: 1px solid #2e7d32;
+    }
     .item-badge.returned         { background: var(--green-bg); color: var(--green); }
     .item-badge.return-requested { background: #fff8e1; color: #f57f17; }
     .item-badge.cancelled        { background: #fce4ec; color: #c62828; }
@@ -444,7 +454,6 @@
           <div class="order-meta">
             <span><i class="fas fa-calendar-alt"></i> <%= new Date(order.createdOn).toLocaleDateString() %></span>
             <span><i class="fas fa-box"></i> <%= order.orderedItems.length %> items</span>
-            <span><i class="fas fa-credit-card"></i> COD</span>
           </div>
         </div>
         <div class="header-right">
@@ -526,6 +535,8 @@
                     <span class="badge cancelled-badge">Cancelled</span>
                     <% } else if (item.status === "Return Requested") { %>
                       <span class="badge return-badge">Return Requested</span>
+                      <% } else if (item.status === "Returned") { %>
+                       <span class="badge return-badge">Returned</span>
     
                     <% } else if (order.status === "Delivered") { %>
                        
@@ -580,9 +591,19 @@
           <i class="fas fa-file-pdf"></i> Download Invoice
         </button>
         <!-- Show Cancel Order only when order is cancellable -->
+         <% 
+            const isSingleItem = order.orderedItems.length === 1;
+            const isSingleItemCancelled = isSingleItem && order.orderedItems[0].status === 'Cancelled'
+          %>
+          <% if (order.status !== 'Delivered' && !isSingleItemCancelled) { %>
         <button class="action-btn danger" onclick="cancelOrder()">
+         
+           
+         
           <i class="fas fa-times-circle"></i> Cancel Entire Order
+           
         </button>
+        <% } %>
         <a href="/orders" class="action-btn ghost">
           <i class="fas fa-arrow-left"></i> Back to Orders
         </a>
@@ -607,11 +628,39 @@
           </div>
           <div>
             <div class="info-label">Payment Method</div>
-            <div class="info-value">COD</div>
+            <div class="info-value">
+              <!-- <%= order.paymentMethod === "Online" ? "ONLINE" : "COD" %> -->
+               <% if (order.paymentMethod === "Online") { %>
+                  ONLINE
+                  <% } else if( order.paymentMethod === "Wallet" ){ %>
+                   WALLET
+                   <% } else { %>
+                    COD
+               <% } %>
+            </div>
           </div>
           <div>
+             <% if (order.status !== 'Cancelled') { %>
             <div class="info-label">Payment Status</div>
-            <div class="info-value"><span class="pay-status-badge">Payment Pending</span></div>
+            <div class="info-value">
+             
+              <span class="pay-status-badge">
+
+                <% if (order.walletUsed > 0 && order.paymentMethod === "Online") { %>
+                  Wallet + Online
+                  <% } else if ( order.paymentMethod === "Wallet") { %>
+                   Paid
+                <% } else { %>
+                <%= (order.paymentMethod === "Online" || 
+                    (order.paymentMethod === "COD" && order.status === "Delivered")) 
+                    ? "Paid" 
+                    : "Payment Pending" %>
+                <% } %>
+  
+              </span>
+                              
+            </div>
+            <% } %>
           </div>
         </div>
 

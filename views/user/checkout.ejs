@@ -311,6 +311,48 @@
       padding: 3px 10px; border-radius: 20px;
     }
 
+     .coupon-row { display: flex; gap: 8px; margin: 18px 0; }
+  .coupon-input {
+    flex: 1;
+    padding: 10px 14px;
+    border: 1px solid #eee;
+    border-radius: 50px;
+    font-size: 13px;
+    outline: none;
+    color: #333;
+  }
+  .coupon-input:focus { border-color: #d4145a; }
+  .coupon-btn {
+    padding: 10px 18px;
+    background: #fbeaf0;
+    color: #d4145a;
+    border: 1px solid #f4c0d1;
+    border-radius: 50px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+  }
+  .coupon-btn:hover { background: #d4145a; color: #fff; border-color: #d4145a; }
+
+  .checkout-btn {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    background: #d4145a;
+    color: #fff;
+    border: none;
+    border-radius: 50px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.3s;
+    margin-top: 10px;
+    text-decoration: none;
+  }
+
     .place-order-btn {
       display: block; width: 100%; padding: 14px;
       background: #d4145a; color: #fff;
@@ -327,6 +369,34 @@
       display: flex; align-items: center; justify-content: center;
       gap: 6px; font-size: 12px; color: #aaa; margin-top: 14px;
     }
+    label.payment-option:has(#useWallet) {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  border-radius: 12px;
+  border: 1.5px dashed var(--border);
+  background: var(--rose-mist);
+  cursor: pointer;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--ink-soft);
+  transition: var(--trans);
+  margin-top: 8px;
+}
+
+label.payment-option:has(#useWallet):hover {
+  border-color: var(--rose);
+  color: var(--rose);
+}
+
+label.payment-option:has(#useWallet) #useWallet {
+  accent-color: var(--rose);
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
 
     @media (max-width: 900px) {
       .checkout-wrap { grid-template-columns: 1fr; }
@@ -381,6 +451,7 @@
               data-address-id="<%= addr._id %>"
               onclick="selectAddress(this, '<%= addr._id %>')"
             >
+          
             <span class="addr-type"><%= addr.addressType %></span>
             <div class="addr-name"><%= addr.name %></div>
             <div class="addr-line"><%= addr.city %></div>
@@ -417,8 +488,13 @@
           </div>
 
         </div>
-
-        <input type="hidden" id="selectedAddressId" name="selectedAddressId" value="addr_1">
+        <input 
+          type="hidden" 
+          id="selectedAddressId" 
+          name="selectedAddressId" 
+          value="<%= addresses.length > 0 ? addresses[0]._id : '' %>"
+        >
+        <!-- <input type="hidden" id="selectedAddressId" name="selectedAddressId" value="addr_1"> -->
       </div>
 
       <!-- STEP 2: Order Items -->
@@ -498,24 +574,27 @@
             </div>
           </label>
 
-          <label class="payment-option" style="opacity:0.6; cursor:not-allowed;">
-            <input type="radio" name="paymentMethod" value="online" disabled>
+          <label class="payment-option" onclick="selectPayment(this)">
+            <input type="radio" name="paymentMethod" value="online" >
             <div class="payment-icon">💳</div>
             <div>
-              <div class="payment-label">Online Payment</div>
+              <div class="payment-label">Razor Pay</div>
               <div class="payment-desc">UPI, Cards, Net Banking</div>
             </div>
-            <span class="payment-soon">Coming Soon</span>
           </label>
 
-          <label class="payment-option" style="opacity:0.6; cursor:not-allowed;">
-            <input type="radio" name="paymentMethod" value="wallet" disabled>
+          <label class="payment-option" onclick="selectPayment(this)" >
+            <input type="radio" name="paymentMethod" value="wallet" >
             <div class="payment-icon">👛</div>
             <div>
               <div class="payment-label">Wallet</div>
               <div class="payment-desc">Pay from your store wallet</div>
             </div>
-            <span class="payment-soon">Coming Soon</span>
+          </label>
+
+          <label class="payment-option" onclick="selectPayment(this)">
+            <input type="checkbox" id="useWallet">
+            Use wallet balance
           </label>
 
         </div>
@@ -563,6 +642,10 @@
            <span style="color:<%= delivery === 0 ? '#2e7d32' : '#333' %>">
             <%= delivery === 0 ? 'FREE' : '₹' + delivery %>
           </span>
+        </div>
+        <div class="coupon-row">
+          <input class="coupon-input" type="text" placeholder="Enter coupon code" id="couponCode">
+          <button class="coupon-btn" onclick="applyCoupon()">Apply</button>
         </div>
 
         <hr class="summary-divider">
@@ -665,6 +748,10 @@
 </div>
 
 
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+  const GRAND_TOTAL = <%= grandTotal %>;
+</script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 
@@ -810,10 +897,22 @@
   } 
 
   /* ── Address Selection ── */
+  // function selectAddress(card, addressId) {
+  //   document.querySelectorAll('.address-card').forEach(c => c.classList.remove('selected'));
+  //   card.classList.add('selected');
+  //   document.getElementById('selectedAddressId').value = addressId;
+  // }
   function selectAddress(card, addressId) {
-    document.querySelectorAll('.address-card').forEach(c => c.classList.remove('selected'));
+  // remove previous selection
+    document.querySelectorAll('.address-card').forEach(card => {
+      card.classList.remove('selected');
+    });
+
     card.classList.add('selected');
+
     document.getElementById('selectedAddressId').value = addressId;
+      console.log("Selected address:", addressId); // debug
+
   }
 
   function confirmDelete(id) {
@@ -854,40 +953,183 @@
     label.classList.add('selected');
   }
 
+  function openRazorpayPopup(order, addressId, useWallet) {
+
+  const options = {
+    key: "<%= razorpayKey %>", 
+    amount: order.amount,
+    currency: order.currency,
+    name: "Nuve Store",
+    description: "Order Payment",
+    order_id: order.id,
+
+    handler: function (response) {
+
+      fetch('/verify-payment', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          razorpay_order_id: response.razorpay_order_id,
+          razorpay_payment_id: response.razorpay_payment_id,
+          razorpay_signature: response.razorpay_signature,
+          addressId: document.getElementById('selectedAddressId').value,
+          useWallet,
+          coupon: window.appliedCoupon
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          window.location.href = '/orderSuccess?orderId=' + data.orderId;
+        } else {
+           Swal.fire("Error", "Payment verification failed ", "error"); 
+        }
+      });
+    },
+
+    prefill: {
+      name: "Customer Name",
+      email: "customer@email.com",
+      contact: "9999999999"
+    },
+
+    theme: {
+      color: "#d4145a"
+    }
+  };
+
+  const rzp = new Razorpay(options);
+  rzp.open();
+}
+  
+
+  function startRazorpayPayment( addressId, useWallet, coupon ) {
+
+    const amount = GRAND_TOTAL ;
+
+    fetch('/create-razorpay-order', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ amount , useWallet, coupon})
+    })
+    .then(res => res.json())
+    .then(data => {
+       if (data.walletOnly) {
+        placeOrderRequest(addressId, 'wallet', true);
+        return;
+      }
+      if (data.success) {
+        openRazorpayPopup(data.order, addressId, useWallet);
+      }else {
+           Swal.fire("Error", "Payment verification failed, Available quantity less than ordering quantity", "error"); 
+        }
+    })
+    .catch(err => {
+      console.log("Error:", err);
+    });
+  }
+
   /* ── Place Order ── */
-  function placeOrder() {
+  async function placeOrder() {
+
+    const isCart = await fetch("/check-cart", {
+      method : 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    .then((data)=> data.json())
+    .then((data)=>{
+      if (!data.success){
+        Swal.fire({ icon: 'error', title: 'Please check your cart to check if it is empty', confirmButtonColor: '#d4145a' });
+        return;
+      }
+    })
+    
     const addressId     = document.getElementById('selectedAddressId').value;
     const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked')?.value;
+    const useWallet = document.getElementById("useWallet")?.checked || false;
 
-    if (!addressId) {
-      Swal.fire({ icon: 'warning', title: 'Please select a delivery address', confirmButtonColor: '#d4145a' });
-      return;
-    }
+    console.log("Use wallet : ",useWallet)
+    console.log("payment method : ", paymentMethod)
 
+      if (!addressId) {
+        Swal.fire({ icon: 'warning', title: 'Please select a delivery address', confirmButtonColor: '#d4145a' });
+        return;
+      }
+    
+      if(paymentMethod === 'cod' || paymentMethod === 'wallet') {
+        // COD → directly place order
+        placeOrderRequest(addressId, paymentMethod, useWallet);
+
+      }else if( paymentMethod === 'online'){
+        console.log("going to razorpay")
+        startRazorpayPayment( addressId, useWallet, window.appliedCoupon);
+        return;
+      }
+
+  
     document.getElementById('placeOrderBtn').disabled    = true;
     document.getElementById('placeOrderBtn').textContent = 'Placing Order…';
 
+  }
+
+  function placeOrderRequest(addressId, paymentMethod, useWallet) {
     fetch('/placeOrder', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ addressId, paymentMethod })
+      body: JSON.stringify({ addressId, paymentMethod, useWallet })
     })
-    .then(r => r.json())
+    .then(res => res.json())
     .then(data => {
       if (data.success) {
-        window.location.href = '/orderSuccess?orderId=' + (data.orderId || '');
-      } else {
-        Swal.fire({ icon: 'error', title: data.message || 'Order failed. Please try again.', confirmButtonColor: '#d4145a' });
-        document.getElementById('placeOrderBtn').disabled    = false;
-        document.getElementById('placeOrderBtn').textContent = 'Place Order';
+        window.location.href = '/orderSuccess?orderId=' + data.orderId;
       }
-    })
-    .catch(() => {
-      Swal.fire({ icon: 'error', title: 'Network error. Please try again.', confirmButtonColor: '#d4145a' });
-      document.getElementById('placeOrderBtn').disabled    = false;
-      document.getElementById('placeOrderBtn').textContent = 'Place Order';
     });
   }
+
+   async function applyCoupon() {
+  const code = document.getElementById('couponCode').value.trim();
+
+  if (!code) {
+    Swal.fire({ icon: 'warning', title: 'Enter a coupon code', confirmButtonColor: '#d4145a' });
+    return;
+  }
+
+  const totalAmount = GRAND_TOTAL; 
+
+  const res = await fetch('/apply-coupon', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ code, totalAmount })
+  });
+
+  const data = await res.json();
+
+  if (data.success) {
+    Swal.fire("Success", "Coupon applied!", "success");
+
+    //  update total
+    const newTotal = totalAmount - data.discount;
+
+    document.getElementById('grandTotal').innerText = newTotal;
+
+    //  store globally in frontend
+    window.appliedCoupon = {
+      code,
+      discount: data.discount
+    };
+
+  } else {
+    Swal.fire("Error", data.message, "error");
+  }
+}
 
 </script>
 </body>

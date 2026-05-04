@@ -2,10 +2,12 @@ const Order = require("../../models/orderSchema");
 const User = require("../../models/userSchema");
 const Product = require("../../models/productSchema");
 const PDFDocument = require("pdfkit");
+const { creditWallet, debitWallet } = require("../../helpers/wallet");
 
 
 const loadOrders = async (req, res)=>{
   try {
+
     const { status, date } = req.query;
 
     const search = req.query.search || "";
@@ -78,6 +80,8 @@ const loadOrders = async (req, res)=>{
     console.log("Error loading orders page : ",error);
   }
 }
+
+
 
 const loadOrderDetails = async (req, res) =>{
   try {
@@ -210,6 +214,8 @@ const downloadInvoice = async (req, res) => {
   }
 };
 
+
+
 const cancelFullOrder = async (req,res) =>{
   try {
 
@@ -237,7 +243,21 @@ const cancelFullOrder = async (req,res) =>{
 
     order.status = "Cancelled";
 
+    if (!order.paymentMethod) {
+      order.paymentMethod = "COD";
+    }
+
     await order.save();
+
+    if(order.paymentMethod !== 'COD'){
+      await creditWallet(
+      order.userId,
+      order.finalAmount,
+      "Order Cancelled",
+      order._id
+    )
+    }
+    
 
     res.json({ message: "Order cancelled successfully" });
 
@@ -247,6 +267,81 @@ const cancelFullOrder = async (req,res) =>{
   }
 }
 
+
+// const cancelSingleItem = async (req, res) => {
+//   try {
+//     const { orderId, productId, reason } = req.body;
+
+//     const order = await Order.findById(orderId).populate("orderedItems.product");
+
+//     if (!order) {
+//       return res.status(404).json({ message: "Order not found" });
+//     }
+
+//     const item = order.orderedItems.find(
+//       i => i.product._id.toString() === productId
+//     );
+
+//     if (!item) {
+//       return res.status(404).json({ message: "Item not found" });
+//     }
+
+//     if (item.status === "Cancelled") {
+//       return res.status(400).json({ message: "Item already cancelled" });
+//     }
+
+//     //  restore stock
+//     await Product.findOneAndUpdate(
+//       {
+//         _id: item.product._id,
+//         "variants.size": item.variant
+//       },
+//       {
+//         $inc: { "variants.$.stock": item.quantity }
+//       }
+//     );
+
+//     await Order.updateOne(
+//       { _id : orderId, 'orderedItems.product' : productId },
+//       { $set :{ 'orderedItems.$.status' : 'Cancelled' } }
+//     )
+
+//     // update item
+//     item.status = "Cancelled";
+//     item.returnReason = reason || "No reason";
+
+//     const refundAmount = item.quantity * item.price;
+
+//     await order.save();
+
+//     if (!order.paymentMethod) {
+//       order.paymentMethod = "COD";
+//     }
+
+//     if(order.paymentMethod !== 'COD'){
+//       await creditWallet(
+//         order.userId,
+//         refundAmount,
+//         "Order Cancelled",
+//         order._id
+//     )
+//     }
+
+//     order.finalAmount -= refundAmount;
+
+//     const allCancelled = order.orderedItems.every(i => i.status === "Cancelled");
+
+//     if (allCancelled) {
+//       order.status = "Cancelled";
+//     }
+
+//     res.json({ message: "Item cancelled successfully" });
+
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ message: "Error cancelling item" });
+//   }
+// };
 
 const cancelSingleItem = async (req, res) => {
   try {
@@ -270,7 +365,6 @@ const cancelSingleItem = async (req, res) => {
       return res.status(400).json({ message: "Item already cancelled" });
     }
 
-    //  restore stock
     await Product.findOneAndUpdate(
       {
         _id: item.product._id,
@@ -281,16 +375,33 @@ const cancelSingleItem = async (req, res) => {
       }
     );
 
-    await Order.updateOne(
-      { _id : orderId, 'orderedItems.product' : productId },
-      { $set :{ 'orderedItems.$.status' : 'Cancelled' } }
-    )
-
-    // update item
     item.status = "Cancelled";
     item.returnReason = reason || "No reason";
 
-    const allCancelled = order.orderedItems.every(i => i.status === "Cancelled");
+    const refundAmount = item.quantity * item.price;
+
+    //  Wallet logic 
+    if (
+      order.paymentMethod === "Online" ||
+      (order.paymentMethod === "COD" && order.status === "Delivered") ||
+      order.paymentMethod === "Wallet"
+    ) {
+      await creditWallet(
+        order.userId,
+        refundAmount,
+        "Item Cancelled",
+        order._id
+      );
+    }
+
+    //  Update order total
+    order.finalAmount -= refundAmount;
+
+    //  Update order status
+    const allCancelled = order.orderedItems.every(
+      i => i.status === "Cancelled"
+    );
+    console.log("All cancelled items : ",allCancelled)
 
     if (allCancelled) {
       order.status = "Cancelled";
@@ -305,6 +416,7 @@ const cancelSingleItem = async (req, res) => {
     res.status(500).json({ message: "Error cancelling item" });
   }
 };
+
 
 const returnOrder = async (req, res) => {
   try {
@@ -339,6 +451,7 @@ const returnOrder = async (req, res) => {
     res.status(500).json({ success: false });
   }
 };
+
 
 
 module.exports = {

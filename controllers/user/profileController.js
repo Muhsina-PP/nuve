@@ -1,9 +1,11 @@
 const User = require("../../models/userSchema")
 const Address = require("../../models/addressSchema")
+const Order = require("../../models/orderSchema")
 const nodemailer = require("nodemailer");
 const env = require("dotenv").config();
 const bcrypt = require("bcrypt");
 const session = require("express-session");
+const Wallet = require("../../models/walletSchema")
 
 
 function generateOtp() {
@@ -177,10 +179,26 @@ const userProfile = async (req, res) =>{
   try {
     const userId = req.session.user;
     const userData = await User.findById(userId);
-    const addressData = await Address.findOne({userId : userId})
+    const addressData = await Address.findOne({userId : userId});
+    const wallet = await Wallet.findOne({userId})
+
+    const totalOrders = await Order.countDocuments({ userId})
+    const deliveredOrders = await Order.countDocuments({
+      userId,
+      status : 'Delivered'
+    })
+    const pendingOrders = await Order.countDocuments({
+      userId,
+      status : 'Pending'
+    })
+
     res.render("user-profile", {
       user : userData,
-      userAddress : addressData ? addressData.address : []
+      userAddress : addressData ? addressData.address : [],
+      totalOrders,
+      deliveredOrders,
+      pendingOrders,
+      wallet
     })
   } catch (error) {
     console.log("Error getting user profile : ",error);

@@ -5,6 +5,7 @@ const profileController = require("../controllers/user/profileController")
 const productController = require("../controllers/user/productController")
 const cartController = require("../controllers/user/cartController")
 const checkoutController = require("../controllers/user/checkoutController")
+const walletController = require("../controllers/user/walletController")
 const {userAuth , adminAuth} = require("../middlewares/auth")
 const wishlistController = require("../controllers/user/wishlistController")
 const orderController = require("../controllers/user/orderController")
@@ -68,6 +69,10 @@ router.post("/validate-otp", userAuth,profileController.otpVerify)
 router.get("/change-password", userAuth, profileController.getChangePassword)
 router.post("/change-password", userAuth, profileController.changePassword)
 
+
+// Wallet management
+router.get("/wallet", userAuth, walletController.loadWallet)
+
 // Address management
 router.get("/addAddress", userAuth, profileController.getAddAddress)
 router.post("/addAddress", userAuth, profileController.addAddress)
@@ -95,14 +100,20 @@ router.get("/checkout", userAuth, checkoutController.loadCheckoutPage )
 router.post("/deleteAddress", userAuth, checkoutController.deleteAddress)
 router.post("/placeOrder", userAuth, checkoutController.placeOrder)
 router.get("/orderSuccess", userAuth, checkoutController.orderSuccess)
+router.post("/create-razorpay-order", userAuth, checkoutController.createRazorpayOrder);
+router.post('/verify-payment', userAuth, checkoutController.verifyPayment);
+router.get("/check-cart", userAuth, checkoutController.checkCart)
+router.post("/apply-coupon", userAuth, checkoutController.applyCoupon);
+
 
 
 // Order management
 router.get("/orders", userAuth, orderController.loadOrders)
-router.get("/order-details/:id", userAuth, orderController.loadOrderDetails)
+router.get("/order-details/:id", userAuth, orderController.loadOrderDetails);
+router.get('/orderDetails/:id', userAuth, orderController.loadOrderDetails);
 router.get("/download-invoice/:id", userAuth, orderController.downloadInvoice);
 router.post("/cancel-full-order", userAuth, orderController.cancelFullOrder);
 router.post("/cancel-order", userAuth, orderController.cancelSingleItem);
-router.patch("/return-item",userAuth, orderController.returnOrder)
+router.patch("/return-item",userAuth, orderController.returnOrder);
 
 module.exports = router;

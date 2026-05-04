@@ -7,12 +7,14 @@ const brandController = require("../controllers/admin/brandController")
 const productController = require("../controllers/admin/productController")
 const bannerController = require("../controllers/admin/bannerController")
 const orderController = require("../controllers/admin/orderController")
+const coupenController = require("../controllers/admin/coupenController")
 const {userAuth , adminAuth} = require("../middlewares/auth");
 const { route } = require('./userRoutes');
 const multer = require("multer")
 const storage = require("../helpers/multer")
 // const upload = multer({storage : storage})
 const upload = require("../helpers/multer")
+
 
 router.get("/pageNotFound", adminController.pageNotFound);
 
@@ -66,7 +68,13 @@ router.get("/orders", adminAuth,orderController.loadOrders )
 router.patch("/update-order-status/:orderId", adminAuth, orderController.updateOrderStatus);
 router.get("/order-details/:orderId", adminAuth, orderController.loadOrderDetails);
 router.get("/download-invoice/:id", adminAuth, orderController.downloadInvoice);
-console.log("verifyReturn:", orderController.verifyReturn);
+router.post("/verifyReturn", adminAuth, orderController.verifyReturn)
+
+
+// Coupen management
+router.get("/coupon", adminAuth, coupenController.loadCoupen )
+router.post("/create-coupon", adminAuth, coupenController.createCoupen)
+router.delete("/delete-coupon/:id", coupenController.deleteCoupon);
 
 
 
