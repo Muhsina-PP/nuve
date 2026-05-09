@@ -793,6 +793,275 @@ const applyCoupon = async (req, res) =>{
   }
 }
 
+const paymentFailed = async (req, res) => {
+  try {
+    const { addressId, useWallet, coupon } = req.body;
+    const userId = req.session.user;
+
+    const cart = await Cart.findOne({ userId }).populate("items.productId");
+    if (!cart || cart.items.length === 0) {
+      return res.json({ success: false, message: "Cart is empty" });
+    }
+
+    const addressData = await Address.findOne({ userId });
+    let selectedAddress;
+    if (addressId) {
+      selectedAddress = addressData.address.id(addressId);
+    } else {
+      selectedAddress = addressData.address.find((addr) => addr.isDefault);
+    }
+    if (!selectedAddress) {
+      return res.json({ success: false, message: "Invalid address" });
+    }
+
+    const totalPrice = cart.items.reduce((sum, item) => {
+      const price = item.productId.salePrice || item.productId.regularPrice;
+      return sum + price * item.quantity;
+    }, 0);
+
+    let gstRate = 18;
+    const gstAmount = (totalPrice * gstRate ) / (100 + gstRate);
+
+    const basePrice = totalPrice - gstAmount;
+
+    let couponDiscount = 0;
+    let validCoupon = null
+
+    if(coupon){
+         validCoupon = await Coupon.findOne({ code : coupon});
+
+         if (!validCoupon) {
+            return res.json({ success: false, message: "Invalid coupon" });
+          }
+
+        if(validCoupon.usedCount >= validCoupon.usageLimit){
+          return res.json({ success: false, message: "Coupon limit reached" });
+        }
+
+        const userUsage = validCoupon.usedBy.find(
+          u => u.userId.toString() === userId.toString()
+        )
+
+        if( userUsage && userUsage.count >= validCoupon.perUserLimit){
+          return res.json({ success: false, message: "You already used this coupon" });
+        }
+
+         if(validCoupon && new Date() < validCoupon.expiry && totalPrice >= validCoupon.minAmount ){
+            if(validCoupon.type === "percentage"){
+              couponDiscount = (totalPrice * validCoupon.discount) / 100;
+            }else{
+              couponDiscount = validCoupon.discount;
+            }
+        }
+
+        req.appliedCoupon = validCoupon;
+    }
+    
+    const finalAmount = totalPrice - couponDiscount;
+
+    const { walletUsed, remainingAmount } = await calculateWalletUsage(
+        userId,
+        finalAmount,
+        useWallet
+      );
+
+    for (let item of cart.items) {
+      if (!item.productId) {
+        return res.json({ success: false, message: "Some products are no longer available" });
+      }
+
+      const product = await Product.findById(item.productId);
+      const variant = product.variants.find((v) => v.size === item.variant);
+
+      if (!variant || variant?.stock < item.quantity) {
+        return res.status(500).json({ success: false, message: "Selected quantity more than available quantity" });
+      }
+
+      const updated = await Product.findOneAndUpdate(
+        {
+          _id: item.productId._id,
+          "variants.size": item.variant,
+        },
+        {
+          $inc: { "variants.$.stock": -item.quantity },
+        },
+      );
+
+      if (!updated) {
+        return res.json({ success: false, message: `Stock not changed for ${item.productId.productName}, try again` });
+      }
+    }
+
+    const newOrder = new Order({
+      couponCode : coupon || null,
+      coupon,
+      userId,
+      paymentMethod: "Online",
+      paymentStatus: "Failed",
+      walletUsed,
+      razorpayPaymentId: null,
+
+      orderedItems: cart.items.map((item) => {
+        const itemPrice = (item.productId.salePrice || item.productId.regularPrice) * item.quantity;
+        const itemCouponShare = totalPrice > 0  ? (itemPrice / totalPrice) * couponDiscount  : 0;
+        const finalItemPrice = itemPrice - itemCouponShare;       
+
+        return {
+          product: item.productId,
+          variant: item.variant,
+          quantity: item.quantity,
+          price: item.productId.salePrice || item.productId.regularPrice,
+          regularPrice: item.productId.regularPrice,
+          couponShare: Number(itemCouponShare.toFixed(2)),
+          finalItemPrice: Number(finalItemPrice.toFixed(2))
+        };
+      }),
+
+      totalPrice,
+      finalAmount,
+      status: "Pending",
+      couponDiscount,
+      basePrice,
+      gstAmount,
+
+      address: {
+        addressType: selectedAddress.addressType,
+        name: selectedAddress.name,
+        city: selectedAddress.city,
+        landMark: selectedAddress.landMark,
+        state: selectedAddress.state,
+        pincode: selectedAddress.pincode,
+        phone: selectedAddress.phone,
+        altPhone: selectedAddress.altPhone,
+      },
+    });
+
+    await newOrder.save();
+
+    if( walletUsed > 0){
+      await debitWallet(
+        userId,
+        walletUsed,
+        "Partial payment (Order Failed)",
+        null
+      )
+    }
+
+    if(req.appliedCoupon){
+      const couponDoc = req.appliedCoupon;
+      couponDoc.usedCount += 1;
+
+      const userIndex  = couponDoc.usedBy.findIndex(
+        u => u.userId.toString() === userId.toString()
+      )
+
+      if(userIndex  > -1){
+        couponDoc.usedBy[userIndex].count += 1;
+      }else{
+        couponDoc.usedBy.push({ userId, count:1})
+      }
+      await couponDoc.save();
+    }
+
+    // clear cart
+    cart.items = [];
+    await cart.save();
+
+    res.json({ success: true, orderId: newOrder._id });
+  } catch (error) {
+    console.error("Payment failed error:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+const paymentFailurePage = async (req, res) => {
+  try {
+    const orderId = req.query.orderId;
+    if (!orderId) {
+      return res.redirect("/shop");
+    }
+    const order = await Order.findById(orderId).populate("orderedItems.product");
+    if (!order) {
+      return res.redirect("/shop");
+    }
+    return res.render("payment-failure", { order, razorpayKey: process.env.RAZORPAY_KEY_ID });
+  } catch (error) {
+    console.error("Error loading payment failure page:", error);
+    res.redirect("/shop");
+  }
+};
+
+const createRetryRazorpayOrder = async (req, res) => {
+  try {
+    const { orderId } = req.body;
+    const userId = req.session.user;
+
+    const order = await Order.findOne({ _id: orderId, userId });
+    if (!order) {
+      return res.status(404).json({ success: false, message: "Order not found" });
+    }
+
+    if (order.paymentStatus === "Paid" || order.status === "Cancelled") {
+       return res.status(400).json({ success: false, message: "Order cannot be paid" });
+    }
+
+    const remainingAmount = order.finalAmount - order.walletUsed;
+
+    if (remainingAmount <= 0) {
+        return res.status(400).json({ success: false, message: "No amount to be paid" });
+    }
+
+    const options = {
+      amount: remainingAmount * 100,
+      currency: "INR",
+      receipt: "retry_receipt_" + Date.now(),
+    };
+
+    const razorpayOrder = await razorpay.orders.create(options);
+    res.json({ success: true, order: razorpayOrder });
+
+  } catch (error) {
+    console.error("Retry Razorpay order error:", error);
+    res.status(500).json({ success: false, message: "Failed to create Razorpay order for retry" });
+  }
+};
+
+const verifyRetryPayment = async (req, res) => {
+  try {
+    const {
+      razorpay_order_id,
+      razorpay_payment_id,
+      razorpay_signature,
+      orderId
+    } = req.body;
+
+    const userId = req.session.user;
+
+    const generatedSignature = crypto
+      .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
+      .update(razorpay_order_id + "|" + razorpay_payment_id)
+      .digest("hex");
+
+    if (generatedSignature !== razorpay_signature) {
+      return res.status(400).json({ success: false, message: "Payment verification failed" });
+    }
+
+    const order = await Order.findOne({ _id: orderId, userId });
+    if (!order) {
+       return res.status(404).json({ success: false, message: "Order not found" });
+    }
+
+    order.paymentStatus = "Paid";
+    order.razorpayPaymentId = razorpay_payment_id;
+    await order.save();
+
+    res.json({ success: true, orderId: order._id });
+  } catch (error) {
+    console.error("verify retry payment error:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
 module.exports = {
   loadCheckoutPage,
   placeOrder,
@@ -801,5 +1070,9 @@ module.exports = {
   createRazorpayOrder,
   verifyPayment,
   checkCart,
-  applyCoupon
+  applyCoupon,
+  paymentFailed,
+  paymentFailurePage,
+  createRetryRazorpayOrder,
+  verifyRetryPayment
 };

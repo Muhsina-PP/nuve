@@ -318,6 +318,10 @@
       color: var(--pink);
       margin-bottom: 10px;
     }
+    .failed-badge{
+    background-color: #d16062 !important;
+    color: white !important;
+}
     .addr-name { font-weight: 600; font-size: 15px; color: var(--text); margin-bottom: 6px; }
     .addr-line { font-size: 13px; color: #555; line-height: 1.8; }
     .addr-line i { color: var(--pink); font-size: 11px; margin-right: 5px; }
@@ -605,6 +609,12 @@
            
         </button>
         <% } %>
+
+        <% if (order.paymentStatus === 'Failed' && order.status !== 'Cancelled') { %>
+        <button class="action-btn primary" onclick="retryPayment('<%= order._id %>')">
+          <i class="fas fa-redo"></i> Retry Payment
+        </button>
+        <% } %>
         <a href="/orders" class="action-btn ghost">
           <i class="fas fa-arrow-left"></i> Back to Orders
         </a>
@@ -645,19 +655,22 @@
             <div class="info-label">Payment Status</div>
             <div class="info-value">
              
-              <span class="pay-status-badge">
+      
+              <span class="pay-status-badge <%= order.paymentStatus === 'Failed' ? 'failed-badge' : '' %>">
 
-                <% if (order.walletUsed > 0 && order.paymentMethod === "Online") { %>
+                <% if (order.paymentStatus === 'Failed') { %>
+                  Failed
+                <% } else if (order.walletUsed > 0 && order.paymentMethod === "Online") { %>
                   Wallet + Online
-                  <% } else if ( order.paymentMethod === "Wallet") { %>
-                   Paid
+                <% } else if ( order.paymentMethod === "Wallet") { %>
+                  Paid
                 <% } else { %>
-                <%= (order.paymentMethod === "Online" || 
-                    (order.paymentMethod === "COD" && order.status === "Delivered")) 
-                    ? "Paid" 
-                    : "Payment Pending" %>
+                  <%= ((order.paymentMethod === "Online" && order.paymentStatus === "Paid") || 
+                      (order.paymentMethod === "COD" && order.status === "Delivered")) 
+                      ? "Paid" 
+                      : "Payment Pending" %>
                 <% } %>
-  
+
               </span>
                               
             </div>
@@ -863,5 +876,70 @@
     }
   </script>
 
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script>
+    function retryPayment(orderId) {
+      fetch('/create-retry-razorpay-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderId: orderId })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          const options = {
+            key: "<%= razorpayKey %>",
+            amount: data.order.amount,
+            currency: data.order.currency,
+            name: "Nuve Store",
+            description: "Retry Order Payment",
+            order_id: data.order.id,
+            handler: function (response) {
+              fetch('/verify-retry-payment', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  razorpay_order_id: response.razorpay_order_id,
+                  razorpay_payment_id: response.razorpay_payment_id,
+                  razorpay_signature: response.razorpay_signature,
+                  orderId: orderId
+                })
+              })
+              .then(res => res.json())
+              .then(verifyData => {
+                if (verifyData.success) {
+                  window.location.href = '/orderSuccess?orderId=' + verifyData.orderId;
+                } else {
+                  Swal.fire("Error", "Payment verification failed", "error");
+                }
+              });
+            },
+            prefill: {
+              name: "Customer Name",
+              email: "customer@email.com",
+              contact: "9999999999"
+            },
+            theme: {
+              color: "#d4145a"
+            }
+          };
+
+          const rzp = new Razorpay(options);
+          
+          rzp.on('payment.failed', function (response) {
+            Swal.fire("Payment Failed", "Your payment could not be completed. Please try again.", "error");
+          });
+
+          rzp.open();
+        } else {
+          Swal.fire("Error", data.message || "Failed to initiate retry", "error");
+        }
+      })
+      .catch(err => {
+        console.error("Retry payment error:", err);
+        Swal.fire("Error", "An unexpected error occurred", "error");
+      });
+    }
+  </script>
 </body>
 </html>

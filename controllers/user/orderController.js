@@ -91,7 +91,8 @@ const loadOrderDetails = async (req, res) =>{
       return res.redirect("/orders");
     }
     res.render('order-details', {
-       order
+       order,
+       razorpayKey: process.env.RAZORPAY_KEY_ID
     })
   } catch (error) {
     console.log("Error loading order-details page : ",error);

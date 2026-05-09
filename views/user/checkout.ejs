@@ -1005,6 +1005,27 @@ label.payment-option:has(#useWallet) #useWallet {
   };
 
   const rzp = new Razorpay(options);
+
+  rzp.on('payment.failed', function (response) {
+    fetch('/payment-failed', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        addressId: addressId,
+        useWallet: useWallet,
+        coupon: coupon
+      })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        window.location.href = '/payment-failure?orderId=' + data.orderId;
+      } else {
+        Swal.fire("Error", "Failed to process payment failure", "error");
+      }
+    });
+  });
+
   rzp.open();
 }
   
