@@ -31,6 +31,11 @@ const productSchema = new Schema({
     type: Number,
     default: 0
   },
+  productOfferId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Offer',
+    default: null
+  },
 
 
   variants: [

@@ -117,16 +117,18 @@ const addCategory = async (req, res) =>{
 
 const addCategoryOffer = async (req, res) => {
   try {
-    const percentage = parseInt(req.body.percentage);
-    const categoryId = req.body.categoryId;
+    const { categoryId, offerId } = req.body;
 
-    if (!categoryId) {
-      return res.status(400).json({ success: false, message: "Category ID required" });
+    if (!categoryId || !offerId) {
+      return res.status(400).json({ success: false, message: "Category ID and Offer ID required" });
     }
 
-    if (!percentage || isNaN(percentage) || percentage <= 0 || percentage > 90) {
-      return res.status(400).json({ success: false, message: "Invalid percentage" });
+    const offer = await require('../../models/offerSchema').findById(offerId);
+    if (!offer || !offer.isActive) {
+      return res.status(400).json({ success: false, message: "Invalid or inactive offer" });
     }
+
+    const percentage = offer.discount;
 
     const category = await Category.findById(categoryId);
     if (!category) {
@@ -135,6 +137,7 @@ const addCategoryOffer = async (req, res) => {
 
     // Update category offer
     category.categoryOffer = percentage;
+    category.categoryOfferId = offerId;
     await category.save();
 
     // Update all products inside this category
@@ -163,22 +166,19 @@ const removeCategoryOffer = async (req, res) =>{
       return res.status(400).send({success : false, message : 'This category doesnt exist'})
     }
 
-
-    const percentage = category.categoryOffer;
     const products = await  Product.find({category : category._id})
 
- // Remove offer and reset price
-      for (let product of products){
-        product.productOffer = 0;
-        applyBestOffer(product, 0);
-        await product.save();
-      }
+    // Remove offer and reset price
+    for (let product of products){
+      applyBestOffer(product, 0);
+      await product.save();
+    }
 
-    
     // Reset category offer
     category.categoryOffer = 0;
+    category.categoryOfferId = null;
     await category.save();
-    return res.status(200).send({success : true, message : "Removed product offer succesfully"})
+    return res.status(200).send({success : true, message : "Removed category offer succesfully"})
 
   } catch (error) {
     console.error("Error removing category offer  : ",error);

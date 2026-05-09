@@ -1,0 +1,549 @@
+<%- include("../../views/partials/admin/header") %>
+
+<style>
+    :root {
+        --primary:       #d4145a;
+        --primary-dark:  #a81049;
+        --primary-light: rgba(212, 20, 90, 0.08);
+        --success:       #28a745;
+        --danger:        #dc3545;
+        --warning:       #f59e0b;
+        --text-muted:    #888;
+        --card-shadow:   0 4px 20px rgba(0,0,0,0.08);
+        --transition:    all 0.3s ease;
+        --border:        #eee;
+        --bg:            #f5f5f5;
+    }
+
+    body { background: var(--bg); font-family: 'Nunito Sans', sans-serif; color: #333; }
+
+    .content-main { padding: 32px 30px; }
+
+    /* ── Section title ── */
+    .section-label {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+        color: var(--primary);
+        margin-bottom: 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .section-label::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: linear-gradient(90deg, var(--primary-light), transparent);
+    }
+
+    /* ── Summary cards ── */
+    .summary-row {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+        margin-bottom: 28px;
+    }
+    .summary-card {
+        background: white;
+        border-radius: 14px;
+        padding: 20px;
+        box-shadow: var(--card-shadow);
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        border-left: 4px solid transparent;
+        transition: var(--transition);
+    }
+    .summary-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
+    .summary-card.pink   { border-left-color: var(--primary); }
+    .summary-card.green  { border-left-color: var(--success); }
+    .summary-card.grey   { border-left-color: #aaa; }
+    .summary-card .icon-wrap {
+        width: 42px; height: 42px; border-radius: 10px;
+        background: var(--primary-light);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 20px; flex-shrink: 0;
+    }
+    .summary-card.green  .icon-wrap { background: rgba(40,167,69,0.1); }
+    .summary-card.grey   .icon-wrap { background: rgba(108,117,125,0.1); }
+    .summary-card .stat-label { font-size: 11px; color: var(--text-muted); margin-bottom: 3px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+    .summary-card .stat-value { font-size: 24px; font-weight: 800; color: #222; }
+
+    /* ── Card ── */
+    .card {
+        background: white;
+        border-radius: 14px;
+        overflow: hidden;
+        box-shadow: var(--card-shadow);
+        border: none;
+        margin-bottom: 28px;
+    }
+    .card-header {
+        background: #fafafa;
+        padding: 18px 24px;
+        border-bottom: 1px solid var(--border);
+        font-size: 15px;
+        font-weight: 700;
+        color: #333;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .card-header .header-icon {
+        width: 30px; height: 30px;
+        background: var(--primary-light);
+        border-radius: 8px;
+        display: flex; align-items: center; justify-content: center;
+        color: var(--primary); font-size: 15px;
+    }
+    .card-body { padding: 26px; }
+
+    /* ── Form layout ── */
+    .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .form-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; }
+    .form-group { margin-bottom: 0; }
+
+    .form-label {
+        font-weight: 700;
+        font-size: 12.5px;
+        color: #444;
+        margin-bottom: 7px;
+        display: block;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+    }
+    .form-label .required { color: var(--primary); margin-left: 2px; }
+
+    .form-control {
+        border: 1.5px solid #e0e0e0;
+        border-radius: 9px;
+        padding: 11px 14px;
+        font-size: 14px;
+        width: 100%;
+        transition: var(--transition);
+        background: #fff;
+        color: #333;
+        font-family: 'Nunito Sans', sans-serif;
+    }
+    .form-control:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(212,20,90,0.1);
+        outline: none;
+    }
+    .form-control.invalid { border-color: var(--danger); box-shadow: 0 0 0 3px rgba(220,53,69,0.1); }
+    .form-control.valid   { border-color: var(--success); box-shadow: 0 0 0 3px rgba(40,167,69,0.08); }
+
+    select.form-control { cursor: pointer; }
+
+    /* ── Hint text ── */
+    .field-hint { font-size: 11.5px; color: var(--text-muted); margin-top: 5px; }
+
+    /* ── Error messages ── */
+    .error-msg {
+        color: var(--danger); font-size: 12px; margin-top: 5px;
+        display: none; align-items: center; gap: 4px; font-weight: 600;
+    }
+    .error-msg.visible { display: flex; }
+
+    /* ── Divider ── */
+    .form-divider { border: none; border-top: 1px dashed #e8e8e8; margin: 22px 0; }
+
+    /* ── Submit ── */
+    .btn-publish {
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        color: white; padding: 13px 36px;
+        border-radius: 50px; font-size: 14px; font-weight: 700;
+        border: none; cursor: pointer; transition: var(--transition);
+        box-shadow: 0 4px 14px rgba(212,20,90,0.3);
+        display: inline-flex; align-items: center; gap: 8px;
+    }
+    .btn-publish:hover { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(212,20,90,0.35); }
+    .btn-publish:active { transform: translateY(0); }
+
+    /* ── Table ── */
+    .offers-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+    .offers-table thead tr { background: #f8f9fa; border-bottom: 2px solid #eee; }
+    .offers-table th {
+        padding: 13px 16px; text-align: left; font-weight: 700;
+        color: #555; font-size: 11px; text-transform: uppercase; letter-spacing: 0.6px;
+    }
+    .offers-table td { padding: 14px 16px; border-bottom: 1px solid #f5f5f5; color: #444; vertical-align: middle; }
+    .offers-table tbody tr:hover { background: #fafafa; }
+    .offers-table tbody tr:last-child td { border-bottom: none; }
+
+    /* ── Badges ── */
+    .name-badge {
+        background: var(--primary-light); color: var(--primary);
+        font-weight: 800; letter-spacing: 1.5px;
+        padding: 5px 12px; border-radius: 6px; font-size: 12.5px; display: inline-block;
+    }
+    .status-badge {
+        padding: 4px 11px; border-radius: 50px; font-size: 11.5px; font-weight: 700; display: inline-block;
+    }
+    .status-active   { background: rgba(40,167,69,0.1); color: var(--success); }
+    .status-inactive { background: rgba(108,117,125,0.1); color: #6c757d; }
+
+    .type-badge {
+        padding: 3px 10px; border-radius: 50px; font-size: 11px; font-weight: 700;
+        text-transform: capitalize;
+    }
+    .type-product { background: rgba(212,20,90,0.1); color: var(--primary); }
+    .type-category { background: rgba(245,158,11,0.12); color: #b45309; }
+    .type-referral { background: rgba(40,167,69,0.12); color: #1e7e34; }
+
+    /* ── Delete btn ── */
+    .btn-delete {
+        background: rgba(220,53,69,0.08); color: var(--danger);
+        border: none; padding: 7px 13px; border-radius: 7px;
+        font-size: 12px; font-weight: 700; cursor: pointer; transition: var(--transition);
+        display: inline-flex; align-items: center; gap: 5px;
+    }
+    .btn-delete:hover { background: var(--danger); color: white; }
+
+    /* ── Toggle active btn ── */
+    .btn-toggle {
+        border: none; padding: 7px 13px; border-radius: 7px;
+        font-size: 12px; font-weight: 700; cursor: pointer; transition: var(--transition);
+        display: inline-flex; align-items: center; gap: 5px;
+    }
+    .btn-toggle.deactivate { background: rgba(40,167,69,0.1); color: var(--success); }
+    .btn-toggle.activate   { background: rgba(108,117,125,0.1); color: #6c757d; }
+    .btn-toggle.deactivate:hover { background: var(--success); color: white; }
+    .btn-toggle.activate:hover   { background: #6c757d; color: white; }
+
+    /* ── Empty state ── */
+    .empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); }
+    .empty-state .empty-icon { font-size: 48px; margin-bottom: 12px; opacity: 0.4; }
+    .empty-state p { font-size: 14px; margin: 0; }
+
+    /* ── Actions cell ── */
+    .actions-cell { display: flex; gap: 6px; align-items: center; }
+
+    @media (max-width: 992px) {
+        .summary-row { grid-template-columns: repeat(2, 1fr); }
+        .form-grid-3 { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 768px) {
+        .summary-row { grid-template-columns: 1fr; }
+        .form-grid-2, .form-grid-3 { grid-template-columns: 1fr; }
+        .offers-table { display: block; overflow-x: auto; }
+        .content-main { padding: 20px 15px; }
+    }
+</style>
+
+<section class="content-main">
+
+    <!-- ── Summary Stats ── -->
+    <div class="summary-row">
+        <div class="summary-card pink">
+            <div class="icon-wrap">🎁</div>
+            <div>
+                <div class="stat-label">Total Offers</div>
+                <div class="stat-value"><%= offers.length %></div>
+            </div>
+        </div>
+        <div class="summary-card green">
+            <div class="icon-wrap">✅</div>
+            <div>
+                <div class="stat-label">Active</div>
+                <div class="stat-value"><%= offers.filter(o => o.isActive).length %></div>
+            </div>
+        </div>
+        <div class="summary-card grey">
+            <div class="icon-wrap">⏸</div>
+            <div>
+                <div class="stat-label">Inactive</div>
+                <div class="stat-value"><%= offers.filter(o => !o.isActive).length %></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Create Offer Form ── -->
+    <div class="card">
+        <div class="card-header">
+            <div class="header-icon">➕</div>
+            Create New Offer
+        </div>
+        <div class="card-body">
+            <form id="offerForm" novalidate>
+
+                <div class="section-label">Offer Details</div>
+                <div class="form-grid-2" style="margin-bottom: 18px;">
+
+                    <div class="form-group">
+                        <label class="form-label">Offer Name <span class="required">*</span></label>
+                        <input type="text" name="name" id="offerName" class="form-control"
+                               placeholder="e.g. Summer Special 20"
+                               oninput="clearError('offerName')">
+                        <div class="error-msg" id="offerName-error">⚠ <span></span></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Offer Type <span class="required">*</span></label>
+                        <select name="type" id="offerType" class="form-control" onchange="clearError('offerType')">
+                            <option value="product">Product Offer</option>
+                            <option value="category">Category Offer</option>
+                            <option value="referral">Referral Offer</option>
+                        </select>
+                        <div class="error-msg" id="offerType-error">⚠ <span></span></div>
+                    </div>
+
+                </div>
+
+                <div class="form-grid-3" style="margin-bottom: 18px;">
+
+                    <div class="form-group">
+                        <label class="form-label">Discount Percentage (%) <span class="required">*</span></label>
+                        <input type="number" name="discount" id="discount" class="form-control"
+                               placeholder="e.g. 20" min="1" max="100"
+                               oninput="clearError('discount')">
+                        <div class="error-msg" id="discount-error">⚠ <span></span></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Expiry Date <span class="required">*</span></label>
+                        <input type="date" name="expiry" id="expiry" class="form-control"
+                               min="<%= new Date().toISOString().split('T')[0] %>"
+                               onchange="clearError('expiry')">
+                        <div class="error-msg" id="expiry-error">⚠ <span></span></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Status</label>
+                        <select name="isActive" id="isActive" class="form-control">
+                            <option value="true">✅ Active</option>
+                            <option value="false">⏸ Inactive</option>
+                        </select>
+                    </div>
+
+                </div>
+
+                <div style="margin-top: 10px;">
+                    <button type="button" class="btn-publish" onclick="validateAndSubmit()">
+                        🎁 Create Offer
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+    <!-- ── Offers Table ── -->
+    <div class="card">
+        <div class="card-header">
+            <div class="header-icon">📋</div>
+            All Offers
+            <span style="margin-left: auto; font-size: 12px; color: var(--text-muted); font-weight: 400;"><%= offers.length %> total</span>
+        </div>
+        <div class="card-body" style="padding: 0;">
+
+            <% if (offers.length === 0) { %>
+                <div class="empty-state">
+                    <div class="empty-icon">🎁</div>
+                    <p>No offers yet. Create your first one above!</p>
+                </div>
+            <% } else { %>
+                <table class="offers-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Type</th>
+                            <th>Discount</th>
+                            <th>Expiry</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% offers.forEach(offer => { %>
+                            <tr>
+                                <td><span class="name-badge"><%= offer.name %></span></td>
+
+                                <td>
+                                    <span class="type-badge type-<%= offer.type %>">
+                                        <%= offer.type %>
+                                    </span>
+                                </td>
+
+                                <td style="font-weight: 800; color: #222;">
+                                    <%= offer.discount %>%
+                                </td>
+
+                                <td style="white-space: nowrap;">
+                                    <%= offer.expiry.toDateString() %>
+                                </td>
+
+                                <td>
+                                    <span class="status-badge <%= offer.isActive ? 'status-active' : 'status-inactive' %>">
+                                        <%= offer.isActive ? '● Active' : '● Inactive' %>
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <div class="actions-cell">
+                                        <% if (offer.isActive) { %>
+                                            <button class="btn-toggle activate" onclick="confirmToggle('<%= offer._id %>', '<%= offer.name %>', true)" title="Deactivate">⏸</button>
+                                        <% } else { %>
+                                            <button class="btn-toggle deactivate" onclick="confirmToggle('<%= offer._id %>', '<%= offer.name %>', false)" title="Activate">▶</button>
+                                        <% } %>
+                                        <button
+                                            class="btn-delete"
+                                            onclick="confirmDelete(event, '<%= offer._id %>', '<%= offer.name %>')" title="Delete">
+                                            🗑
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            <% } %>
+
+        </div>
+    </div>
+
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+
+    /* ── Error helpers ── */
+    function showError(fieldId, message) {
+        const field = document.getElementById(fieldId);
+        const errorDiv = document.getElementById(fieldId + '-error');
+        if (!field || !errorDiv) return;
+        field.classList.add('invalid'); field.classList.remove('valid');
+        errorDiv.querySelector('span').textContent = message;
+        errorDiv.classList.add('visible');
+    }
+    function clearError(fieldId) {
+        const field = document.getElementById(fieldId);
+        const errorDiv = document.getElementById(fieldId + '-error');
+        if (!field || !errorDiv) return;
+        field.classList.remove('invalid');
+        errorDiv.classList.remove('visible');
+        errorDiv.querySelector('span').textContent = '';
+    }
+    function markValid(fieldId) {
+        const field = document.getElementById(fieldId);
+        if (!field) return;
+        field.classList.remove('invalid'); field.classList.add('valid');
+    }
+
+    /* ── Validate & Submit ── */
+    function validateAndSubmit() {
+        let isValid = true;
+        const today = new Date(); today.setHours(0,0,0,0);
+
+        // Name
+        const name = document.getElementById('offerName').value.trim();
+        if (!name) { showError('offerName', 'Offer name is required.'); isValid = false; }
+        else if (name.length < 3) { showError('offerName', 'Name must be at least 3 characters.'); isValid = false; }
+        else markValid('offerName');
+
+        // Discount
+        const discountVal = document.getElementById('discount').value.trim();
+        const discount = parseFloat(discountVal);
+        if (!discountVal) { showError('discount', 'Discount is required.'); isValid = false; }
+        else if (isNaN(discount) || discount <= 0 || discount > 100) { showError('discount', 'Must be between 1 and 100%.'); isValid = false; }
+        else markValid('discount');
+
+        // Expiry
+        const expiryVal = document.getElementById('expiry').value;
+        if (!expiryVal) { showError('expiry', 'Expiry date is required.'); isValid = false; }
+        else { const exp = new Date(expiryVal); exp.setHours(0,0,0,0); if (exp < today) { showError('expiry', 'Cannot be in the past.'); isValid = false; } else markValid('expiry'); }
+
+        if (isValid) {
+            document.querySelectorAll('.form-control.valid').forEach(el => el.classList.remove('valid'));
+            createOffer();
+        }
+    }
+
+    /* ── Create Offer API ── */
+    function createOffer() {
+        const payload = {
+            name:     document.getElementById('offerName').value.trim(),
+            type:     document.getElementById('offerType').value,
+            discount: parseFloat(document.getElementById('discount').value),
+            expiry:   document.getElementById('expiry').value,
+            isActive: document.getElementById('isActive').value === 'true'
+        };
+
+        fetch('/admin/create-offer', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                Swal.fire({ icon: 'success', title: 'Offer Created!', text: `${payload.name} is ready.`, confirmButtonColor: '#d4145a' })
+                    .then(() => location.reload());
+            } else {
+                Swal.fire({ icon: 'error', title: 'Failed', text: data.message || 'Error creating offer.', confirmButtonColor: '#d4145a' });
+            }
+        })
+        .catch(() => Swal.fire('Error', 'Something went wrong.', 'error'));
+    }
+
+    /* ── Toggle Active/Inactive ── */
+    function confirmToggle(offerId, offerName, isCurrentlyActive) {
+        const action = isCurrentlyActive ? 'deactivate' : 'activate';
+        Swal.fire({
+            title: `${isCurrentlyActive ? 'Deactivate' : 'Activate'} offer?`,
+            text: `Offer ${offerName} will be ${action}d.`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: isCurrentlyActive ? '#f59e0b' : '#28a745',
+            confirmButtonText: `Yes, ${action} it`
+        }).then(result => {
+            if (result.isConfirmed) {
+                fetch(`/admin/toggle-offer/${offerId}`, { method: 'PATCH' })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire({ icon: 'success', title: `Offer ${action}d!`, confirmButtonColor: '#d4145a' })
+                                .then(() => location.reload());
+                        } else {
+                            Swal.fire('Error', data.message || 'Failed to toggle offer.', 'error');
+                        }
+                    });
+            }
+        });
+    }
+
+    /* ── Delete ── */
+    function confirmDelete(event, offerId, offerName) {
+        event.preventDefault();
+        Swal.fire({
+            title: 'Delete offer?',
+            text: `${offerName} will be permanently removed.`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            confirmButtonText: 'Yes, delete it'
+        }).then(result => {
+            if (result.isConfirmed) {
+                fetch(`/admin/delete-offer/${offerId}`, { method: 'DELETE' })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire('Deleted!', 'Offer removed.', 'success').then(() => location.reload());
+                        } else {
+                            Swal.fire('Error', data.message || 'Failed to delete offer.', 'error');
+                        }
+                    });
+            }
+        });
+    }
+
+    /* ── Clear valid on refocus ── */
+    document.querySelectorAll('#offerForm .form-control').forEach(input => {
+        input.addEventListener('focus', function () { this.classList.remove('valid'); });
+    });
+
+</script>
+
+<%- include("../../views/partials/admin/footer") %>

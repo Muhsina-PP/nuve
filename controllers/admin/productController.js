@@ -206,12 +206,18 @@ const addProducts = async (req, res) => {
 
 const addProductOffer = async (req, res) => {
   try {
-    const percentage = parseInt(req.body.percentage);
-    const productId = req.body.productId;
+    const { productId, offerId } = req.body;
 
-    if (!percentage || isNaN(percentage) || percentage <= 0 || percentage > 90) {
-      return res.status(400).json({ success: false, message: "Invalid percentage" });
+    if (!productId || !offerId) {
+      return res.status(400).json({ success: false, message: "Product ID and Offer ID required" });
     }
+
+    const offer = await require('../../models/offerSchema').findById(offerId);
+    if (!offer || !offer.isActive) {
+      return res.status(400).json({ success: false, message: "Invalid or inactive offer" });
+    }
+
+    const percentage = offer.discount;
 
     const product = await Product.findById(productId);
     if (!product) {
@@ -220,7 +226,9 @@ const addProductOffer = async (req, res) => {
 
     const category = await Category.findById(product.category);
 
+    // Save offer details to product
     product.productOffer = percentage;
+    product.productOfferId = offerId;
 
     const categoryOffer = category ? category.categoryOffer || 0 : 0;
 
@@ -251,6 +259,7 @@ const removeProductOffer = async (req, res) => {
     const categoryOffer = category ? category.categoryOffer || 0 : 0;
 
     product.productOffer = 0;
+    product.productOfferId = null;
 
     applyBestOffer(product, categoryOffer);
 

@@ -179,6 +179,13 @@ const userProfile = async (req, res) =>{
   try {
     const userId = req.session.user;
     const userData = await User.findById(userId);
+    
+    if (!userData.referalCode) {
+      const referalCode = Math.random().toString(36).slice(-6).toUpperCase() + Math.floor(1000 + Math.random() * 9000);
+      userData.referalCode = referalCode;
+      await userData.save();
+    }
+    
     const addressData = await Address.findOne({userId : userId});
     const wallet = await Wallet.findOne({userId})
 

@@ -982,6 +982,40 @@
       </div>
       
     </div>
+    
+    <!-- Referral card -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title-group">
+          <div class="card-icon"><i class="fas fa-link"></i></div>
+          <span class="card-title">Refer a Friend</span>
+        </div>
+      </div>
+      <div style="background: #fff5f8; border: 1.5px dashed #d4145a; border-radius: 12px; padding: 20px; text-align: center;">
+        <p style="font-size: 0.9rem; color: #3d3d5c; margin-bottom: 12px;">Share this link with your friends. When they sign up, you'll earn a reward!</p>
+        <div style="display: flex; gap: 10px; justify-content: center; align-items: center;">
+          <input type="text" readonly id="referralLink" value="http://localhost:3000/signup?ref=<%= user.referalCode %>" style="width: 100%; max-width: 400px; padding: 10px 14px; border: 1px solid #eedde5; border-radius: 8px; font-size: 0.85rem; color: #1a1a2e; background: #fff;" />
+          <button onclick="copyReferralLink()" class="btn-rose" style="padding: 10px 20px; flex-shrink: 0;">
+            <i class="fas fa-copy"></i> Copy
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function copyReferralLink() {
+        const linkInput = document.getElementById('referralLink');
+        linkInput.select();
+        document.execCommand('copy');
+        Swal.fire({
+          icon: 'success',
+          title: 'Link Copied!',
+          text: 'Referral link copied to clipboard.',
+          showConfirmButton: false,
+          timer: 1500
+        });
+      }
+    </script>
 
   </main>
 </div>

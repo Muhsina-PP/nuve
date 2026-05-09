@@ -530,51 +530,73 @@
 <script>
 
     async function addOffer(productId) {
-        const {value : amount} = await Swal.fire({
-            title : 'Offer in percentage',
-            input : 'number',
-            inputLabel : 'percentage',
-            inputPlaceholder : '%'
-        })
-
-        if (amount === undefined || amount === null || amount === "") {
-            return;
-        }
-
         try {
-            const response = await fetch('/admin/addProductOffer', {
-                method : 'POST',
-                headers : {'content-type' : 'application/json'},
-                body : JSON.stringify({
-                    percentage : Number(amount), 
-                    productId : productId
+            // Fetch active product offers
+            const res = await fetch('/admin/active-offers?type=product');
+            const data = await res.json();
+
+            if (!data.success || !data.offers || data.offers.length === 0) {
+                return Swal.fire('No Offers', 'There are no active product offers available. Please create one first.', 'info');
+            }
+
+            // Prepare options for select
+            const offerOptions = {};
+            data.offers.forEach(offer => {
+                offerOptions[offer._id] = `${offer.name} (${offer.discount}%)`;
+            });
+
+            const { value: selectedOfferId } = await Swal.fire({
+                title: 'Select an Offer',
+                input: 'select',
+                inputOptions: offerOptions,
+                inputPlaceholder: 'Select an offer',
+                showCancelButton: true,
+                inputValidator: (value) => {
+                    return new Promise((resolve) => {
+                        if (value) {
+                            resolve();
+                        } else {
+                            resolve('You need to select an offer');
+                        }
+                    });
+                }
+            });
+
+            if (selectedOfferId) {
+                const response = await fetch('/admin/addProductOffer', {
+                    method : 'POST',
+                    headers : {'content-type' : 'application/json'},
+                    body : JSON.stringify({
+                        offerId : selectedOfferId, 
+                        productId : productId
+                    })
                 })
-            })
-            const data = await response.json()
-            
-            if(response.ok && data.success === true){
-                Swal.fire({
-                    title : 'success',
-                    text : 'Offer added succesfully',
-                    icon : 'success'
-                })
-                .then(()=>{
-                    location.reload();
-                })
-            }else{
-                Swal.fire({
-                    icon : 'error',
-                    title : 'error',
-                    text : 'Offer adding failed'
-                })
+                const result = await response.json()
+                
+                if(response.ok && result.success === true){
+                    Swal.fire({
+                        title : 'Success',
+                        text : 'Offer applied successfully',
+                        icon : 'success'
+                    })
+                    .then(()=>{
+                        location.reload();
+                    })
+                }else{
+                    Swal.fire({
+                        icon : 'error',
+                        title : 'Error',
+                        text : result.message || 'Offer application failed'
+                    })
+                }
             }
         } catch (error) {
             Swal.fire({
                     icon : 'error',
-                    title : 'error',
-                    text : 'An error occured while adding offer '
+                    title : 'Error',
+                    text : 'An error occured while applying offer '
                 })
-            console.log('An error occured while adding offer : ',error);                  
+            console.error('An error occured while applying offer : ',error);                  
         }
     }
 

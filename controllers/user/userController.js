@@ -3,6 +3,8 @@ const Category = require("../../models/categorySchema");
 const Product = require("../../models/productSchema");
 const Banner = require("../../models/bannerSchema")
 const Brand = require("../../models/brandSchema")
+const Offer = require("../../models/offerSchema")
+const Coupen = require("../../models/coupenSchema")
 const nodemailer = require("nodemailer");
 const env = require("dotenv").config();
 const bcrypt = require("bcrypt");
@@ -90,7 +92,8 @@ const pageNotFound = async (req, res) => {
 
 const loadSignup = async (req, res) => {
   try {
-    res.render("signup");
+    const ref = req.query.ref || "";
+    res.render("signup", { ref });
   } catch (error) {
     console.log("Error loading signup page : ", error);
     res.redirect("/pageNotFound");
@@ -99,7 +102,7 @@ const loadSignup = async (req, res) => {
 
 const signup = async (req, res) => {
   try {
-    const { name, email, phone, password, cPassword } = req.body;
+    const { name, email, phone, password, cPassword, ref } = req.body;
     if (password !== cPassword) {
       return res.render("signup", { message: "Passwords do not match" });
     }
@@ -118,7 +121,7 @@ const signup = async (req, res) => {
     }
 
     req.session.userOtp = otp;
-    req.session.userData = { name, phone, email, password };
+    req.session.userData = { name, phone, email, password, referredBy: ref };
 
     res.render("verify-otp");
     console.log("OTP : ",otp);
@@ -151,14 +154,52 @@ const verifyOtp = async (req, res) => {
       const user = req.session.userData;
       const passwordHash = await securePsssword(user.password);
 
+      const referalCode = Math.random().toString(36).slice(-6).toUpperCase() + Math.floor(1000 + Math.random() * 9000);
+
       const saveUserData = new User({
         name: user.name,
         email: user.email,
         phone: user.phone,
         password: passwordHash,
+        referalCode: referalCode
       });
 
-      await saveUserData.save();
+      if (user.referredBy) {
+        const referrer = await User.findOne({ referalCode: user.referredBy });
+        if (referrer) {
+          saveUserData.referredBy = referrer._id;
+          
+          const activeReferralOffer = await Offer.findOne({ type: 'referral', isActive: true });
+          if (activeReferralOffer) {
+            // Generate unique coupon for referrer
+            const couponCode = `REF-${Math.random().toString(36).slice(-6).toUpperCase()}`;
+            const expiryDate = new Date();
+            expiryDate.setDate(expiryDate.getDate() + 30); // 30 days expiry
+
+            const newCoupon = new Coupen({
+              code: couponCode,
+              discount: activeReferralOffer.discount,
+              minAmount: 1000,
+              expiry: expiryDate,
+              type: 'percentage',
+              usageLimit: 1,
+              perUserLimit: 1,
+              isActive: true,
+              usedBy: []
+            });
+            await newCoupon.save();
+          }
+          
+          await saveUserData.save(); // Save first to get _id
+          referrer.redeemedUsers.push(saveUserData._id);
+          await referrer.save();
+        } else {
+          await saveUserData.save();
+        }
+      } else {
+        await saveUserData.save();
+      }
+
       req.session.user = saveUserData._id;
       res.json({ success: true, redirectUrl: "/" });
     } else {

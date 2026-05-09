@@ -8,6 +8,7 @@ const productController = require("../controllers/admin/productController")
 const bannerController = require("../controllers/admin/bannerController")
 const orderController = require("../controllers/admin/orderController")
 const coupenController = require("../controllers/admin/coupenController")
+const offerController = require("../controllers/admin/offerController")
 const {userAuth , adminAuth} = require("../middlewares/auth");
 const { route } = require('./userRoutes');
 const multer = require("multer")
@@ -74,8 +75,13 @@ router.post("/verifyReturn", adminAuth, orderController.verifyReturn)
 // Coupen management
 router.get("/coupon", adminAuth, coupenController.loadCoupen )
 router.post("/create-coupon", adminAuth, coupenController.createCoupen)
-router.delete("/delete-coupon/:id", coupenController.deleteCoupon);
+router.delete("/delete-coupon/:id", adminAuth, coupenController.deleteCoupon);
 
-
+// Offer management
+router.get("/offers", adminAuth, offerController.loadOffers);
+router.post("/create-offer", adminAuth, offerController.createOffer);
+router.patch("/toggle-offer/:id", adminAuth, offerController.toggleOffer);
+router.delete("/delete-offer/:id", adminAuth, offerController.deleteOffer);
+router.get("/active-offers", adminAuth, offerController.getActiveOffers);
 
 module.exports = router

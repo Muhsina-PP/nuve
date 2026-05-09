@@ -59,6 +59,11 @@ const userSchema = new Schema ({
     type : String,
     // required : true
   },
+  referredBy: {
+    type: Schema.Types.ObjectId,
+    ref: "User",
+    default: null
+  },
   redeemed :{
     type : Boolean,
     // default : false

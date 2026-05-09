@@ -261,6 +261,10 @@
           <h1>Create Account</h1>
 
           <form id="signform" action="/signup" method="POST">
+            <% if (typeof ref !== 'undefined' && ref) { %>
+              <input type="hidden" name="ref" value="<%= ref %>">
+            <% } %>
+            
             <!-- Google Signup -->
             <a href="/auth/google" class="google-btn">
               <i class="fab fa-google"></i>
