@@ -30,6 +30,7 @@ const customerInfo = async( req, res) =>{
     const noUserFound = search !== "" && userData.length === 0;
 
     res.render("customers" , {
+      title : 'Customers',
       data : userData, 
       totalPages : Math.ceil(count/limit),
       currentPage : Number(page),

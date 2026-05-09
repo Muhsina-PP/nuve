@@ -527,6 +527,7 @@
                 <td><span class="qty-pill"><%= item.quantity %></span></td>
                 <td><span class="price-val">₹<%= item.price.toLocaleString("en-IN") %>
 </span></td>
+
                 <td><span class="price-val">₹<%= (item.price * item.quantity).toLocaleString("en-IN") %>
 </span></td>
         
@@ -672,9 +673,11 @@
           <%
               const totalMRP      = order.orderedItems.reduce((s, i) => s + i.product.regularPrice * i.quantity, 0);
               const totalSale     = order.orderedItems.reduce((s, i) => s + i.product.salePrice    * i.quantity, 0);
-              const totalDiscount = totalMRP - totalSale;
+              const couponDiscount = order.couponDiscount || 0;
+              console.log("Coupon discount : ",couponDiscount)
+              const totalDiscount = totalMRP - totalSale ;
               const delivery      = totalSale >= 999 ? 0 : 99;
-              const grandTotal    = totalSale + delivery;
+              const grandTotal    = totalSale + delivery - couponDiscount;
           %>
     
       <div class="card">
@@ -692,8 +695,12 @@
           <span style="color:var(--green);"><%= delivery %></span>
         </div>
         <div class="summary-row discount">
-          <span>Coupon (WELCOME10)</span>
-          <span>− </span>
+          <span>Coupon </span>
+          <span>− <%= order.coupon ? order.coupon : "No Coupon" %> </span>
+        </div>
+        <div class="summary-row discount">
+          <span>Coupon Discount</span>
+          <span><%= couponDiscount %> </span>
         </div>
         <div class="summary-row total">
           <span>Amount Paid</span>

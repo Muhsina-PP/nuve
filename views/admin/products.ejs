@@ -427,6 +427,7 @@
                 <table class="table table-striped">
                     <thead>
                         <tr>
+                            <th scope="col">Image</th>
                             <th scope="col">Product Name</th>
                             <th scope="col">Brand</th>
                             <th scope="col">Category</th>
@@ -443,6 +444,12 @@
                       <% for( let i = 0; i < product.length; i++ ) { %>
 
                         <tr>
+                            <td class="text-start">
+                                <div class="d-flex align-items-center justify-content-center"></div>
+                                      <img src="/uploads/product-images/<%= product[i].productImage[0] %>" alt="<%= product[i].productName %>" class="img-fluid rounded-circle"
+                                      style="width: 100%; height: auto">
+                            </td>
+
                             <td class="text-start"><%= product[i].productName  %></td>
                             <td class="text-start"><%= product[i].brand.brandName %></td>
                             <td class="text-start"><%= product[i].category.name%></td>

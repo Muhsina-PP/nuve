@@ -51,6 +51,15 @@ const orderSchema = new Schema({
       returnReason: {
         type: String,
       },
+      couponShare: {
+        type: Number,
+        default: 0
+      },
+
+      finalItemPrice: {
+        type: Number,
+        default: 0
+      }
     },
   ],
   totalPrice: {
@@ -65,6 +74,10 @@ const orderSchema = new Schema({
     type: Number,
     required: true,
   },
+  gstAmount: {
+  type: Number,
+  default: 0
+},
   address: {
     addressType: {
       type: String,
@@ -147,6 +160,13 @@ const orderSchema = new Schema({
     type: Boolean,
     default: false,
   },
+  coupon :{
+    type : String,
+    default  : null
+  },
+  couponDiscount :{
+    type : Number
+  }
 });
 
 const Order = mongoose.model("Order", orderSchema);

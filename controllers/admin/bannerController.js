@@ -19,6 +19,7 @@ const getBannerPage = async (req, res) =>{
     const totalPages = Math.ceil(totalBanners / limit);
 
     res.render("banners", {
+      title : 'Banner',
       banners : findBanner,
       currentPage : page,
       totalPages : totalPages,
@@ -33,7 +34,9 @@ const getBannerPage = async (req, res) =>{
 
 const getAddBannerPage = async (req, res) =>{
   try {
-    res.render("add-banner")
+    res.render("add-banner",{
+      title : 'Banner'
+    })
   } catch (error) {
     console.log("Error getting add banner page : ",error)
     res.status(500).send("Something went wrong while getting add banner page");

@@ -2,397 +2,285 @@
 
 <style>
     :root {
-        --primary:      #d4145a;
-        --primary-dark: #a81049;
+        --primary:       #d4145a;
+        --primary-dark:  #a81049;
         --primary-light: rgba(212, 20, 90, 0.08);
-        --light-bg:     #f8f9fa;
-        --card-shadow:  0 4px 15px rgba(0,0,0,0.08);
-        --transition:   all 0.3s ease;
-        --success:      #28a745;
-        --danger:       #dc3545;
-        --text-muted:   #888;
+        --success:       #28a745;
+        --danger:        #dc3545;
+        --warning:       #f59e0b;
+        --text-muted:    #888;
+        --card-shadow:   0 4px 20px rgba(0,0,0,0.08);
+        --transition:    all 0.3s ease;
+        --border:        #eee;
+        --bg:            #f5f5f5;
     }
 
-    body {
-        background: var(--light-bg);
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        color: #333;
-    }
+    body { background: var(--bg); font-family: 'Nunito Sans', sans-serif; color: #333; }
 
-    .content-main {
-        padding: 40px 5%;
-        max-width: 1200px;
-        margin: 0 auto;
-    }
+    .content-main { padding: 32px 30px; }
 
-    .content-title {
-        font-size: 32px;
+    /* ── Section title ── */
+    .section-label {
+        font-size: 11px;
         font-weight: 700;
-        color: #333;
-        margin-bottom: 30px;
-    }
-
-    /* ── Card ── */
-    .card {
-        background: white;
-        border-radius: 12px;
-        overflow: hidden;
-        box-shadow: var(--card-shadow);
-        border: none;
-        margin-bottom: 32px;
-    }
-
-    .card-header {
-        background: #f8f9fa;
-        padding: 18px 24px;
-        border-bottom: 1px solid #eee;
-        font-size: 18px;
-        font-weight: 600;
-        color: #444;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-
-    .card-header .header-icon {
-        width: 32px;
-        height: 32px;
-        background: var(--primary-light);
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: var(--primary);
-        font-size: 16px;
-    }
-
-    .card-body {
-        padding: 28px;
-    }
-
-    /* ── Form ── */
-    .form-label {
-        font-weight: 600;
-        color: #444;
-        margin-bottom: 7px;
-        font-size: 14px;
-        display: block;
-    }
-
-    .form-control {
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        padding: 11px 15px;
-        font-size: 15px;
-        width: 100%;
-        transition: var(--transition);
-        box-sizing: border-box;
-        background: #fff;
-        color: #333;
-    }
-
-    .form-control:focus {
-        border-color: var(--primary);
-        box-shadow: 0 0 0 3px rgba(212, 20, 90, 0.12);
-        outline: none;
-    }
-
-    .form-group {
-        margin-bottom: 20px;
-    }
-
-    .form-row {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 20px;
-    }
-
-    /* ── Coupon code field special style ── */
-    .coupon-code-wrapper {
-        position: relative;
-    }
-
-    .coupon-code-wrapper .form-control {
         text-transform: uppercase;
-        letter-spacing: 2px;
-        font-weight: 700;
-        font-size: 16px;
-        padding-right: 110px;
-    }
-
-    .generate-btn {
-        position: absolute;
-        right: 6px;
-        top: 50%;
-        transform: translateY(-50%);
-        background: var(--primary-light);
+        letter-spacing: 1.2px;
         color: var(--primary);
-        border: none;
-        border-radius: 6px;
-        padding: 6px 12px;
-        font-size: 12px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: var(--transition);
-        white-space: nowrap;
-    }
-
-    .generate-btn:hover {
-        background: var(--primary);
-        color: white;
-    }
-
-    /* ── Submit button ── */
-    .btn-publish {
-        background: var(--primary);
-        color: white;
-        padding: 13px 36px;
-        border-radius: 50px;
-        font-size: 15px;
-        font-weight: 600;
-        border: none;
-        cursor: pointer;
-        transition: var(--transition);
-        box-shadow: 0 4px 12px rgba(212,20,90,0.2);
-        display: inline-flex;
+        margin-bottom: 14px;
+        display: flex;
         align-items: center;
         gap: 8px;
     }
-
-    .btn-publish:hover {
-        background: var(--primary-dark);
-        transform: translateY(-2px);
-        box-shadow: 0 10px 20px rgba(212,20,90,0.25);
-    }
-
-    .btn-publish:active {
-        transform: translateY(0);
-    }
-
-    /* ── Table ── */
-    .coupons-table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 14px;
-    }
-
-    .coupons-table thead tr {
-        background: #f8f9fa;
-        border-bottom: 2px solid #eee;
-    }
-
-    .coupons-table th {
-        padding: 13px 16px;
-        text-align: left;
-        font-weight: 600;
-        color: #555;
-        font-size: 13px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-
-    .coupons-table td {
-        padding: 14px 16px;
-        border-bottom: 1px solid #f0f0f0;
-        color: #444;
-        vertical-align: middle;
-    }
-
-    .coupons-table tbody tr {
-        transition: var(--transition);
-    }
-
-    .coupons-table tbody tr:hover {
-        background: #fafafa;
-    }
-
-    .coupons-table tbody tr:last-child td {
-        border-bottom: none;
-    }
-
-    /* ── Coupon code badge ── */
-    .code-badge {
-        background: var(--primary-light);
-        color: var(--primary);
-        font-weight: 700;
-        letter-spacing: 1.5px;
-        padding: 5px 12px;
-        border-radius: 6px;
-        font-size: 13px;
-        display: inline-block;
-    }
-
-    /* ── Status badge ── */
-    .status-badge {
-        padding: 4px 12px;
-        border-radius: 50px;
-        font-size: 12px;
-        font-weight: 600;
-        display: inline-block;
-    }
-
-    .status-active {
-        background: rgba(40, 167, 69, 0.1);
-        color: var(--success);
-    }
-
-    .status-inactive {
-        background: rgba(108, 117, 125, 0.1);
-        color: #6c757d;
-    }
-
-    /* ── Discount chip ── */
-    .discount-chip {
-        font-weight: 700;
-        color: #333;
-        font-size: 15px;
-    }
-
-    .discount-chip span {
-        font-size: 12px;
-        color: var(--text-muted);
-        font-weight: 400;
-    }
-
-    /* ── Delete button ── */
-    .btn-delete {
-        background: rgba(220, 53, 69, 0.08);
-        color: var(--danger);
-        border: none;
-        padding: 7px 14px;
-        border-radius: 8px;
-        font-size: 13px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: var(--transition);
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-    }
-
-    .btn-delete:hover {
-        background: var(--danger);
-        color: white;
-    }
-
-    /* ── Empty state ── */
-    .empty-state {
-        text-align: center;
-        padding: 50px 20px;
-        color: var(--text-muted);
-    }
-
-    .empty-state svg {
-        opacity: 0.3;
-        margin-bottom: 14px;
-    }
-
-    .empty-state p {
-        font-size: 15px;
-        margin: 0;
-    }
-
-    /* ── Alert ── */
-    .alert {
-        padding: 13px 18px;
-        border-radius: 8px;
-        margin-bottom: 20px;
-        font-size: 14px;
-        font-weight: 500;
-    }
-
-    .alert-success {
-        background: rgba(40, 167, 69, 0.1);
-        color: var(--success);
-        border-left: 4px solid var(--success);
-    }
-
-    .alert-error {
-        background: rgba(220, 53, 69, 0.08);
-        color: var(--danger);
-        border-left: 4px solid var(--danger);
+    .section-label::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: linear-gradient(90deg, var(--primary-light), transparent);
     }
 
     /* ── Summary cards ── */
     .summary-row {
         display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 18px;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
         margin-bottom: 28px;
     }
-
     .summary-card {
         background: white;
-        border-radius: 12px;
-        padding: 20px 22px;
+        border-radius: 14px;
+        padding: 20px;
         box-shadow: var(--card-shadow);
         display: flex;
         align-items: center;
-        gap: 15px;
+        gap: 14px;
+        border-left: 4px solid transparent;
+        transition: var(--transition);
     }
-
+    .summary-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
+    .summary-card.pink   { border-left-color: var(--primary); }
+    .summary-card.green  { border-left-color: var(--success); }
+    .summary-card.grey   { border-left-color: #aaa; }
+    .summary-card.amber  { border-left-color: var(--warning); }
     .summary-card .icon-wrap {
-        width: 44px;
-        height: 44px;
-        border-radius: 10px;
+        width: 42px; height: 42px; border-radius: 10px;
         background: var(--primary-light);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: var(--primary);
-        font-size: 20px;
-        flex-shrink: 0;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 20px; flex-shrink: 0;
     }
+    .summary-card.green  .icon-wrap { background: rgba(40,167,69,0.1); }
+    .summary-card.grey   .icon-wrap { background: rgba(108,117,125,0.1); }
+    .summary-card.amber  .icon-wrap { background: rgba(245,158,11,0.1); }
+    .summary-card .stat-label { font-size: 11px; color: var(--text-muted); margin-bottom: 3px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+    .summary-card .stat-value { font-size: 24px; font-weight: 800; color: #222; }
 
-    .summary-card .stat-label {
-        font-size: 12px;
-        color: var(--text-muted);
-        margin-bottom: 3px;
+    /* ── Card ── */
+    .card {
+        background: white;
+        border-radius: 14px;
+        overflow: hidden;
+        box-shadow: var(--card-shadow);
+        border: none;
+        margin-bottom: 28px;
     }
-
-    .summary-card .stat-value {
-        font-size: 22px;
+    .card-header {
+        background: #fafafa;
+        padding: 18px 24px;
+        border-bottom: 1px solid var(--border);
+        font-size: 15px;
         font-weight: 700;
         color: #333;
-    }
-
-    /* ── Validation ── */
-    .error-msg {
-        color: var(--danger);
-        font-size: 12.5px;
-        margin-top: 5px;
-        display: none;
-        align-items: center;
-        gap: 4px;
-    }
-
-    .error-msg.visible {
         display: flex;
+        align-items: center;
+        gap: 10px;
     }
-
-    .form-control.invalid {
-        border-color: var(--danger);
-        box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+    .card-header .header-icon {
+        width: 30px; height: 30px;
+        background: var(--primary-light);
+        border-radius: 8px;
+        display: flex; align-items: center; justify-content: center;
+        color: var(--primary); font-size: 15px;
     }
+    .card-body { padding: 26px; }
 
-    .form-control.valid {
-        border-color: var(--success);
-        box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.08);
+    /* ── Form layout ── */
+    .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .form-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; }
+    .form-group { margin-bottom: 0; }
+
+    .form-label {
+        font-weight: 700;
+        font-size: 12.5px;
+        color: #444;
+        margin-bottom: 7px;
+        display: block;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
     }
+    .form-label .required { color: var(--primary); margin-left: 2px; }
+    .form-label .optional  { color: var(--text-muted); font-size: 11px; font-weight: 400; text-transform: none; letter-spacing: 0; margin-left: 4px; }
 
+    .form-control {
+        border: 1.5px solid #e0e0e0;
+        border-radius: 9px;
+        padding: 11px 14px;
+        font-size: 14px;
+        width: 100%;
+        transition: var(--transition);
+        background: #fff;
+        color: #333;
+        font-family: 'Nunito Sans', sans-serif;
+    }
+    .form-control:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(212,20,90,0.1);
+        outline: none;
+    }
+    .form-control.invalid { border-color: var(--danger); box-shadow: 0 0 0 3px rgba(220,53,69,0.1); }
+    .form-control.valid   { border-color: var(--success); box-shadow: 0 0 0 3px rgba(40,167,69,0.08); }
+
+    select.form-control { cursor: pointer; }
+
+    /* ── Coupon code wrapper ── */
+    .coupon-code-wrapper { position: relative; }
+    .coupon-code-wrapper .form-control {
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        font-weight: 800;
+        font-size: 15px;
+        padding-right: 115px;
+    }
+    .generate-btn {
+        position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+        background: var(--primary-light); color: var(--primary);
+        border: none; border-radius: 6px; padding: 6px 12px;
+        font-size: 12px; font-weight: 700; cursor: pointer;
+        transition: var(--transition); white-space: nowrap;
+    }
+    .generate-btn:hover { background: var(--primary); color: white; }
+
+    /* ── Discount type toggle ── */
+    .type-toggle { display: flex; gap: 0; border-radius: 9px; overflow: hidden; border: 1.5px solid #e0e0e0; }
+    .type-toggle input[type="radio"] { display: none; }
+    .type-toggle label {
+        flex: 1; text-align: center; padding: 11px 14px;
+        font-size: 14px; font-weight: 700; cursor: pointer;
+        transition: var(--transition); color: var(--text-muted);
+        background: white; user-select: none;
+    }
+    .type-toggle input[type="radio"]:checked + label {
+        background: var(--primary); color: white;
+    }
+    .type-toggle label:hover { background: var(--primary-light); color: var(--primary); }
+    .type-toggle input[type="radio"]:checked + label:hover { background: var(--primary-dark); color: white; }
+
+    /* ── Hint text ── */
+    .field-hint { font-size: 11.5px; color: var(--text-muted); margin-top: 5px; }
+
+    /* ── Error messages ── */
+    .error-msg {
+        color: var(--danger); font-size: 12px; margin-top: 5px;
+        display: none; align-items: center; gap: 4px; font-weight: 600;
+    }
+    .error-msg.visible { display: flex; }
+
+    /* ── Divider ── */
+    .form-divider { border: none; border-top: 1px dashed #e8e8e8; margin: 22px 0; }
+
+    /* ── Submit ── */
+    .btn-publish {
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        color: white; padding: 13px 36px;
+        border-radius: 50px; font-size: 14px; font-weight: 700;
+        border: none; cursor: pointer; transition: var(--transition);
+        box-shadow: 0 4px 14px rgba(212,20,90,0.3);
+        display: inline-flex; align-items: center; gap: 8px;
+    }
+    .btn-publish:hover { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(212,20,90,0.35); }
+    .btn-publish:active { transform: translateY(0); }
+
+    /* ── Table ── */
+    .coupons-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+    .coupons-table thead tr { background: #f8f9fa; border-bottom: 2px solid #eee; }
+    .coupons-table th {
+        padding: 13px 16px; text-align: left; font-weight: 700;
+        color: #555; font-size: 11px; text-transform: uppercase; letter-spacing: 0.6px;
+    }
+    .coupons-table td { padding: 14px 16px; border-bottom: 1px solid #f5f5f5; color: #444; vertical-align: middle; }
+    .coupons-table tbody tr:hover { background: #fafafa; }
+    .coupons-table tbody tr:last-child td { border-bottom: none; }
+
+    /* ── Badges ── */
+    .code-badge {
+        background: var(--primary-light); color: var(--primary);
+        font-weight: 800; letter-spacing: 1.5px;
+        padding: 5px 12px; border-radius: 6px; font-size: 12.5px; display: inline-block;
+    }
+    .status-badge {
+        padding: 4px 11px; border-radius: 50px; font-size: 11.5px; font-weight: 700; display: inline-block;
+    }
+    .status-active   { background: rgba(40,167,69,0.1); color: var(--success); }
+    .status-inactive { background: rgba(108,117,125,0.1); color: #6c757d; }
+
+    .type-badge {
+        padding: 3px 10px; border-radius: 50px; font-size: 11px; font-weight: 700;
+    }
+    .type-flat       { background: rgba(212,20,90,0.1); color: var(--primary); }
+    .type-percentage { background: rgba(245,158,11,0.12); color: #b45309; }
+
+    .usage-bar-wrap { width: 80px; }
+    .usage-bar {
+        height: 5px; background: #eee; border-radius: 50px; overflow: hidden; margin-top: 4px;
+    }
+    .usage-bar-fill { height: 100%; background: var(--primary); border-radius: 50px; transition: width 0.5s; }
+
+    /* ── Delete btn ── */
+    .btn-delete {
+        background: rgba(220,53,69,0.08); color: var(--danger);
+        border: none; padding: 7px 13px; border-radius: 7px;
+        font-size: 12px; font-weight: 700; cursor: pointer; transition: var(--transition);
+        display: inline-flex; align-items: center; gap: 5px;
+    }
+    .btn-delete:hover { background: var(--danger); color: white; }
+
+    /* ── Toggle active btn ── */
+    .btn-toggle {
+        border: none; padding: 7px 13px; border-radius: 7px;
+        font-size: 12px; font-weight: 700; cursor: pointer; transition: var(--transition);
+        display: inline-flex; align-items: center; gap: 5px;
+    }
+    .btn-toggle.deactivate { background: rgba(40,167,69,0.1); color: var(--success); }
+    .btn-toggle.activate   { background: rgba(108,117,125,0.1); color: #6c757d; }
+    .btn-toggle.deactivate:hover { background: var(--success); color: white; }
+    .btn-toggle.activate:hover   { background: #6c757d; color: white; }
+
+    /* ── Alert ── */
+    .alert { padding: 13px 18px; border-radius: 9px; margin-bottom: 20px; font-size: 14px; font-weight: 600; }
+    .alert-success { background: rgba(40,167,69,0.1); color: var(--success); border-left: 4px solid var(--success); }
+    .alert-error   { background: rgba(220,53,69,0.08); color: var(--danger); border-left: 4px solid var(--danger); }
+
+    /* ── Empty state ── */
+    .empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); }
+    .empty-state .empty-icon { font-size: 48px; margin-bottom: 12px; opacity: 0.4; }
+    .empty-state p { font-size: 14px; margin: 0; }
+
+    /* ── Actions cell ── */
+    .actions-cell { display: flex; gap: 6px; align-items: center; }
+
+    @media (max-width: 992px) {
+        .summary-row { grid-template-columns: repeat(2, 1fr); }
+        .form-grid-3 { grid-template-columns: 1fr 1fr; }
+    }
     @media (max-width: 768px) {
-        .form-row { grid-template-columns: 1fr; }
         .summary-row { grid-template-columns: 1fr; }
+        .form-grid-2, .form-grid-3 { grid-template-columns: 1fr; }
         .coupons-table { display: block; overflow-x: auto; }
-        .content-main { padding: 24px 4%; }
+        .content-main { padding: 20px 15px; }
     }
 </style>
 
 <section class="content-main">
-    <h2 class="content-title">Coupon Management</h2>
 
-    <!-- Flash messages (if you use connect-flash) -->
+    <!-- Flash messages -->
     <% if (typeof success !== 'undefined' && success) { %>
         <div class="alert alert-success">✓ <%= success %></div>
     <% } %>
@@ -400,77 +288,141 @@
         <div class="alert alert-error">⚠ <%= error %></div>
     <% } %>
 
-    <!-- Summary Stats -->
+    <!-- ── Summary Stats ── -->
     <div class="summary-row">
-        <div class="summary-card">
+        <div class="summary-card pink">
             <div class="icon-wrap">🎟</div>
             <div>
                 <div class="stat-label">Total Coupons</div>
                 <div class="stat-value"><%= coupons.length %></div>
             </div>
         </div>
-        <div class="summary-card">
+        <div class="summary-card green">
             <div class="icon-wrap">✅</div>
             <div>
                 <div class="stat-label">Active</div>
                 <div class="stat-value"><%= coupons.filter(c => c.isActive).length %></div>
             </div>
         </div>
-        <div class="summary-card">
+        <div class="summary-card grey">
             <div class="icon-wrap">⏸</div>
             <div>
                 <div class="stat-label">Inactive</div>
                 <div class="stat-value"><%= coupons.filter(c => !c.isActive).length %></div>
             </div>
         </div>
+        <div class="summary-card amber">
+            <div class="icon-wrap">🔥</div>
+            <div>
+                <div class="stat-label">Total Redemptions</div>
+                <div class="stat-value"><%= coupons.reduce((a, c) => a + (c.usedCount || 0), 0) %></div>
+            </div>
+        </div>
     </div>
 
-    <!-- Create Coupon Form -->
+    <!-- ── Create Coupon Form ── -->
     <div class="card">
         <div class="card-header">
             <div class="header-icon">➕</div>
             Create New Coupon
         </div>
         <div class="card-body">
-            <form id="couponForm"  novalidate>
+            <form id="couponForm" novalidate>
 
-                <div class="form-group">
-                    <label class="form-label">Coupon Code</label>
-                    <div class="coupon-code-wrapper">
-                        <input type="text" name="code" id="couponCode" class="form-control"
-                               placeholder="e.g. SUMMER25"
-                               oninput="this.value = this.value.toUpperCase(); clearError('couponCode')">
-                        <button type="button" class="generate-btn" onclick="generateCode()">Generate</button>
+                <!-- Basic Info -->
+                <div class="section-label">Basic Info</div>
+                <div class="form-grid-2" style="margin-bottom: 18px;">
+
+                    <div class="form-group">
+                        <label class="form-label">Coupon Code <span class="required">*</span></label>
+                        <div class="coupon-code-wrapper">
+                            <input type="text" name="code" id="couponCode" class="form-control"
+                                   placeholder="e.g. SUMMER25"
+                                   oninput="this.value = this.value.toUpperCase(); clearError('couponCode')">
+                            <button type="button" class="generate-btn" onclick="generateCode()">⚡ Generate</button>
+                        </div>
+                        <div class="error-msg" id="couponCode-error">⚠ <span></span></div>
                     </div>
-                    <div class="error-msg" id="couponCode-error">⚠ <span></span></div>
+
+                    <div class="form-group">
+                        <label class="form-label">Discount Type <span class="required">*</span></label>
+                        <div class="type-toggle" id="discountTypeToggle">
+                            <input type="radio" name="type" id="typeFlat" value="flat" checked>
+                            <label for="typeFlat">₹ Flat</label>
+                            <input type="radio" name="type" id="typePercentage" value="percentage">
+                            <label for="typePercentage">% Percentage</label>
+                        </div>
+                        <div class="field-hint" id="typeHint">A fixed rupee amount will be deducted.</div>
+                    </div>
+
                 </div>
 
-                <div class="form-row">
+                <!-- Discount Details -->
+                <div class="section-label">Discount Details</div>
+                <div class="form-grid-3" style="margin-bottom: 18px;">
+
                     <div class="form-group">
-                        <label class="form-label">Discount Amount (₹)</label>
+                        <label class="form-label" id="discountLabel">Discount Amount (₹) <span class="required">*</span></label>
                         <input type="number" name="discount" id="discount" class="form-control"
                                placeholder="e.g. 100" min="1"
                                oninput="clearError('discount')">
                         <div class="error-msg" id="discount-error">⚠ <span></span></div>
                     </div>
+
                     <div class="form-group">
-                        <label class="form-label">Minimum Order Amount (₹)</label>
+                        <label class="form-label">Min. Order Amount (₹) <span class="optional">(optional)</span></label>
                         <input type="number" name="minAmount" id="minAmount" class="form-control"
                                placeholder="e.g. 500" min="0"
                                oninput="clearError('minAmount')">
                         <div class="error-msg" id="minAmount-error">⚠ <span></span></div>
                     </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Expiry Date <span class="required">*</span></label>
+                        <input type="date" name="expiry" id="expiry" class="form-control"
+                               min="<%= new Date().toISOString().split('T')[0] %>"
+                               onchange="clearError('expiry')">
+                        <div class="error-msg" id="expiry-error">⚠ <span></span></div>
+                    </div>
+
                 </div>
 
-                <div class="form-group" style="max-width: 300px;">
-                    <label class="form-label">Expiry Date</label>
-                    <input type="date" name="expiry" id="expiry" class="form-control"
-                           min="<%= new Date().toISOString().split('T')[0] %>"
-                           onchange="clearError('expiry')">
-                    <div class="error-msg" id="expiry-error">⚠ <span></span></div>
+                <hr class="form-divider">
+
+                <!-- Usage Limits -->
+                <div class="section-label">Usage Limits</div>
+                <div class="form-grid-3" style="margin-bottom: 22px;">
+
+                    <div class="form-group">
+                        <label class="form-label">Total Usage Limit <span class="required">*</span></label>
+                        <input type="number" name="usageLimit" id="usageLimit" class="form-control"
+                               placeholder="e.g. 100" min="1" value="1"
+                               oninput="clearError('usageLimit')">
+                        <div class="field-hint">Max times this coupon can be used across all users.</div>
+                        <div class="error-msg" id="usageLimit-error">⚠ <span></span></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Per-User Limit <span class="required">*</span></label>
+                        <input type="number" name="perUserLimit" id="perUserLimit" class="form-control"
+                               placeholder="e.g. 1" min="1" value="1"
+                               oninput="clearError('perUserLimit')">
+                        <div class="field-hint">Max times one user can apply this coupon.</div>
+                        <div class="error-msg" id="perUserLimit-error">⚠ <span></span></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Status</label>
+                        <select name="isActive" id="isActive" class="form-control">
+                            <option value="true">✅ Active</option>
+                            <option value="false">⏸ Inactive</option>
+                        </select>
+                        <div class="field-hint">Inactive coupons cannot be applied by users.</div>
+                    </div>
+
                 </div>
 
-                <div style="margin-top: 8px;">
+                <div style="margin-top: 6px;">
                     <button type="button" class="btn-publish" onclick="validateAndSubmit()">
                         🎟 Create Coupon
                     </button>
@@ -480,20 +432,18 @@
         </div>
     </div>
 
-    <!-- Coupons Table -->
+    <!-- ── Coupons Table ── -->
     <div class="card">
         <div class="card-header">
             <div class="header-icon">📋</div>
             All Coupons
+            <span style="margin-left: auto; font-size: 12px; color: var(--text-muted); font-weight: 400;"><%= coupons.length %> total</span>
         </div>
         <div class="card-body" style="padding: 0;">
 
             <% if (coupons.length === 0) { %>
                 <div class="empty-state">
-                    <svg width="60" height="60" fill="none" viewBox="0 0 24 24" stroke="#999">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                              d="M9 14l2 2 4-4m-7 8h10a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v13a2 2 0 002 2z"/>
-                    </svg>
+                    <div class="empty-icon">🎟</div>
                     <p>No coupons yet. Create your first one above!</p>
                 </div>
             <% } else { %>
@@ -501,42 +451,83 @@
                     <thead>
                         <tr>
                             <th>Code</th>
+                            <th>Type</th>
                             <th>Discount</th>
                             <th>Min Order</th>
                             <th>Expiry</th>
+                            <th>Usage</th>
+                            <th>Per User</th>
                             <th>Status</th>
-                            <th>Action</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <% coupons.forEach(coupon => { %>
+                        <% coupons.forEach(coupon => {
+                               const usagePct = coupon.usageLimit > 0
+                                   ? Math.min(100, Math.round((coupon.usedCount / coupon.usageLimit) * 100))
+                                   : 0;
+                        %>
                             <tr>
                                 <td><span class="code-badge"><%= coupon.code %></span></td>
+
                                 <td>
-                                    <span class="discount-chip">
-                                        ₹<%= coupon.discount %>
-                                        <span>off</span>
+                                    <span class="type-badge <%= coupon.type === 'flat' ? 'type-flat' : 'type-percentage' %>">
+                                        <%= coupon.type === 'flat' ? '₹ Flat' : '% Off' %>
                                     </span>
                                 </td>
-                                <td>
-                                    <% if (coupon.minAmount) { %>
-                                        Min ₹<%= coupon.minAmount %>
+
+                                <td style="font-weight: 800; color: #222;">
+                                    <% if (coupon.type === 'percentage') { %>
+                                        <%= coupon.discount %>%
                                     <% } else { %>
-                                        <span style="color: var(--text-muted);">None</span>
+                                        ₹<%= coupon.discount %>
                                     <% } %>
                                 </td>
-                                <td><%= coupon.expiry.toDateString() %></td>
+
+                                <td>
+                                    <% if (coupon.minAmount && coupon.minAmount > 0) { %>
+                                        ₹<%= coupon.minAmount %>
+                                    <% } else { %>
+                                        <span style="color: var(--text-muted);">—</span>
+                                    <% } %>
+                                </td>
+
+                                <td style="white-space: nowrap;">
+                                    <%= coupon.expiry.toDateString() %>
+                                </td>
+
+                                <td>
+                                    <div class="usage-bar-wrap">
+                                        <span style="font-size: 12px; font-weight: 700;">
+                                            <%= coupon.usedCount %> / <%= coupon.usageLimit %>
+                                        </span>
+                                        <div class="usage-bar">
+                                            <div class="usage-bar-fill" style="width: <%= usagePct %>%;
+                                                 background: <%= usagePct >= 90 ? '#dc3545' : usagePct >= 60 ? '#f59e0b' : '#d4145a' %>;">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <td style="font-size: 13px; font-weight: 700;">
+                                    <%= coupon.perUserLimit %>x
+                                </td>
+
                                 <td>
                                     <span class="status-badge <%= coupon.isActive ? 'status-active' : 'status-inactive' %>">
                                         <%= coupon.isActive ? '● Active' : '● Inactive' %>
                                     </span>
                                 </td>
+
                                 <td>
-                                    <button 
-                                      class="btn-delete"
-                                      onclick="confirmDelete(event, '<%= coupon._id %>', '<%= coupon.code %>')">
-                                      🗑 Delete
-                                    </button>
+                                    <div class="actions-cell">
+                                        
+                                        <button
+                                            class="btn-delete"
+                                            onclick="confirmDelete(event, '<%= coupon._id %>', '<%= coupon.code %>')">
+                                            🗑
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
                         <% }) %>
@@ -546,218 +537,203 @@
 
         </div>
     </div>
+
 </section>
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    // ── Generate random coupon code ──
+
+    /* ── Discount type hint ── */
+    document.querySelectorAll('input[name="type"]').forEach(radio => {
+        radio.addEventListener('change', function () {
+            const isPercentage = this.value === 'percentage';
+            document.getElementById('discountLabel').innerHTML =
+                isPercentage
+                    ? 'Discount Percentage (%) <span class="required">*</span>'
+                    : 'Discount Amount (₹) <span class="required">*</span>';
+            document.getElementById('typeHint').textContent =
+                isPercentage
+                    ? 'A percentage of the order total will be deducted.'
+                    : 'A fixed rupee amount will be deducted.';
+            document.getElementById('discount').placeholder = isPercentage ? 'e.g. 10' : 'e.g. 100';
+            clearError('discount');
+        });
+    });
+
+    /* ── Generate code ── */
     function generateCode() {
         const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
         let code = '';
-        for (let i = 0; i < 8; i++) {
-            code += chars.charAt(Math.floor(Math.random() * chars.length));
-        }
-        const input = document.getElementById('couponCode');
-        input.value = code;
+        for (let i = 0; i < 8; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
+        document.getElementById('couponCode').value = code;
         clearError('couponCode');
     }
 
-    // ── Show error under a field ──
+    /* ── Error helpers ── */
     function showError(fieldId, message) {
         const field = document.getElementById(fieldId);
         const errorDiv = document.getElementById(fieldId + '-error');
         if (!field || !errorDiv) return;
-
-        field.classList.add('invalid');
-        field.classList.remove('valid');
+        field.classList.add('invalid'); field.classList.remove('valid');
         errorDiv.querySelector('span').textContent = message;
         errorDiv.classList.add('visible');
     }
-
-    // ── Clear error from a field ──
     function clearError(fieldId) {
         const field = document.getElementById(fieldId);
         const errorDiv = document.getElementById(fieldId + '-error');
         if (!field || !errorDiv) return;
-
         field.classList.remove('invalid');
         errorDiv.classList.remove('visible');
         errorDiv.querySelector('span').textContent = '';
     }
-
-    // ── Mark field as valid ──
     function markValid(fieldId) {
         const field = document.getElementById(fieldId);
         if (!field) return;
-        field.classList.remove('invalid');
-        field.classList.add('valid');
+        field.classList.remove('invalid'); field.classList.add('valid');
     }
 
-    // ── Main validation ──
+    /* ── Validate & Submit ── */
     function validateAndSubmit() {
         let isValid = true;
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
+        const today = new Date(); today.setHours(0,0,0,0);
+        const type = document.querySelector('input[name="type"]:checked').value;
 
-        // 1. Coupon Code
+        // Code
         const code = document.getElementById('couponCode').value.trim();
-        if (!code) {
-            showError('couponCode', 'Coupon code is required.');
-            isValid = false;
-        } else if (code.length < 3) {
-            showError('couponCode', 'Code must be at least 3 characters.');
-            isValid = false;
-        } else if (code.length > 20) {
-            showError('couponCode', 'Code cannot exceed 20 characters.');
-            isValid = false;
-        } else if (!/^[A-Z0-9_\-]+$/.test(code)) {
-            showError('couponCode', 'Only uppercase letters, numbers, - and _ are allowed.');
-            isValid = false;
-        } else {
-            markValid('couponCode');
-        }
+        if (!code) { showError('couponCode', 'Coupon code is required.'); isValid = false; }
+        else if (code.length < 3) { showError('couponCode', 'Code must be at least 3 characters.'); isValid = false; }
+        else if (code.length > 20) { showError('couponCode', 'Code cannot exceed 20 characters.'); isValid = false; }
+        else if (!/^[A-Z0-9_\-]+$/.test(code)) { showError('couponCode', 'Only uppercase letters, numbers, - and _ allowed.'); isValid = false; }
+        else markValid('couponCode');
 
-        // 2. Discount Amount
+        // Discount
         const discountVal = document.getElementById('discount').value.trim();
         const discount = parseFloat(discountVal);
-        if (!discountVal) {
-            showError('discount', 'Discount amount is required.');
-            isValid = false;
-        } else if (isNaN(discount) || discount <= 0) {
-            showError('discount', 'Discount must be a positive number.');
-            isValid = false;
-        } else if (!Number.isInteger(discount)) {
-            showError('discount', 'Discount must be a whole number (no decimals).');
-            isValid = false;
-        } else if (discount > 100000) {
-            showError('discount', 'Discount amount seems too high. Please check.');
-            isValid = false;
-        } else {
-            markValid('discount');
-        }
+        if (!discountVal) { showError('discount', 'Discount is required.'); isValid = false; }
+        else if (isNaN(discount) || discount <= 0) { showError('discount', 'Must be a positive number.'); isValid = false; }
+        else if (type === 'percentage' && discount > 100) { showError('discount', 'Percentage cannot exceed 100%.'); isValid = false; }
+        else if (type === 'flat' && discount > 100000) { showError('discount', 'Amount seems too high.'); isValid = false; }
+        else markValid('discount');
 
-        // 3. Minimum Order Amount (optional, but validate if filled)
+        // Min Amount
         const minAmountVal = document.getElementById('minAmount').value.trim();
         if (minAmountVal !== '') {
             const minAmount = parseFloat(minAmountVal);
-            if (isNaN(minAmount) || minAmount < 0) {
-                showError('minAmount', 'Minimum order must be 0 or a positive number.');
-                isValid = false;
-            } else if (!Number.isInteger(minAmount)) {
-                showError('minAmount', 'Minimum order must be a whole number.');
-                isValid = false;
-            } else if (!isNaN(discount) && discount > 0 && minAmount > 0 && discount >= minAmount) {
-                showError('minAmount', 'Minimum order must be greater than the discount amount.');
-                isValid = false;
-            } else {
-                markValid('minAmount');
-            }
+            if (isNaN(minAmount) || minAmount < 0) { showError('minAmount', 'Must be 0 or a positive number.'); isValid = false; }
+            else if (!Number.isInteger(minAmount)) { showError('minAmount', 'Must be a whole number.'); isValid = false; }
+            else if (type === 'flat' && !isNaN(discount) && discount > 0 && minAmount > 0 && discount >= minAmount) {
+                showError('minAmount', 'Min order must be greater than discount.'); isValid = false;
+            } else markValid('minAmount');
         }
 
-        // 4. Expiry Date
+        // Expiry
         const expiryVal = document.getElementById('expiry').value;
-        if (!expiryVal) {
-            showError('expiry', 'Expiry date is required.');
-            isValid = false;
-        } else {
-            const expiry = new Date(expiryVal);
-            expiry.setHours(0, 0, 0, 0);
-            if (expiry < today) {
-                showError('expiry', 'Expiry date cannot be in the past.');
-                isValid = false;
-            } else {
-                markValid('expiry');
-            }
-        }
+        if (!expiryVal) { showError('expiry', 'Expiry date is required.'); isValid = false; }
+        else { const exp = new Date(expiryVal); exp.setHours(0,0,0,0); if (exp < today) { showError('expiry', 'Cannot be in the past.'); isValid = false; } else markValid('expiry'); }
+
+        // Usage Limit
+        const usageLimitVal = document.getElementById('usageLimit').value.trim();
+        const usageLimit = parseInt(usageLimitVal);
+        if (!usageLimitVal) { showError('usageLimit', 'Usage limit is required.'); isValid = false; }
+        else if (isNaN(usageLimit) || usageLimit < 1) { showError('usageLimit', 'Must be at least 1.'); isValid = false; }
+        else markValid('usageLimit');
+
+        // Per User Limit
+        const perUserVal = document.getElementById('perUserLimit').value.trim();
+        const perUser = parseInt(perUserVal);
+        if (!perUserVal) { showError('perUserLimit', 'Per-user limit is required.'); isValid = false; }
+        else if (isNaN(perUser) || perUser < 1) { showError('perUserLimit', 'Must be at least 1.'); isValid = false; }
+        else if (!isNaN(usageLimit) && perUser > usageLimit) { showError('perUserLimit', 'Cannot exceed total usage limit.'); isValid = false; }
+        else markValid('perUserLimit');
 
         if (isValid) {
-            // Remove valid highlights before submit (optional, clean look)
             document.querySelectorAll('.form-control.valid').forEach(el => el.classList.remove('valid'));
-            document.getElementById('couponForm').submit();
             createCoupon();
         }
-
-        
     }
 
-
+    /* ── Create Coupon API ── */
     function createCoupon() {
+        const payload = {
+            code:         document.getElementById('couponCode').value.trim(),
+            type:         document.querySelector('input[name="type"]:checked').value,
+            discount:     parseFloat(document.getElementById('discount').value),
+            minAmount:    parseFloat(document.getElementById('minAmount').value) || 0,
+            expiry:       document.getElementById('expiry').value,
+            usageLimit:   parseInt(document.getElementById('usageLimit').value),
+            perUserLimit: parseInt(document.getElementById('perUserLimit').value),
+            isActive:     document.getElementById('isActive').value === 'true'
+        };
 
-      const code = document.getElementById("couponCode").value;
-      const discount = document.getElementById("discount").value;
-      const minAmount = document.getElementById("minAmount").value;
-      const expiry = document.getElementById("expiry").value;
-
-      fetch('/admin/create-coupon', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          code,
-          discount,
-          minAmount,
-          expiry
+        fetch('/admin/create-coupon', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
         })
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          Swal.fire({
-            icon: 'success',
-            title: 'Coupon created successfully!',
-            confirmButtonColor: '#d4145a'
-          }).then(() => {
-            location.reload(); // reload to show in table
-          });
-        } else {
-          Swal.fire({
-            icon: 'error',
-            title: data.message || 'Error creating coupon',
-            confirmButtonColor: '#d4145a'
-          });
-        }
-      })
-      .catch(err => {
-        console.log(err);
-        Swal.fire('Error', 'Something went wrong', 'error');
-      });
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                Swal.fire({ icon: 'success', title: 'Coupon Created!', text: `${payload.code} is ready.`, confirmButtonColor: '#d4145a' })
+                    .then(() => location.reload());
+            } else {
+                Swal.fire({ icon: 'error', title: 'Failed', text: data.message || 'Error creating coupon.', confirmButtonColor: '#d4145a' });
+            }
+        })
+        .catch(() => Swal.fire('Error', 'Something went wrong.', 'error'));
     }
 
-    function confirmDelete(event, couponId, couponCode) {
-      event.preventDefault();
-
-      Swal.fire({
-        title: "Are you sure?",
-        text: `Delete coupon ${couponCode}?`,
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#d33",
-        confirmButtonText: "Yes, delete it!"
-      }).then((result) => {
-        if (result.isConfirmed) {
-
-          fetch(`/admin/delete-coupon/${couponId}`, {
-            method : "DELETE"
-          })
-            .then(res => res.json())
-            .then(data => {
-              if (data.success) {
-                Swal.fire("Deleted!", "Coupon removed.", "success")
-                  .then(() => location.reload());
-              }
-            });
-
-        }
-      });
-    }
-
-    // ── Clear valid state on re-edit (feel natural) ──
-    document.querySelectorAll('#couponForm .form-control').forEach(function(input) {
-        input.addEventListener('focus', function() {
-            this.classList.remove('valid');
+    /* ── Toggle Active/Inactive ── */
+    function confirmToggle(couponId, couponCode, isCurrentlyActive) {
+        const action = isCurrentlyActive ? 'deactivate' : 'activate';
+        Swal.fire({
+            title: `${isCurrentlyActive ? 'Deactivate' : 'Activate'} coupon?`,
+            text: `Coupon ${couponCode} will be ${action}d.`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: isCurrentlyActive ? '#f59e0b' : '#28a745',
+            confirmButtonText: `Yes, ${action} it`
+        }).then(result => {
+            if (result.isConfirmed) {
+                fetch(`/admin/toggle-coupon/${couponId}`, { method: 'PATCH' })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire({ icon: 'success', title: `Coupon ${action}d!`, confirmButtonColor: '#d4145a' })
+                                .then(() => location.reload());
+                        }
+                    });
+            }
         });
+    }
+
+    /* ── Delete ── */
+    function confirmDelete(event, couponId, couponCode) {
+        event.preventDefault();
+        Swal.fire({
+            title: 'Delete coupon?',
+            text: `${couponCode} will be permanently removed.`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            confirmButtonText: 'Yes, delete it'
+        }).then(result => {
+            if (result.isConfirmed) {
+                fetch(`/admin/delete-coupon/${couponId}`, { method: 'DELETE' })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire('Deleted!', 'Coupon removed.', 'success').then(() => location.reload());
+                        }
+                    });
+            }
+        });
+    }
+
+    /* ── Clear valid on refocus ── */
+    document.querySelectorAll('#couponForm .form-control').forEach(input => {
+        input.addEventListener('focus', function () { this.classList.remove('valid'); });
     });
 
-
-
 </script>
+
+<%- include("../../views/partials/admin/footer") %>

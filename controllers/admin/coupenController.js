@@ -3,8 +3,9 @@ const Coupen = require("../../models/coupenSchema");
 
 const loadCoupen = async (req, res) =>{
   try {
-    const coupon = await Coupen.find()
+    const coupon = await Coupen.find().sort({createdAt : -1});
     res.render("coupen",{
+      title : 'Coupon',
        coupons : coupon
     })
   } catch (error) {
@@ -16,7 +17,7 @@ const loadCoupen = async (req, res) =>{
 const createCoupen = async (req, res) =>{
   try {
     
-    const { code, discount, minAmount, expiry } = req.body;
+    const { code, discount, minAmount, expiry, type, usageLimit, perUserLimit, isActive } = req.body;
 
     const existing = await Coupen.findOne({ code });
     if (existing) {
@@ -27,7 +28,11 @@ const createCoupen = async (req, res) =>{
       code, 
       discount,
       minAmount,
-      expiry
+      expiry,
+      type,
+      usageLimit,
+      perUserLimit,
+      isActive
     })
 
     return res.status(200).json({

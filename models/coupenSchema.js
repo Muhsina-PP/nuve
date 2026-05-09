@@ -23,6 +23,43 @@ const couponSchema = new Schema({
   isActive: {
     type: Boolean,
     default: true
+  },
+    type: {
+    type: String,
+    enum: ['percentage', 'flat'],
+    required: true
+  },
+  // limit that coupon can use in total
+  usageLimit  :{  
+    type : Number,
+    default : 1
+  },
+  perUserLimit :{
+    type : Number,
+    default : 1
+  },
+  usedCount :{
+    type : Number,
+    default : 0
+  },
+  usedBy: {
+    type: [
+      {
+        userId: {
+          type: Schema.Types.ObjectId,
+          ref: "User"
+        },
+        count: {
+          type: Number,
+          default: 0
+        }
+      }
+    ],
+    default: []   // ✅ THIS FIXES YOUR ERROR
+  },
+  createdAt : {
+    type : Date,
+    default : Date.now
   }
 }, { timestamps: true });
 

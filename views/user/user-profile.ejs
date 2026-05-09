@@ -976,7 +976,7 @@
       <div class="wallet-balance">
         <div>
           <div class="label">Available Balance</div>
-          <div class="amount">₹<%= wallet?.balance || 0 %></div>
+          <div class="amount">₹<%= wallet?.balance.toFixed(2) || 0 %></div>
         </div>
         <div class="wallet-icon"><i class="fas fa-wallet"></i></div>
       </div>

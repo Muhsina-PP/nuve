@@ -45,6 +45,7 @@ const loadOrders = async  (req, res)=>{
     const totalPages = Math.ceil(totalOrders / limit)
 
     res.render("orders", {
+      title : 'Orders',
       orders,
       currentPage : page,
       skip,

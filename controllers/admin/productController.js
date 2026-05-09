@@ -14,7 +14,7 @@ const productInfo = async (req, res) =>{
     
     const search = req.query.search?.trim() || "";
     const page = parseInt(req.query.page) || 1;
-    const limit = 5;
+    const limit = 10;
     const skip = (page - 1) * limit;
 
     const productData = await Product.find({
@@ -43,6 +43,7 @@ const productInfo = async (req, res) =>{
 
     if(category && brand){
       res.render("products" , {
+        title : 'Products',
         product : productData,
         currentPage : page,
         totalPages : totalPages,
@@ -72,6 +73,7 @@ const getAddProductPage = async (req, res) =>{
     const category = await Category.find({isListed : true})
     const brand = await Brand.find({isBlocked : false})
     res.render("add-products", {
+      title : 'Products',
       category,
       brand 
     })
@@ -304,6 +306,7 @@ const removeProductOffer = async (req, res) => {
     const brand = await Brand.find()
 
     return res.render("edit-product",{
+      title : 'Products',
       product,
       category,
       brand

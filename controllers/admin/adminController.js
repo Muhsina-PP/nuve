@@ -58,7 +58,7 @@ const loadDashboard = async(req,res) =>{
       if(!req.session.admin){
          return res.redirect("/admin/login");
       }
-      return res.render("dashboard") 
+      return res.render("dashboard", {title : 'Dashboard' }) 
     } catch (error) {
       console.log("Loading dashboard error : ",error);
       return res.redirect("/admin/pageNotFound")   

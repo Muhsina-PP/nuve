@@ -394,7 +394,7 @@
       <div class="wallet-banner">
         <div>
           <div class="label">Available Balance</div>
-          <div class="amount" id="balance-display">₹<%= wallet?.balance || 0 %></div>
+          <div class="amount" id="balance-display">₹<%= wallet?.balance.toFixed(2) || 0 %></div>
         </div>
         <div class="wallet-icon"><i class="fas fa-wallet"></i></div>
       </div>

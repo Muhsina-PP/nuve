@@ -566,7 +566,7 @@ label.payment-option:has(#useWallet) #useWallet {
         <div class="payment-options">
 
           <label class="payment-option selected" onclick="selectPayment(this)">
-            <input type="radio" name="paymentMethod" value="cod" checked>
+            <input type="radio" name="paymentMethod" value="COD" checked>
             <div class="payment-icon">💵</div>
             <div>
               <div class="payment-label">Cash on Delivery</div>
@@ -632,9 +632,13 @@ label.payment-option:has(#useWallet) #useWallet {
           <span id="summaryCoupon">− ₹0</span>
         </div>
         <!-- Tax row — show/hide as needed -->
-        <div class="summary-row" id="taxRow" style="display:none;">
+         <div class="summary-row" id="taxRow" >
+          <span>Base Price</span>
+          <span id="summaryTax"><%= (totalMRP - gstAmount).toFixed(2) %></span>
+        </div>
+        <div class="summary-row" id="taxRow" >
           <span>Tax (GST)</span>
-          <span id="summaryTax">₹0</span>
+          <span id="summaryTax"><%= gstAmount.toFixed(2) %></span>
         </div>
         <div class="summary-row">
           <span>Delivery Charges</span>
@@ -750,7 +754,7 @@ label.payment-option:has(#useWallet) #useWallet {
 
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
-  const GRAND_TOTAL = <%= grandTotal %>;
+  const GRAND_TOTAL = <%= grandTotal %>
 </script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
@@ -953,7 +957,7 @@ label.payment-option:has(#useWallet) #useWallet {
     label.classList.add('selected');
   }
 
-  function openRazorpayPopup(order, addressId, useWallet) {
+  function openRazorpayPopup(order, addressId, useWallet, coupon) {
 
   const options = {
     key: "<%= razorpayKey %>", 
@@ -976,7 +980,7 @@ label.payment-option:has(#useWallet) #useWallet {
           razorpay_signature: response.razorpay_signature,
           addressId: document.getElementById('selectedAddressId').value,
           useWallet,
-          coupon: window.appliedCoupon
+          coupon
         })
       })
       .then(res => res.json())
@@ -1023,7 +1027,7 @@ label.payment-option:has(#useWallet) #useWallet {
         return;
       }
       if (data.success) {
-        openRazorpayPopup(data.order, addressId, useWallet);
+        openRazorpayPopup(data.order, addressId, useWallet, coupon);
       }else {
            Swal.fire("Error", "Payment verification failed, Available quantity less than ordering quantity", "error"); 
         }
@@ -1053,6 +1057,7 @@ label.payment-option:has(#useWallet) #useWallet {
     const addressId     = document.getElementById('selectedAddressId').value;
     const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked')?.value;
     const useWallet = document.getElementById("useWallet")?.checked || false;
+    const coupon = document.getElementById("couponCode").value;
 
     console.log("Use wallet : ",useWallet)
     console.log("payment method : ", paymentMethod)
@@ -1062,13 +1067,13 @@ label.payment-option:has(#useWallet) #useWallet {
         return;
       }
     
-      if(paymentMethod === 'cod' || paymentMethod === 'wallet') {
+      if(paymentMethod === 'COD' || paymentMethod === 'wallet') {
         // COD → directly place order
-        placeOrderRequest(addressId, paymentMethod, useWallet);
+        placeOrderRequest(addressId, paymentMethod, useWallet, coupon);
 
       }else if( paymentMethod === 'online'){
         console.log("going to razorpay")
-        startRazorpayPayment( addressId, useWallet, window.appliedCoupon);
+        startRazorpayPayment( addressId, useWallet, coupon);
         return;
       }
 
@@ -1078,11 +1083,11 @@ label.payment-option:has(#useWallet) #useWallet {
 
   }
 
-  function placeOrderRequest(addressId, paymentMethod, useWallet) {
+  function placeOrderRequest(addressId, paymentMethod, useWallet, coupon) {
     fetch('/placeOrder', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ addressId, paymentMethod, useWallet })
+      body: JSON.stringify({ addressId, paymentMethod, useWallet,  coupon: coupon || null   })
     })
     .then(res => res.json())
     .then(data => {
@@ -1092,44 +1097,45 @@ label.payment-option:has(#useWallet) #useWallet {
     });
   }
 
-   async function applyCoupon() {
-  const code = document.getElementById('couponCode').value.trim();
+  async function applyCoupon() {
+    const code = document.getElementById('couponCode').value.trim();
 
-  if (!code) {
-    Swal.fire({ icon: 'warning', title: 'Enter a coupon code', confirmButtonColor: '#d4145a' });
-    return;
+    if (!code) {
+      Swal.fire({ icon: 'warning', title: 'Enter a coupon code', confirmButtonColor: '#d4145a' });
+      return;
+    }
+
+    const totalAmount = GRAND_TOTAL; 
+
+    const res = await fetch('/apply-coupon', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ code, totalAmount })   
+    });
+    console.log("Coupon  : ",code)
+
+    const data = await res.json();
+
+    if (data.success) {
+      Swal.fire("Success", "Coupon applied!", "success");
+
+      //  update total
+      const newTotal = totalAmount - data.discount;
+
+      document.getElementById('grandTotal').innerText = newTotal;
+
+      //  store globally in frontend
+      window.appliedCoupon = {
+        code,
+        discount: data.discount
+      };
+
+    } else {
+      Swal.fire("Error", data.message, "error");
+    }
   }
-
-  const totalAmount = GRAND_TOTAL; 
-
-  const res = await fetch('/apply-coupon', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ code, totalAmount })
-  });
-
-  const data = await res.json();
-
-  if (data.success) {
-    Swal.fire("Success", "Coupon applied!", "success");
-
-    //  update total
-    const newTotal = totalAmount - data.discount;
-
-    document.getElementById('grandTotal').innerText = newTotal;
-
-    //  store globally in frontend
-    window.appliedCoupon = {
-      code,
-      discount: data.discount
-    };
-
-  } else {
-    Swal.fire("Error", data.message, "error");
-  }
-}
 
 </script>
 </body>

@@ -378,7 +378,9 @@ const cancelSingleItem = async (req, res) => {
     item.status = "Cancelled";
     item.returnReason = reason || "No reason";
 
-    const refundAmount = item.quantity * item.price;
+    // const refundAmount = item.quantity * item.price;
+    const refundAmount = item.finalItemPrice
+    console.log("Refund amount : ", refundAmount)
 
     //  Wallet logic 
     if (

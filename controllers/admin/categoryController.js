@@ -23,6 +23,7 @@ const categoryInfo = async (req,res) =>{
     const totalPages = Math.ceil( totalCategoories / limit);
 
     res.render("category",{
+      title : 'Category',
       category : categoryData,
       currentPage : page,
       totalPages : totalPages,
@@ -212,7 +213,7 @@ const getEditCategory = async (req, res) =>{
   try {
     const id = req.params.id;
     const category = await Category.findOne({_id: id})
-    res.render("edit-category", {category : category})    
+    res.render("edit-category", {category : category, title : 'Category' })    
   } catch (error) {
     console.log("Error loading edit-category page : ", error);
     res.redirect("/admin/pageNotFound")

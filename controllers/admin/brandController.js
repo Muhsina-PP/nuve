@@ -16,6 +16,7 @@ const getBrandPage = async (req,res) =>{
     const totalPages = Math.ceil(totalBrands / limit);
 
     res.render("brands", {
+      title : 'Brands',
       brand : brandData,
       currentPage : page,
       totalBrands : totalBrands,
