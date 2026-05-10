@@ -847,6 +847,59 @@
       </div>
     </div>
 
+    <!-- Refer & Earn Card -->
+    <div class="card" style="border-color: var(--rose-blush); background: var(--rose-mist);">
+      <div class="card-header">
+        <div class="card-title-group">
+          <div class="card-icon" style="background: var(--rose); color: white;"><i class="fas fa-gift"></i></div>
+          <span class="card-title">Refer & Earn</span>
+        </div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 15px;">
+        <p style="font-size: 0.9rem; color: var(--ink-soft); margin: 0;">
+          Invite your friends to NUVE and get a unique discount coupon when they join!
+        </p>
+        <div style="background: white; border: 1.5px dashed var(--rose-blush); padding: 15px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+          <div style="display: flex; flex-direction: column;">
+            <span style="font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">Your Referral Code</span>
+            <span style="font-family: monospace; font-size: 1.1rem; font-weight: 700; color: var(--rose); letter-spacing: 0.1em;" id="refCode"><%= user.referalCode %></span>
+          </div>
+          <button onclick="copyReferralLink()" class="btn-rose" style="padding: 8px 16px; font-size: 0.75rem;">
+            <i class="fas fa-copy"></i> Copy Link
+          </button>
+        </div>
+      </div>
+    </div>
+    <!-- My Rewards Card -->
+    <div class="card" style="margin-top: 20px;">
+      <div class="card-header">
+        <div class="card-title-group">
+          <div class="card-icon" style="background: var(--blue-bg); color: var(--blue);"><i class="fas fa-ticket-alt"></i></div>
+          <span class="card-title">My Referral Rewards</span>
+        </div>
+      </div>
+      <% if (coupons && coupons.length > 0) { %>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px;">
+          <% coupons.forEach(coupon => { %>
+            <div style="border: 1px solid var(--border); border-radius: 10px; padding: 12px; background: <%= coupon.isActive ? '#fff' : '#f8f9fa' %>; opacity: <%= coupon.isActive ? 1 : 0.7 %>;">
+              <div style="font-size: 0.7rem; color: var(--muted); text-transform: uppercase; margin-bottom: 4px;">Coupon Code</div>
+              <div style="font-family: monospace; font-size: 1rem; font-weight: 700; color: var(--primary);"><%= coupon.code %></div>
+              <div style="font-size: 0.8rem; margin-top: 5px; font-weight: 600;"><%= coupon.discount %><%= coupon.type === 'percentage' ? '%' : '₹' %> Off</div>
+              <div style="font-size: 0.7rem; color: var(--muted); margin-top: 2px;">Min. Order: ₹<%= coupon.minAmount %></div>
+              <div style="font-size: 0.7rem; color: <%= coupon.isActive ? 'var(--green)' : 'var(--red)' %>; margin-top: 6px; font-weight: 600;">
+                <%= coupon.isActive ? 'Active' : 'Used/Expired' %>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+      <% } else { %>
+        <div style="text-align: center; padding: 20px; color: var(--muted);">
+          <i class="fas fa-gift" style="font-size: 2rem; opacity: 0.2; margin-bottom: 10px;"></i>
+          <p style="font-size: 0.85rem;">No rewards earned yet. Start referring!</p>
+        </div>
+      <% } %>
+    </div>
+
     <!-- Personal Info card -->
     <div class="card">
       <div class="card-header">
@@ -983,36 +1036,22 @@
       
     </div>
     
-    <!-- Referral card -->
-    <div class="card">
-      <div class="card-header">
-        <div class="card-title-group">
-          <div class="card-icon"><i class="fas fa-link"></i></div>
-          <span class="card-title">Refer a Friend</span>
-        </div>
-      </div>
-      <div style="background: #fff5f8; border: 1.5px dashed #d4145a; border-radius: 12px; padding: 20px; text-align: center;">
-        <p style="font-size: 0.9rem; color: #3d3d5c; margin-bottom: 12px;">Share this link with your friends. When they sign up, you'll earn a reward!</p>
-        <div style="display: flex; gap: 10px; justify-content: center; align-items: center;">
-          <input type="text" readonly id="referralLink" value="http://localhost:3000/signup?ref=<%= user.referalCode %>" style="width: 100%; max-width: 400px; padding: 10px 14px; border: 1px solid #eedde5; border-radius: 8px; font-size: 0.85rem; color: #1a1a2e; background: #fff;" />
-          <button onclick="copyReferralLink()" class="btn-rose" style="padding: 10px 20px; flex-shrink: 0;">
-            <i class="fas fa-copy"></i> Copy
-          </button>
-        </div>
-      </div>
-    </div>
 
     <script>
       function copyReferralLink() {
-        const linkInput = document.getElementById('referralLink');
-        linkInput.select();
-        document.execCommand('copy');
-        Swal.fire({
-          icon: 'success',
-          title: 'Link Copied!',
-          text: 'Referral link copied to clipboard.',
-          showConfirmButton: false,
-          timer: 1500
+        const refCode = document.getElementById('refCode').innerText;
+        const link = window.location.origin + '/signup?ref=' + refCode;
+        
+        navigator.clipboard.writeText(link).then(() => {
+          Swal.fire({
+            icon: 'success',
+            title: 'Link Copied!',
+            text: 'Your referral link has been copied to clipboard.',
+            showConfirmButton: false,
+            timer: 1500
+          });
+        }).catch(err => {
+          console.error('Failed to copy: ', err);
         });
       }
     </script>

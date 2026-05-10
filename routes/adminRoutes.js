@@ -9,6 +9,7 @@ const bannerController = require("../controllers/admin/bannerController")
 const orderController = require("../controllers/admin/orderController")
 const coupenController = require("../controllers/admin/coupenController")
 const offerController = require("../controllers/admin/offerController")
+const salesController =  require("../controllers/admin/salesController")
 const {userAuth , adminAuth} = require("../middlewares/auth");
 const { route } = require('./userRoutes');
 const multer = require("multer")
@@ -83,5 +84,9 @@ router.post("/create-offer", adminAuth, offerController.createOffer);
 router.patch("/toggle-offer/:id", adminAuth, offerController.toggleOffer);
 router.delete("/delete-offer/:id", adminAuth, offerController.deleteOffer);
 router.get("/active-offers", adminAuth, offerController.getActiveOffers);
+
+
+// Sales report management
+router.get("/sales-report", adminAuth, salesController.getSalesReport)
 
 module.exports = router

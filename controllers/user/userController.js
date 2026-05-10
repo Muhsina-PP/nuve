@@ -169,26 +169,30 @@ const verifyOtp = async (req, res) => {
         if (referrer) {
           saveUserData.referredBy = referrer._id;
           
-          const activeReferralOffer = await Offer.findOne({ type: 'referral', isActive: true });
-          if (activeReferralOffer) {
-            // Generate unique coupon for referrer
-            const couponCode = `REF-${Math.random().toString(36).slice(-6).toUpperCase()}`;
-            const expiryDate = new Date();
-            expiryDate.setDate(expiryDate.getDate() + 30); // 30 days expiry
+          let activeReferralOffer = await Offer.findOne({ type: 'referral', isActive: true });
+          
+          // Use fallback if no active referral offer is found
+          const discountAmount = activeReferralOffer ? activeReferralOffer.discount : 10; // Default 10%
+          
+          // Generate unique coupon for referrer
+          const couponCode = `REF-${Math.random().toString(36).slice(-6).toUpperCase()}`;
+          const expiryDate = new Date();
+          expiryDate.setDate(expiryDate.getDate() + 30); // 30 days expiry
 
-            const newCoupon = new Coupen({
-              code: couponCode,
-              discount: activeReferralOffer.discount,
-              minAmount: 1000,
-              expiry: expiryDate,
-              type: 'percentage',
-              usageLimit: 1,
-              perUserLimit: 1,
-              isActive: true,
-              usedBy: []
-            });
-            await newCoupon.save();
-          }
+          const newCoupon = new Coupen({
+            code: couponCode,
+            discount: discountAmount,
+            minAmount: 1000,
+            expiry: expiryDate,
+            type: 'percentage',
+            usageLimit: 1,
+            perUserLimit: 1,
+            isActive: true,
+            userId: referrer._id, // Assign to referrer
+            usedBy: []
+          });
+          await newCoupon.save();
+          console.log(`Referral coupon ${couponCode} created for user ${referrer._id}`);
           
           await saveUserData.save(); // Save first to get _id
           referrer.redeemedUsers.push(saveUserData._id);

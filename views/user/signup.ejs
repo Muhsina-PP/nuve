@@ -261,9 +261,6 @@
           <h1>Create Account</h1>
 
           <form id="signform" action="/signup" method="POST">
-            <% if (typeof ref !== 'undefined' && ref) { %>
-              <input type="hidden" name="ref" value="<%= ref %>">
-            <% } %>
             
             <!-- Google Signup -->
             <a href="/auth/google" class="google-btn">
@@ -306,6 +303,12 @@
               <input type="password" name="cPassword" />
               <label>Confirm Password</label>
               <div id="error5" class="error-msg"></div>
+            </div>
+
+            <!-- Referral Code (Optional) -->
+            <div id="referralCode" class="form-group">
+              <input type="text" name="ref" value="<%= typeof ref !== 'undefined' ? ref : '' %>" />
+              <label>Referral Code (Optional)</label>
             </div>
 
             <button type="submit" class="submit-btn">Create Account</button>

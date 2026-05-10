@@ -2,6 +2,7 @@ const Product = require("../../models/productSchema")
 const Category = require("../../models/categorySchema")
 const Brand = require("../../models/brandSchema")
 const User = require("../../models/userSchema")
+const Offer = require("../../models/offerSchema")
 const path = require("path")
 const fs = require("fs")
 const sharp = require("sharp") //to resize images
@@ -212,7 +213,7 @@ const addProductOffer = async (req, res) => {
       return res.status(400).json({ success: false, message: "Product ID and Offer ID required" });
     }
 
-    const offer = await require('../../models/offerSchema').findById(offerId);
+    const offer = await Offer.findById(offerId);
     if (!offer || !offer.isActive) {
       return res.status(400).json({ success: false, message: "Invalid or inactive offer" });
     }

@@ -138,6 +138,7 @@ const loadOrderDetails = async (req, res)=>{
     const finalAmount = totalPrice - discount + shippingCharge;
 
     res.render("single-order-details", {
+      title : 'Order Details',
       order , 
       shippingCharge,
       finalAmount, 

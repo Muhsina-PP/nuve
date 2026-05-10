@@ -57,6 +57,11 @@ const couponSchema = new Schema({
     ],
     default: []   // ✅ THIS FIXES YOUR ERROR
   },
+  userId: {
+    type: Schema.Types.ObjectId,
+    ref: "User",
+    default: null
+  },
   createdAt : {
     type : Date,
     default : Date.now

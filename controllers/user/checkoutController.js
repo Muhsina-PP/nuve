@@ -751,6 +751,10 @@ const applyCoupon = async (req, res) =>{
       return res.json({ success: false, message: "Invalid coupon" });
     }
 
+    if (coupon.userId && coupon.userId.toString() !== userId) {
+      return res.json({ success: false, message: "This coupon is not valid for your account" });
+    }
+
     if(!coupon.isActive){
       return res.json({ success : false, message : "Coupon is no longer active"})
     }

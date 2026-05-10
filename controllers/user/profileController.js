@@ -6,6 +6,7 @@ const env = require("dotenv").config();
 const bcrypt = require("bcrypt");
 const session = require("express-session");
 const Wallet = require("../../models/walletSchema")
+const Coupen = require("../../models/coupenSchema")
 
 
 function generateOtp() {
@@ -188,6 +189,7 @@ const userProfile = async (req, res) =>{
     
     const addressData = await Address.findOne({userId : userId});
     const wallet = await Wallet.findOne({userId})
+    const coupons = await Coupen.find({ userId: userId });
 
     const totalOrders = await Order.countDocuments({ userId})
     const deliveredOrders = await Order.countDocuments({
@@ -205,7 +207,8 @@ const userProfile = async (req, res) =>{
       totalOrders,
       deliveredOrders,
       pendingOrders,
-      wallet
+      wallet,
+      coupons
     })
   } catch (error) {
     console.log("Error getting user profile : ",error);
