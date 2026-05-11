@@ -9,7 +9,7 @@ const couponSchema = new Schema({
     uppercase: true
   },
   discount: {
-    type: Number, // flat discount for now (simple)
+    type: Number, // flat discount 
     required: true
   },
   minAmount: {
@@ -55,7 +55,7 @@ const couponSchema = new Schema({
         }
       }
     ],
-    default: []   // ✅ THIS FIXES YOUR ERROR
+    default: []   
   },
   userId: {
     type: Schema.Types.ObjectId,

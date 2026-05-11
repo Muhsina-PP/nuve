@@ -636,15 +636,18 @@
   // ── PERIOD SELECTION
   function selectPeriod(period, el) {
     document.querySelectorAll('.sr-pill').forEach(p=>p.classList.remove('active'));
-    el.classList.add('active'); activePeriod=period;
+    if (el) el.classList.add('active'); 
+    activePeriod=period;
     const today=todayStr();
     if(period==='today')  { activeFrom=today;          activeTo=today; }
     if(period==='week')   { activeFrom=startOfWeek();  activeTo=today; }
     if(period==='month')  { activeFrom=startOfMonth(); activeTo=today; }
     if(period==='year')   { activeFrom=startOfYear();  activeTo=today; }
     if(period==='custom') { activeFrom=null; activeTo=null; }
+    
     document.getElementById('srFrom').value = (period!=='custom'&&activeFrom)?activeFrom:'';
     document.getElementById('srTo').value   = (period!=='custom'&&activeTo)?activeTo:'';
+    
     if(period!=='custom') generateReport();
   }
 
@@ -653,6 +656,7 @@
     if(f&&t) {
       activeFrom=f; activeTo=t; activePeriod='custom';
       document.querySelectorAll('.sr-pill').forEach(p=>p.classList.toggle('active',p.dataset.period==='custom'));
+      generateReport();
     }
   }
 
@@ -661,7 +665,8 @@
     if(!activeFrom||!activeTo) { showToast('⚠️  Please select a period or set a date range','error'); return; }
     if(activeFrom>activeTo)    { showToast('⚠️  From date must be before To date','error'); return; }
     
-    document.getElementById('srLoading').classList.add('show');
+    const loadingEl = document.getElementById('srLoading');
+    loadingEl.classList.add('show');
     
     try {
       const url = `/admin/sales-report?json=true&filter=${activePeriod || 'custom'}&startDate=${activeFrom}&endDate=${activeTo}`;
@@ -686,7 +691,7 @@
       console.error('Error generating report:', error);
       showToast('❌  An error occurred while generating the report', 'error');
     } finally {
-      document.getElementById('srLoading').classList.remove('show');
+      loadingEl.classList.remove('show');
     }
   }
 
@@ -853,17 +858,17 @@
   // ── INIT
   (function(){
     const el=document.getElementById('srDateTime');
-    function tick(){ el.textContent=new Date().toLocaleString('en-IN',{weekday:'short',day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}); }
-    tick(); setInterval(tick,1000);
+    if (el) {
+      function tick(){ el.textContent=new Date().toLocaleString('en-IN',{weekday:'short',day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}); }
+      tick(); setInterval(tick,1000);
+    }
+    
     const today=todayStr();
     document.getElementById('srFrom').value=today;
     document.getElementById('srTo').value=today;
     
-    // Auto-load today's report
-    activePeriod = 'today';
-    activeFrom = today;
-    activeTo = today;
-    generateReport();
+    // Auto-load today's report on init
+    selectPeriod('today', document.querySelector('[data-period="today"]'));
   })();
 </script>
 
