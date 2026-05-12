@@ -13,6 +13,7 @@ const injectedUser = async (req, res, next)=>{
 }
 
 const userAuth = (req, res, next) => {
+  res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
   if (req.session && req.session.user) {
     next();
   } else {
@@ -21,6 +22,7 @@ const userAuth = (req, res, next) => {
 };
 
 const adminAuth = async (req, res, next) => {
+  res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
   try {  
     await User.findOne({ isAdmin: true });
     if (req.session.admin) {

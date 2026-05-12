@@ -34,6 +34,13 @@ const loadCheckoutPage = async (req, res) => {
     const userId = req.session.user;
     const cart = await Cart.findOne({ userId }).populate("items.productId");
     const addresses = await Address.findOne({ userId });
+    const coupons = await Coupon.find({
+      isActive : true,
+      expiry : {$gt : new Date()},
+      $expr: {
+        $lt: ["$usedCount", "$usageLimit"]
+      }
+    })
     if (!cart || cart.items.length === 0) {
       return res.redirect("/cart");
     }
@@ -85,7 +92,8 @@ const loadCheckoutPage = async (req, res) => {
       addresses: addresses ? addresses.address : [],
       grandTotal,
       razorpayKey: process.env.RAZORPAY_KEY_ID,
-      gstAmount
+      gstAmount,
+      coupons : coupons
     });
   } catch (error) {
     console.error("error loading checkout page : ", error);
@@ -321,6 +329,8 @@ const placeOrder = async (req, res) => {
     });
   }
 };
+
+
 
 const orderSuccess = async (req, res) => {
   try {
@@ -747,6 +757,14 @@ const applyCoupon = async (req, res) =>{
     const { code, totalAmount } = req.body;
     const coupon = await Coupon.findOne({ code });
 
+    const cart = await Cart.findOne({ userId }).populate("items.productId");
+
+    const totalPrice = cart.items.reduce((sum, item) => {
+      const price = item.productId.salePrice || item.productId.regularPrice;
+      return sum + price * item.quantity;
+    }, 0);
+
+
     if (!coupon) {
       return res.json({ success: false, message: "Invalid coupon" });
     }
@@ -785,10 +803,16 @@ const applyCoupon = async (req, res) =>{
       couponDiscount = coupon.discount;
     }
 
+    const deliveryCharge = totalPrice >= 999 ? 0 : 99;
+
+    const finalAmount = totalPrice - couponDiscount + deliveryCharge;
+
     return res.json({
       success : true,
-      discount: coupon.discount,
-      message : 'Coupon applied succesfully'
+      couponDiscount ,
+      message : 'Coupon applied succesfully',
+      couponCode : coupon.code,
+      finalAmount
     })
 
   } catch (error) {

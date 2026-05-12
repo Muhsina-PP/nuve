@@ -771,6 +771,120 @@
       cursor: pointer;
       flex-shrink: 0;
     }
+    .available-coupons-section{
+  margin-top: 18px;
+  border-top: 1px solid #ececec;
+  padding-top: 18px;
+}
+
+.available-coupon-header{
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.coupon-card{
+  border: 1px dashed #cfcfcf;
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 12px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  background: #fafafa;
+}
+
+.coupon-code{
+  font-size: 14px;
+  font-weight: 700;
+  color: #111;
+  margin-bottom: 4px;
+}
+
+.coupon-desc{
+  font-size: 13px;
+  color: #555;
+  margin-bottom: 4px;
+}
+
+.coupon-expiry{
+  font-size: 11px;
+  color: #999;
+}
+.applied-coupon-box {
+  margin-top: 15px;
+  padding: 15px 20px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+  border: 1px solid #bbf7d0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  animation: slideIn 0.3s ease-out;
+  color: #166534;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.applied-left{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.remove-coupon-btn {
+  background: #fff;
+  color: #dc2626;
+  border: 1px solid #fee2e2;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  letter-spacing: 0.5px;
+}
+
+.remove-coupon-btn:hover {
+  background: #dc2626;
+  color: #fff;
+  border-color: #dc2626;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(220, 38, 38, 0.2);
+}
+
+.coupon-apply-btn{
+  border: none;
+  background: black;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.coupon-apply-btn:hover{
+  opacity: 0.9;
+}
+
+.no-coupon-text{
+  font-size: 13px;
+  color: #888;
+}
 
     @media (max-width: 900px) {
       .checkout-wrap {
@@ -1046,16 +1160,92 @@
               </div>
               <div class="coupon-row">
                 <input class="coupon-input" type="text" placeholder="Enter coupon code" id="couponCode">
+                <div id="appliedCouponBox" class="applied-coupon-box" style="display:none;">
+
+  <div class="applied-left">
+    <i class="fas fa-check-circle"></i>
+
+    <span>
+      Coupon Applied:
+      <strong id="appliedCouponCode"></strong>
+    </span>
+  </div>
+
+  <button onclick="removeCoupon()" class="remove-coupon-btn">
+    Remove
+  </button>
+
+</div>
                 <button class="coupon-btn" onclick="applyCoupon()">Apply</button>
+                
               </div>
+
+
+
+
+            <!-- Available Coupons -->
+            <div class="available-coupons-section">
+
+              <div class="available-coupon-header">
+                <i class="fas fa-tags"></i>
+                Available Coupons
+              </div>
+
+              <% if(coupons.length > 0){ %>
+
+                <% coupons.forEach(coupon => { %>
+
+                  <div class="coupon-card">
+
+                    <div class="coupon-left">
+
+                      <div class="coupon-code">
+                        <%= coupon.code %>
+                      </div>
+
+                      <div class="coupon-desc">
+
+                        <% if(coupon.type === "percentage"){ %>
+
+                          Save <%= coupon.discount %>% 
+                          on orders above ₹<%= coupon.minAmount %>
+
+                        <% } else { %>
+
+                          Save ₹<%= coupon.discount %>
+                          on orders above ₹<%= coupon.minAmount %>
+
+                        <% } %>
+
+                      </div>
+
+                      <div class="coupon-expiry">
+                        Valid till
+                        <%= new Date(coupon.expiry).toDateString() %>
+                      </div>
+
+                    </div>
+
+
+                  </div>
+
+                <% }) %>
+
+              <% } else { %>
+
+                <p class="no-coupon-text">No offers available right now</p>
+
+              <% } %>
+
+            </div>
 
               <hr class="summary-divider">
 
               <div class="summary-row total">
                 <span>Total Amount</span>
-                <span>₹<%= grandTotal.toLocaleString('en-IN') %></span>
+                <span id="grandTotal">₹<%= grandTotal.toLocaleString('en-IN') %></span>
               </div>
-
+              
               <div style="font-size:12px; color:#2e7d32; font-weight:600; margin-bottom:16px; text-align:right;">
                 You will save <%= totalDiscount.toLocaleString('en-IN') %> on this order
               </div>
@@ -1555,23 +1745,59 @@
       const data = await res.json();
 
       if (data.success) {
-        Swal.fire("Success", "Coupon applied!", "success");
+        // show coupon row
+        document.getElementById("couponDiscountRow").style.display = "flex";
 
-        //  update total
-        const newTotal = totalAmount - data.discount;
+        // update coupon discount
+        document.getElementById("summaryCoupon").innerText = `− ₹${data.couponDiscount.toLocaleString('en-IN')}`;
 
-        document.getElementById('grandTotal').innerText = newTotal;
+        // update total
+        document.getElementById("grandTotal").innerText = `₹${data.finalAmount.toLocaleString('en-IN')}`;
 
-        //  store globally in frontend
+        document.getElementById("appliedCouponBox").style.display = "flex";
+        document.getElementById("appliedCouponCode").innerText = data.couponCode;
+
+        // store globally in frontend
         window.appliedCoupon = {
           code,
-          discount: data.discount
+          discount: data.couponDiscount
         };
+
+        Swal.fire("Success", "Coupon applied!", "success");
 
       } else {
         Swal.fire("Error", data.message, "error");
       }
     }
+
+    function removeCoupon(){
+
+  // clear input
+  document.getElementById("couponCode").value = "";
+
+  // hide applied coupon box
+  document.getElementById("appliedCouponBox").style.display = "none";
+
+  // hide coupon discount row
+  document.getElementById("couponDiscountRow").style.display = "none";
+
+  // reset coupon amount
+  document.getElementById("summaryCoupon").innerText = "− ₹0";
+
+  // restore original total
+  document.getElementById("grandTotal").innerText = `₹${GRAND_TOTAL.toLocaleString('en-IN')}`;
+
+  // clear frontend stored coupon
+  window.appliedCoupon = null;
+
+  Swal.fire({
+    icon: "success",
+    title: "Coupon Removed",
+    timer: 1200,
+    showConfirmButton: false
+  });
+
+}
 
   </script>
 </body>

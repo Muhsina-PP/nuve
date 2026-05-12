@@ -13,6 +13,10 @@ const adminRoutes = require('./routes/adminRoutes')
 const {injectedUser} = require("./middlewares/auth")
 
 app.use(morgan('dev'));
+app.use((req, res, next) => {
+  res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+  next();
+});
 
 app.use( express.json())
 app.use (express.urlencoded({extended : true}))

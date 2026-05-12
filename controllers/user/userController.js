@@ -412,10 +412,10 @@ const loadShopPage = async (req, res) =>{
     const skip = (page-1) * limit;
 
     // filter values
-    const selectedCategory = req.query.category?.trim()
-    const selectedBrand = req.query.brand?.trim()
-    const minPrice = req.query.minPrice ? Number(req.query.minPrice) : undefined;
-    const maxPrice = req.query.maxPrice ? Number(req.query.maxPrice) : undefined;
+    const selectedCategory = req.query.category || "";
+    const selectedBrand = req.query.brand || "";
+    const minPrice = req.query.minPrice || "";
+    const maxPrice = req.query.maxPrice || "";
 
 
     // query object 
@@ -433,12 +433,12 @@ const loadShopPage = async (req, res) =>{
       query.brand = selectedBrand
     }
 
-    if(minPrice !== undefined && maxPrice !== undefined){
-      query.salePrice = { $gte: minPrice, $lte: maxPrice }
-    }
-
-    else if(minPrice !== undefined && maxPrice === undefined){
-      query.salePrice = { $gte: minPrice }
+    if (minPrice !== "" && maxPrice !== "") {
+      query.salePrice = { $gte: Number(minPrice), $lte: Number(maxPrice) };
+    } else if (minPrice !== "" && maxPrice === "") {
+      query.salePrice = { $gte: Number(minPrice) };
+    } else if (minPrice === "" && maxPrice !== "") {
+      query.salePrice = { $lte: Number(maxPrice) };
     }
 
      // sorting value

@@ -433,6 +433,25 @@
     transition: all 0.25s;
     box-shadow: 0 1px 4px rgba(0,0,0,0.05);
   }
+  .active-category {
+    color: #fff;
+    background-color: #ca99ab;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-weight: 600;
+  }
+  .active-brand {
+    color: #fff;
+    background: #c77392;
+    padding: 6px 10px;
+    border-radius: 6px;
+  }
+  .active-price {
+    background-color: #c77392;
+    color: white !important;
+    border-radius: 6px;
+    font-weight: 600;
+  }
 
   .nuve-page-link:hover {
     border-color: #d4145a;
@@ -483,6 +502,8 @@
         />
         <input type="hidden" name="category" value="<%= selectedCategory || '' %>">
         <input type="hidden" name="brand" value="<%= selectedBrand || '' %>">
+        <input type="hidden" name="minPrice" value="<%= minPrice || '' %>">
+        <input type="hidden" name="maxPrice" value="<%= maxPrice || '' %>">
         <input type="hidden" name="sort" value="<%= sort || '' %>">
         <button class="nuve-search-btn" type="submit">
           <i class="fas fa-search" style="margin-right:5px;font-size:11px;"></i>Search
@@ -493,13 +514,18 @@
         <a href="/shop" class="nuve-clear-btn">✕ Clear</a>
       <% } %>
 
-      <form method="GET" action="/shop">
+      <form method="GET" action="/shop" id="sortForm">
+        <input type="hidden" name="search" value="<%= search || '' %>">
+        <input type="hidden" name="category" value="<%= selectedCategory || '' %>">
+        <input type="hidden" name="brand" value="<%= selectedBrand || '' %>">
+        <input type="hidden" name="minPrice" value="<%= minPrice || '' %>">
+        <input type="hidden" name="maxPrice" value="<%= maxPrice || '' %>">
         <select name="sort" class="nuve-sort-select" onchange="this.form.submit()">
           <option value="">Sort By</option>
-          <option value="priceLow">Price: Low to High</option>
-          <option value="priceHigh">Price: High to Low</option>
-          <option value="a-z">A → Z</option>
-          <option value="z-a">Z → A</option>
+          <option value="priceLow" <%= sort === 'priceLow' ? 'selected' : '' %>>Price: Low to High</option>
+          <option value="priceHigh" <%= sort === 'priceHigh' ? 'selected' : '' %>>Price: High to Low</option>
+          <option value="a-z" <%= sort === 'a-z' ? 'selected' : '' %>>A → Z</option>
+          <option value="z-a" <%= sort === 'z-a' ? 'selected' : '' %>>Z → A</option>
         </select>
       </form>
 
@@ -516,7 +542,9 @@
           <ul class="nuve-filter-list">
             <% for (let i = 0; i < category.length; i++) { %>
               <li class="nuve-filter-item">
-                <a href="/shop?category=<%= category[i]._id %>&search=<%= search || '' %>&sort=<%= sort || '' %>">
+                <a 
+                  class="<%= selectedCategory == category[i]._id.toString() ? 'active-category' : '' %>"
+                  href="/shop?category=<%= category[i]._id %>&brand=<%= selectedBrand || '' %>&minPrice=<%= minPrice || '' %>&maxPrice=<%= maxPrice || '' %>&search=<%= search || '' %>&sort=<%= sort || '' %>">
                   <%= category[i].name %>
                 </a>
               </li>
@@ -531,7 +559,9 @@
           <ul class="nuve-filter-list">
             <% for (let i = 0; i < brand.length; i++) { %>
               <li class="nuve-filter-item">
-                <a href="/shop?brand=<%= brand[i]._id %>&search=<%= search || '' %>&sort=<%= sort || '' %>">
+                <a 
+                  class="<%= selectedBrand == brand[i]._id.toString() ? 'active-brand' : '' %>"
+                  href="/shop?brand=<%= brand[i]._id %>&category=<%= selectedCategory || '' %>&minPrice=<%= minPrice || '' %>&maxPrice=<%= maxPrice || '' %>&search=<%= search || '' %>&sort=<%= sort || '' %>">
                   <%= brand[i].brandName %>
                 </a>
               </li>
@@ -544,21 +574,25 @@
         <div class="nuve-filter-section">
           <div class="nuve-filter-title">Price Range</div>
           <div class="nuve-price-options">
-            <a class="nuve-price-btn"
-               href="/shop?minPrice=0&maxPrice=500&search=<%= search || '' %>&category=<%= selectedCategory || '' %>&brand=<%= selectedBrand || '' %>&sort=<%= sort || '' %>">
-               Under ₹500
+            <a 
+              class="nuve-price-btn <%= minPrice == 0 && maxPrice == 500 ? 'active-price' : '' %>"
+              href="/shop?minPrice=0&maxPrice=500&search=<%= search || '' %>&category=<%= selectedCategory || '' %>&brand=<%= selectedBrand || '' %>&sort=<%= sort || '' %>">
+              Under ₹500
             </a>
-            <a class="nuve-price-btn"
-               href="/shop?minPrice=500&maxPrice=1000&search=<%= search || '' %>&category=<%= selectedCategory || '' %>&brand=<%= selectedBrand || '' %>&sort=<%= sort || '' %>">
-               ₹500 – ₹1,000
+            <a 
+              class="nuve-price-btn <%= minPrice == 500 && maxPrice == 1000 ? 'active-price' : '' %>"
+              href="/shop?minPrice=500&maxPrice=1000&search=<%= search || '' %>&category=<%= selectedCategory || '' %>&brand=<%= selectedBrand || '' %>&sort=<%= sort || '' %>">
+              ₹500 – ₹1,000
             </a>
-            <a class="nuve-price-btn"
-               href="/shop?minPrice=1000&maxPrice=1500&search=<%= search || '' %>&category=<%= selectedCategory || '' %>&brand=<%= selectedBrand || '' %>&sort=<%= sort || '' %>">
-               ₹1,000 – ₹1,500
+            <a 
+              class="nuve-price-btn <%= minPrice == 1000 && maxPrice == 1500 ? 'active-price' : '' %>"
+              href="/shop?minPrice=1000&maxPrice=1500&search=<%= search || '' %>&category=<%= selectedCategory || '' %>&brand=<%= selectedBrand || '' %>&sort=<%= sort || '' %>">
+              ₹1,000 – ₹1,500
             </a>
-            <a class="nuve-price-btn"
-               href="/shop?minPrice=1500&search=<%= search || '' %>&category=<%= selectedCategory || '' %>&brand=<%= selectedBrand || '' %>&sort=<%= sort || '' %>">
-               Above ₹1,500
+            <a 
+              class="nuve-price-btn <%= minPrice == 1500 && !maxPrice ? 'active-price' : '' %>"
+              href="/shop?minPrice=1500&search=<%= search || '' %>&category=<%= selectedCategory || '' %>&brand=<%= selectedBrand || '' %>&sort=<%= sort || '' %>">
+              Above ₹1,500
             </a>
           </div>
         </div>
