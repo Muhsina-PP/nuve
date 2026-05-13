@@ -28,6 +28,8 @@ router.get("/logout", adminController.logout)
 // dashboard management
 router.get("/dashboard", adminAuth, adminController.loadDashboard);
 router.get("/sales-chart", adminAuth, adminController.getSalesChart);
+router.get("/ledger-book", adminAuth, adminController.getLedgerBook)
+
 
 
 // customer management
@@ -93,6 +95,5 @@ router.get("/active-offers", adminAuth, offerController.getActiveOffers);
 
 // Sales report management
 router.get("/sales-report", adminAuth, salesController.getSalesReport)
-router.get("/ledger-book", adminAuth, salesController.getLedgerBook)
 
 module.exports = router

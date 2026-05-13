@@ -106,38 +106,8 @@ const getSalesReport = async (req, res) => {
   }
 }
 
-const getLedgerBook = async (req, res) => {
-  try {
-    const orders = await Order.find({})
-      .populate('userId', 'name')
-      .sort({ createdOn: -1 });
 
-    const ledgerData = orders.map(order => ({
-      orderId: order.orderId ? order.orderId.slice(0, 8).toUpperCase() : 'N/A',
-      date: order.createdOn.toISOString().split('T')[0],
-      customer: order.userId ? order.userId.name : 'Unknown',
-      totalPrice: order.totalPrice,
-      discount: order.discount,
-      couponDiscount: order.couponDiscount || 0,
-      walletUsed: order.walletUsed || 0,
-      gstAmount: order.gstAmount || 0,
-      finalAmount: order.finalAmount,
-      paymentMethod: order.paymentMethod,
-      status: order.status
-    }));
-
-    res.render("ledger-book", {
-      title: 'Ledger Book',
-      data: ledgerData
-    });
-
-  } catch (error) {
-    console.log("Error loading ledger book : ", error);
-    res.status(500).send("Internal Server Error");
-  }
-}
 
 module.exports = {
   getSalesReport,
-  getLedgerBook
 }
