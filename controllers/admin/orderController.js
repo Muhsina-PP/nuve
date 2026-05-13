@@ -310,7 +310,7 @@ const verifyReturn = async (req, res)  =>{
       }
     )
 
-    const itemAmount = item.quantity * item.price;
+    const itemAmount = item.finalItemPrice || (item.quantity * item.price);
 
     if(item.status === 'Returned'){
         await creditWallet(

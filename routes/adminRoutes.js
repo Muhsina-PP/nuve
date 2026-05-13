@@ -22,8 +22,13 @@ router.get("/pageNotFound", adminController.pageNotFound);
 
 router.get("/login", adminController.loadLogin)
 router.post("/login", adminController.login)
-router.get("/dashboard", adminAuth, adminController.loadDashboard)
 router.get("/logout", adminController.logout)
+
+
+// dashboard management
+router.get("/dashboard", adminAuth, adminController.loadDashboard);
+router.get("/sales-chart", adminAuth, adminController.getSalesChart);
+
 
 // customer management
 router.get("/users", adminAuth, customerController.customerInfo)
@@ -88,5 +93,6 @@ router.get("/active-offers", adminAuth, offerController.getActiveOffers);
 
 // Sales report management
 router.get("/sales-report", adminAuth, salesController.getSalesReport)
+router.get("/ledger-book", adminAuth, salesController.getLedgerBook)
 
 module.exports = router

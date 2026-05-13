@@ -568,6 +568,7 @@
             <th>Order ID</th>
             <th>Date</th>
             <th>Customer</th>
+            <th>Products</th>
             <th>Items</th>
             <th>Order Amount</th>
             <th>Discount</th>
@@ -590,7 +591,7 @@
         </tbody>
         <tfoot id="srFoot" style="display:none;">
           <tr>
-            <td colspan="5"><strong>TOTALS</strong></td>
+            <td colspan="6"><strong>TOTALS</strong></td>
             <td class="foot-amt"  id="footAmt"></td>
             <td class="foot-disc" id="footDisc"></td>
             <td class="foot-coup" id="footCoup"></td>
@@ -738,6 +739,7 @@
         <td class="order-id">${r.orderId}</td>
         <td>${fmtD(r.date)}</td>
         <td>${r.customer}</td>
+        <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${r.itemNames}">${r.itemNames}</td>
         <td>${r.items}</td>
         <td class="amt">${fmt(r.orderAmount)}</td>
         <td class="disc">${r.discount>0?'-'+fmt(r.discount):'—'}</td>
@@ -808,11 +810,11 @@
 
     doc.autoTable({
       startY:44,
-      head:[['#','Order ID','Date','Customer','Items','Order Amt','Discount','Coupon Amt','Coupon Code','Net Amt','Status']],
-      body:allRows.map((r,i)=>[i+1,r.orderId,fmtD(r.date),r.customer,r.items,fmt(r.orderAmount),
+      head:[['#','Order ID','Date','Customer','Products','Items','Order Amt','Discount','Coupon Amt','Coupon Code','Net Amt','Status']],
+      body:allRows.map((r,i)=>[i+1,r.orderId,fmtD(r.date),r.customer,r.itemNames,r.items,fmt(r.orderAmount),
         r.discount>0?'-'+fmt(r.discount):'—',r.coupon>0?'-'+fmt(r.coupon):'—',r.couponCode,fmt(r.net),
         r.status.charAt(0).toUpperCase()+r.status.slice(1)]),
-      foot:[['','','','','TOTALS',fmt(tAmt),tDisc>0?'-'+fmt(tDisc):'—',tCoup>0?'-'+fmt(tCoup):'—','',fmt(tNet),'']],
+      foot:[['','','','','','TOTALS',fmt(tAmt),tDisc>0?'-'+fmt(tDisc):'—',tCoup>0?'-'+fmt(tCoup):'—','',fmt(tNet),'']],
       styles:{fontSize:7.5,cellPadding:2.5,textColor:[80,80,80]},
       headStyles:{fillColor:[212,20,90],textColor:[255,255,255],fontStyle:'bold'},
       footStyles:{fillColor:[253,242,246],textColor:[212,20,90],fontStyle:'bold'},
@@ -845,11 +847,11 @@
       ['Net Revenue',tNet],
     ];
     XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(summary),'Summary');
-    const headers=['#','Order ID','Date','Customer','Items','Order Amount (₹)','Discount (₹)','Coupon Amount (₹)','Coupon Code','Net Amount (₹)','Status'];
-    const rows=allRows.map((r,i)=>[i+1,r.orderId,r.date,r.customer,r.items,r.orderAmount,r.discount,r.coupon,r.couponCode,r.net,r.status]);
-    rows.push(['','','','','TOTALS',tAmt,tDisc,tCoup,'',tNet,'']);
+    const headers=['#','Order ID','Date','Customer','Products','Items','Order Amount (₹)','Discount (₹)','Coupon Amount (₹)','Coupon Code','Net Amount (₹)','Status'];
+    const rows=allRows.map((r,i)=>[i+1,r.orderId,r.date,r.customer,r.itemNames,r.items,r.orderAmount,r.discount,r.coupon,r.couponCode,r.net,r.status]);
+    rows.push(['','','','','','TOTALS',tAmt,tDisc,tCoup,'',tNet,'']);
     const ws2=XLSX.utils.aoa_to_sheet([headers,...rows]);
-    ws2['!cols']=[4,12,12,18,6,18,14,16,14,16,12].map(w=>({wch:w}));
+    ws2['!cols']=[4,12,12,18,25,6,18,14,16,14,16,12].map(w=>({wch:w}));
     XLSX.utils.book_append_sheet(wb,ws2,'Orders');
     XLSX.writeFile(wb,`sales-report_${activeFrom}_to_${activeTo}.xlsx`);
     showToast('✓ Excel downloaded','success');

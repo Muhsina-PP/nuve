@@ -1,10 +1,449 @@
 <%- include("../../views/partials/admin/header") %>
+<style>
+    /* ===========================
+   PINK ADMIN DASHBOARD STYLES
+   =========================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+:root {
+  --pink-50:  #fff0f6;
+  --pink-100: #ffd6e8;
+  --pink-200: #ffadd2;
+  --pink-300: #ff85bc;
+  --pink-400: #f759a0;
+  --pink-500: #eb2f7e;
+  --pink-600: #c41263;
+  --pink-700: #9e0a4e;
+  --rose:     #ff4d94;
+  --blush:    #ffe4f0;
+  --deep:     #2d0a1a;
+  --text-main:#1a0a12;
+  --text-muted:#8a5a72;
+  --card-bg:  #ffffff;
+  --page-bg:  #fdf4f8;
+  --shadow-sm: 0 2px 12px rgba(235,47,126,0.08);
+  --shadow-md: 0 8px 32px rgba(235,47,126,0.14);
+  --shadow-lg: 0 20px 60px rgba(235,47,126,0.18);
+}
+
+/* ── Page & Content ── */
+body {
+  background: var(--page-bg);
+  font-family: 'DM Sans', sans-serif;
+  color: var(--text-main);
+}
+
+.content-main {
+  padding: 2.5rem 2.5rem 3rem;
+  min-height: 100vh;
+  background:
+    radial-gradient(ellipse 60% 40% at 80% 10%, rgba(255,173,210,.18) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 50% at 5%  90%, rgba(247,89,160,.10) 0%, transparent 55%),
+    var(--page-bg);
+}
+
+/* ── Header ── */
+.content-header {
+  margin-bottom: 2.4rem;
+}
+
+.content-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.4rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 0;
+  position: relative;
+  display: inline-block;
+}
+
+.content-title::after {
+  content: '';
+  position: absolute;
+  left: 0; bottom: -6px;
+  width: 48px; height: 3px;
+  background: linear-gradient(90deg, var(--pink-500), var(--pink-300));
+  border-radius: 2px;
+}
+
+/* ── Dashboard Cards Grid ── */
+.dashboard-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+  margin-top: 0.5rem;
+}
+
+/* ── Single Card ── */
+.dashboard-card {
+  background: var(--card-bg);
+  border-radius: 20px;
+  padding: 2rem 1.8rem 1.8rem;
+  box-shadow: var(--shadow-sm);
+  border: 1.5px solid rgba(255,173,210,.35);
+  position: relative;
+  overflow: hidden;
+  transition: transform .28s cubic-bezier(.22,1,.36,1),
+              box-shadow .28s ease;
+  cursor: default;
+}
+
+/* Decorative blob per card */
+.dashboard-card::before {
+  content: '';
+  position: absolute;
+  top: -30px; right: -30px;
+  width: 110px; height: 110px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--pink-100) 0%, transparent 70%);
+  transition: transform .4s ease;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-md);
+  border-color: rgba(235,47,126,.35);
+}
+
+.dashboard-card:hover::before {
+  transform: scale(1.35);
+}
+
+/* Individual accent colours per card (nth-child) */
+.dashboard-card:nth-child(1) { --accent: var(--pink-500); --accent-light: var(--pink-100); }
+.dashboard-card:nth-child(2) { --accent: #b8479e;          --accent-light: #f5d6f0;        }
+.dashboard-card:nth-child(3) { --accent: #e05580;          --accent-light: #fde0eb;        }
+.dashboard-card:nth-child(4) { --accent: #d63a9a;          --accent-light: #fbd6ef;        }
+
+/* Icon badge */
+.dashboard-card::after {
+  content: '';
+  position: absolute;
+  bottom: 18px; right: 18px;
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  background: var(--accent-light);
+  opacity: .8;
+}
+
+/* Label */
+.dashboard-card h4 {
+  font-family: 'DM Sans', sans-serif;
+  font-size: .78rem;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin: 0 0 .9rem;
+}
+
+/* Value */
+.dashboard-card h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.1rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 0;
+  line-height: 1.1;
+  position: relative;
+  z-index: 1;
+}
+
+/* Subtle left accent bar */
+.dashboard-card {
+  border-left: 4px solid var(--accent, var(--pink-400));
+}
+
+/* ── Entrance animation ── */
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(22px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+.dashboard-card {
+  animation: cardIn .55s cubic-bezier(.22,1,.36,1) both;
+}
+.dashboard-card:nth-child(1) { animation-delay: .05s; }
+.dashboard-card:nth-child(2) { animation-delay: .15s; }
+.dashboard-card:nth-child(3) { animation-delay: .25s; }
+.dashboard-card:nth-child(4) { animation-delay: .35s; }
+
+/* ── Rankings Section ── */
+.rankings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-top: 3rem;
+}
+
+.ranking-card {
+  background: white;
+  border-radius: 20px;
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--pink-100);
+}
+
+.ranking-card h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.4rem;
+  margin-bottom: 1.2rem;
+  color: var(--pink-600);
+  border-bottom: 2px solid var(--pink-50);
+  padding-bottom: 0.5rem;
+}
+
+.ranking-list {
+  list-style: none;
+  padding: 0;
+}
+
+.ranking-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.8rem 0;
+  border-bottom: 1px solid var(--pink-50);
+}
+
+.ranking-item:last-child {
+  border-bottom: none;
+}
+
+.ranking-name {
+  font-weight: 500;
+  color: var(--text-main);
+}
+
+.ranking-count {
+  background: var(--pink-50);
+  color: var(--pink-600);
+  padding: 0.2rem 0.8rem;
+  border-radius: 50px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+/* ── Chart Section ── */
+.chart-container {
+  background: white;
+  border-radius: 24px;
+  padding: 2rem;
+  margin-top: 2.5rem;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--pink-100);
+}
+
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.chart-header h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.6rem;
+  color: var(--text-main);
+}
+
+.filter-select {
+  padding: 0.6rem 1.2rem;
+  border-radius: 50px;
+  border: 2px solid var(--pink-100);
+  background: white;
+  color: var(--pink-600);
+  font-weight: 600;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.filter-select:focus {
+  border-color: var(--pink-400);
+}
+
+.btn-ledger {
+  padding: 0.8rem 1.8rem;
+  background: linear-gradient(135deg, var(--pink-500), var(--pink-600));
+  color: white;
+  border-radius: 50px;
+  text-decoration: none;
+  font-weight: 600;
+  box-shadow: 0 4px 15px rgba(235, 47, 126, 0.3);
+  transition: all 0.3s ease;
+}
+
+.btn-ledger:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(235, 47, 126, 0.4);
+}
+
+/* ── Responsive ── */
+@media (max-width: 600px) {
+  .content-main  { padding: 1.5rem 1rem 2rem; }
+  .content-title { font-size: 1.8rem; }
+  .dashboard-cards { gap: 1rem; }
+  .dashboard-card h2 { font-size: 1.7rem; }
+  .chart-header { flex-direction: column; gap: 1rem; align-items: flex-start; }
+}
+</style>
+
 <section class="content-main">
     <div class="content-header">
-        <div>
-            <h2 class="content-title card-title">Dashboard </h2>
+        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+            <h2 class="content-title card-title">Dashboard</h2>
+            
         </div>
-       
     </div>
+    <a href="/admin/ledger-book" class="btn-ledger">
+              <i class="fas fa-book"></i> Ledger Book
+            </a>
+
+    <div class="dashboard-cards">
+        
+
+    <div class="dashboard-card">
+        <h4>Total Revenue</h4>
+        <h2>₹<%= totalRevenue.toLocaleString("en-IN") %></h2>
+    </div>
+
+    <div class="dashboard-card">
+        <h4>Total Orders</h4>
+        <h2><%= totalOrders %></h2>
+    </div>
+
+    <div class="dashboard-card">
+        <h4>Delivered Orders</h4>
+        <h2><%= deliveredOrders %></h2>
+    </div>
+
+    <div class="dashboard-card">
+        <h4>Total Users</h4>
+        <h2><%= totalUsers %></h2>
+    </div>
+
+    </div>
+
+    <!-- Chart Section -->
+    <div class="chart-container">
+      <div class="chart-header">
+        <h3>Sales Analytics</h3>
+        <select class="filter-select" id="chartFilter" onchange="updateChart()">
+          <option value="yearly">Yearly</option>
+          <option value="monthly" selected>Monthly</option>
+          <option value="weekly">Weekly</option>
+          <option value="daily">Daily</option>
+        </select>
+      </div>
+      <canvas id="salesChart" height="100"></canvas>
+    </div>
+
+    <!-- Best Sellers Section -->
+    <div class="rankings-grid">
+      <!-- Top Products -->
+      <div class="ranking-card">
+        <h3>Best Selling Products</h3>
+        <ul class="ranking-list">
+          <% topProducts.forEach(item => { %>
+            <li class="ranking-item">
+              <span class="ranking-name"><%= item.productDetails.productName %></span>
+              <span class="ranking-count"><%= item.totalSold %> sold</span>
+            </li>
+          <% }) %>
+        </ul>
+      </div>
+
+      <!-- Top Categories -->
+      <div class="ranking-card">
+        <h3>Best Selling Categories</h3>
+        <ul class="ranking-list">
+          <% topCategories.forEach(item => { %>
+            <li class="ranking-item">
+              <span class="ranking-name"><%= item.categoryDetails.name %></span>
+              <span class="ranking-count"><%= item.totalSold %> sold</span>
+            </li>
+          <% }) %>
+        </ul>
+      </div>
+
+      <!-- Top Brands -->
+      <div class="ranking-card">
+        <h3>Best Selling Brands</h3>
+        <ul class="ranking-list">
+          <% topBrands.forEach(item => { %>
+            <li class="ranking-item">
+              <span class="ranking-name"><%= item.brandDetails.brandName %></span>
+              <span class="ranking-count"><%= item.totalSold %> sold</span>
+            </li>
+          <% }) %>
+        </ul>
+      </div>
+    </div>
+
+    
 </section>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  let salesChart;
+
+  async function updateChart() {
+    const filter = document.getElementById('chartFilter').value;
+    try {
+      const response = await fetch(`/admin/sales-chart?filter=${filter}`);
+      const result = await response.json();
+
+      if (result.success) {
+        const ctx = document.getElementById('salesChart').getContext('2d');
+        
+        if (salesChart) {
+          salesChart.destroy();
+        }
+
+        salesChart = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: result.labels,
+            datasets: [{
+              label: 'Total Sales (₹)',
+              data: result.data,
+              borderColor: '#eb2f7e',
+              backgroundColor: 'rgba(235, 47, 126, 0.1)',
+              borderWidth: 3,
+              fill: true,
+              tension: 0.4,
+              pointRadius: 4,
+              pointBackgroundColor: '#eb2f7e'
+            }]
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: {
+                display: false
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: {
+                  callback: function(value) {
+                    return '₹' + value.toLocaleString();
+                  }
+                }
+              }
+            }
+          }
+        });
+      }
+    } catch (error) {
+      console.error('Error updating chart:', error);
+    }
+  }
+
+  // Initial load
+  document.addEventListener('DOMContentLoaded', updateChart);
+</script>
 <%- include("../../views/partials/admin/footer") %>

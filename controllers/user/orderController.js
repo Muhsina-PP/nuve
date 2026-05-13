@@ -269,80 +269,6 @@ const cancelFullOrder = async (req,res) =>{
 }
 
 
-// const cancelSingleItem = async (req, res) => {
-//   try {
-//     const { orderId, productId, reason } = req.body;
-
-//     const order = await Order.findById(orderId).populate("orderedItems.product");
-
-//     if (!order) {
-//       return res.status(404).json({ message: "Order not found" });
-//     }
-
-//     const item = order.orderedItems.find(
-//       i => i.product._id.toString() === productId
-//     );
-
-//     if (!item) {
-//       return res.status(404).json({ message: "Item not found" });
-//     }
-
-//     if (item.status === "Cancelled") {
-//       return res.status(400).json({ message: "Item already cancelled" });
-//     }
-
-//     //  restore stock
-//     await Product.findOneAndUpdate(
-//       {
-//         _id: item.product._id,
-//         "variants.size": item.variant
-//       },
-//       {
-//         $inc: { "variants.$.stock": item.quantity }
-//       }
-//     );
-
-//     await Order.updateOne(
-//       { _id : orderId, 'orderedItems.product' : productId },
-//       { $set :{ 'orderedItems.$.status' : 'Cancelled' } }
-//     )
-
-//     // update item
-//     item.status = "Cancelled";
-//     item.returnReason = reason || "No reason";
-
-//     const refundAmount = item.quantity * item.price;
-
-//     await order.save();
-
-//     if (!order.paymentMethod) {
-//       order.paymentMethod = "COD";
-//     }
-
-//     if(order.paymentMethod !== 'COD'){
-//       await creditWallet(
-//         order.userId,
-//         refundAmount,
-//         "Order Cancelled",
-//         order._id
-//     )
-//     }
-
-//     order.finalAmount -= refundAmount;
-
-//     const allCancelled = order.orderedItems.every(i => i.status === "Cancelled");
-
-//     if (allCancelled) {
-//       order.status = "Cancelled";
-//     }
-
-//     res.json({ message: "Item cancelled successfully" });
-
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ message: "Error cancelling item" });
-//   }
-// };
 
 const cancelSingleItem = async (req, res) => {
   try {
@@ -379,9 +305,7 @@ const cancelSingleItem = async (req, res) => {
     item.status = "Cancelled";
     item.returnReason = reason || "No reason";
 
-    // const refundAmount = item.quantity * item.price;
-    const refundAmount = item.finalItemPrice
-    console.log("Refund amount : ", refundAmount)
+    const refundAmount = item.finalItemPrice || (item.quantity * item.price);
 
     //  Wallet logic 
     if (

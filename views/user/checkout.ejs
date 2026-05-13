@@ -1001,6 +1001,9 @@
         </div>
 
         <!-- STEP 3: Payment -->
+         <% if (cartItems.length > 0) { %>
+          
+         
         <div class="section-card">
           <div class="section-header">
             <div class="section-title-left">
@@ -1011,17 +1014,61 @@
           <div class="section-body">
             <div class="payment-options">
 
-              <label class="payment-option selected" onclick="selectPayment(this)">
+              <% const totalMRP = cartItems.reduce((s, i) => s + i.productId.regularPrice * i.quantity, 0);
+             const totalSale = cartItems.reduce((s, i) => s + i.productId.salePrice * i.quantity, 0);
+             const totalDiscount = totalMRP - totalSale;
+             const delivery = totalSale >= 999 ? 0 : 99;
+             const grandTotal = totalSale + delivery; %>
+
+
+
+<% if (grandTotal > 1000) { %>
+
+<label class="payment-option disabled-payment">
+
+  <input type="radio" disabled>
+
+  <div class="payment-icon">💵</div>
+
+  <div>
+    <div class="payment-label">
+      Cash on Delivery
+    </div>
+
+    <div class="payment-desc cod-disabled-text">
+      Not available for orders above ₹1000
+    </div>
+  </div>
+
+</label>
+
+<% } else { %>
+
+<label class="payment-option selected" onclick="selectPayment(this)">
+  <input type="radio" name="paymentMethod" value="COD" checked>
+
+  <div class="payment-icon">💵</div>
+
+  <div>
+    <div class="payment-label">Cash on Delivery</div>
+    <div class="payment-desc">Pay when your order arrives</div>
+  </div>
+</label>
+
+<% } %>                
+
+
+              <!-- <label class="payment-option selected" onclick="selectPayment(this)">
                 <input type="radio" name="paymentMethod" value="COD" checked>
                 <div class="payment-icon">💵</div>
                 <div>
                   <div class="payment-label">Cash on Delivery</div>
                   <div class="payment-desc">Pay when your order arrives</div>
                 </div>
-              </label>
+              </label> -->
 
               <label class="payment-option" onclick="selectPayment(this)">
-                <input type="radio" name="paymentMethod" value="online">
+                <input type="radio" name="paymentMethod" value="Online">
                 <div class="payment-icon">💳</div>
                 <div>
                   <div class="payment-label">Razor Pay</div>
@@ -1030,7 +1077,7 @@
               </label>
 
               <label class="payment-option" onclick="selectPayment(this)">
-                <input type="radio" name="paymentMethod" value="wallet">
+                <input type="radio" name="paymentMethod" value="Wallet">
                 <div class="payment-icon">👛</div>
                 <div>
                   <div class="payment-label">Wallet</div>
@@ -1046,6 +1093,7 @@
             </div>
           </div>
         </div>
+        <% } %>
 
       </div><!-- /checkout-left -->
 
