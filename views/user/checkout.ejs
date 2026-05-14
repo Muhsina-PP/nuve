@@ -1482,7 +1482,7 @@
       })
         .then(res => res.json())
         .then(data => {
-          if (data.walletOnly) { placeOrderRequest(addressId, 'wallet', true); return; }
+          if (data.walletOnly) { placeOrderRequest(addressId, 'Wallet', true); return; }
           if (data.success) { openRazorpayPopup(data.order, addressId, useWallet, coupon); }
           else { Swal.fire("Error", "Payment verification failed, Available quantity less than ordering quantity", "error"); }
         })
@@ -1512,16 +1512,15 @@
         Swal.fire({ icon: 'warning', title: 'Please select a delivery address', confirmButtonColor: '#d4145a' }); return;
       }
 
-      if (paymentMethod === 'COD' || paymentMethod === 'wallet') {
+      if (paymentMethod === 'COD' || paymentMethod === 'Wallet') {
+        document.getElementById('placeOrderBtn').disabled = true;
+        document.getElementById('placeOrderBtn').textContent = 'Placing Order…';
         placeOrderRequest(addressId, paymentMethod, useWallet, coupon);
-      } else if (paymentMethod === 'online') {
+      } else if (paymentMethod === 'Online') {
         console.log("going to razorpay");
         startRazorpayPayment(addressId, useWallet, coupon);
         return;
       }
-
-      document.getElementById('placeOrderBtn').disabled = true;
-      document.getElementById('placeOrderBtn').textContent = 'Placing Order…';
     }
 
     function placeOrderRequest(addressId, paymentMethod, useWallet, coupon) {

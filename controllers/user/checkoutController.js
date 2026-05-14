@@ -180,9 +180,8 @@ const placeOrder = async (req, res) => {
             }else{
               couponDiscount = validCoupon.discount;
             }
+            req.appliedCoupon = validCoupon;
         }
-
-        req.appliedCoupon = validCoupon;
     }
     
     const finalAmount = totalPrice - couponDiscount;
@@ -250,8 +249,13 @@ const placeOrder = async (req, res) => {
       )
     }
 
+    const totalMRP = cart.items.reduce((sum, item) => {
+      return sum + item.productId.regularPrice * item.quantity;
+    }, 0);
+    const productDiscount = totalMRP - totalPrice;
+
     const newOrder = new Order({
-      couponCode: coupon || null,
+      couponCode: couponDiscount > 0 ? coupon : null,
       userId: userId,
       paymentMethod: walletUsed === finalAmount ? "Wallet" : paymentMethod,
       paymentStatus: walletUsed === finalAmount ? "Paid"  : "Pending",
@@ -285,7 +289,8 @@ const placeOrder = async (req, res) => {
       finalAmount,
       status: "Pending",
       couponDiscount ,
-      coupon,
+      coupon: couponDiscount > 0 ? coupon : null,
+      discount: productDiscount,
       basePrice,
       gstAmount,
 
@@ -446,9 +451,8 @@ const createRazorpayOrder = async (req, res) => {
             }else{
               couponDiscount = validCoupon.discount;
             }
+            req.appliedCoupon = validCoupon;
         }
-
-        req.appliedCoupon = validCoupon;
     }
     
     
@@ -584,9 +588,8 @@ const verifyPayment = async (req, res) => {
             }else{
               couponDiscount = validCoupon.discount;
             }
+            req.appliedCoupon = validCoupon;
         }
-
-        req.appliedCoupon = validCoupon;
     }
     
     
@@ -638,9 +641,14 @@ const verifyPayment = async (req, res) => {
       }
     }
 
+    const totalMRP = cart.items.reduce((sum, item) => {
+      return sum + item.productId.regularPrice * item.quantity;
+    }, 0);
+    const productDiscount = totalMRP - totalPrice;
+
     const newOrder = new Order({
-      couponCode : coupon || null,
-      coupon,
+      couponCode : couponDiscount > 0 ? coupon : null,
+      coupon : couponDiscount > 0 ? coupon : null,
       userId,
       paymentMethod: "Online",
       paymentStatus: "Paid",
@@ -676,6 +684,7 @@ const verifyPayment = async (req, res) => {
       finalAmount,
       status: "Pending",
       couponDiscount,
+      discount: productDiscount,
       basePrice,
       gstAmount,
 
