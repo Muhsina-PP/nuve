@@ -272,10 +272,16 @@
 
     <!-- Right Column: Order Summary & Actions -->
     <div class="col-lg-4">
+
+      <% if (order.orderedItems.length > 0) { %>
+    
       
       <%
+        const totalMrp = order.orderedItems.reduce((s,i)=> s + i.product.regularPrice * i.quantity, 0)
+        const discount = order.discount;
+        const couponDiscount = order.couponDiscount;
         const shipping = order.totalPrice < 999 ? 99 : 0;
-        const grandTotal = order.finalAmount + shipping; // or recompute if needed
+        const grandTotal = totalMrp - discount - couponDiscount + shipping // or recompute if needed
       %>
 
       <div class="card">
@@ -284,7 +290,7 @@
           <div class="info-row">
             <span class="info-label">Order Total</span>
             <span class="info-value">
-              ₹<%= order.totalPrice.toLocaleString("en-IN") %>
+              ₹<%= totalMrp.toLocaleString("en-IN") %>
             </span>
           </div>
           <div class="info-row">
@@ -292,37 +298,41 @@
             <span class="info-value"><%= shipping === 0 ? "Free" : "₹" + shipping %></span>
           </div>
           <div class="info-row">
-            <span class="info-label"><strong>Grand Total</strong></span>
-            <span class="info-value">
-              <strong>₹<%= order.totalPrice - (order.discount || 0) + shipping %></strong>
-            </span>
+            <span class="info-label">Product Discount</span>
+            <span class="info-value">₹<%= discount.toLocaleString("en-IN") %></span>
           </div>
           <div class="info-row">
+            <span class="info-label">Coupon Discount</span>
+            <span class="info-value">₹<%= couponDiscount.toLocaleString("en-IN") %></span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Coupon </span>
+            <span class="info-value"><%= order.coupon %></span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Wallet Used </span>
+            <span class="info-value"><%= order.walletUsed %></span>
+          </div>
+      
+          <div class="info-row">
             <span class="info-label">Payment Method</span>
-            <span class="info-value">Cash on Delivery</span>
+            <% if (order.paymentMethod === "COD") { %>
+             <span class="info-value"> COD </span>
+             <% } else if (order.paymentMethod === "Online" && order.walletUsed > 0) { %>
+              <span class="info-value">Online + Wallet</span>
+              <% } else if (order.paymentMethod === "Online") { %>
+              <span class="info-value"> Online </span>
+              <% } else if (order.paymentMethod === "Wallet") { %>
+              <span class="info-value"> Wallet </span>
+            <% } %>
           </div>
           <hr>
           <div class="info-row">
             <span class="info-label"><strong>Grand Total</strong></span>
-            <strong>₹<%= order.totalPrice - (order.discount || 0) + shipping %></strong>
+            <strong>₹<%= grandTotal %></strong>
           </div>
         </div>
       </div>
-
-      <!-- Change Status -->
-      <!-- <div class="card">
-        <div class="card-header">Update Order Status</div>
-        <div class="card-body">
-          <select class="form-control mb-3" id="statusSelect">
-            <option value="Pending">Pending</option>
-            <option value="Shipped">Shipped</option>
-            <option value="Out for Delivery">Out for Delivery</option>
-            <option value="Delivered">Delivered</option>
-            <option value="Cancelled">Cancelled</option>
-          </select>
-          <button class="btn btn-primary w-100" onclick="updateOrderStatus()">Update Status</button>
-        </div>
-      </div> -->
 
       <!-- Actions -->
       <div class="card">
@@ -331,25 +341,13 @@
           <button class="btn btn-sm btn-success w-100 mb-2" onclick="handleDownload()">Download Invoice</button>
         </div>
       </div>
+      <% } %>
     </div>
   </div>
 </section>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-  function updateOrderStatus() {
-    const status = document.getElementById('statusSelect').value;
-    Swal.fire({
-      title: `Change status to ${status}?`,
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonText: 'Yes, Update'
-    }).then(result => {
-      if (result.isConfirmed) {
-        Swal.fire('Updated!', `Order status changed to ${status}`, 'success');
-      }
-    });
-  }
 
   function verifyReturn(orderId, itemId) {
     Swal.fire({

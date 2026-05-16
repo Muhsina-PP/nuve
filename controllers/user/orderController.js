@@ -3,6 +3,7 @@ const User = require("../../models/userSchema");
 const Product = require("../../models/productSchema");
 const PDFDocument = require("pdfkit");
 const { creditWallet, debitWallet } = require("../../helpers/wallet");
+const { generateInvoice } = require("../../helpers/invoiceHelper");
 
 
 const loadOrders = async (req, res)=>{
@@ -103,111 +104,14 @@ const loadOrderDetails = async (req, res) =>{
 
 const downloadInvoice = async (req, res) => {
   try {
-    const order = await Order.findById(req.params.id).populate({
+    const orderId = req.params.id;
+    const order = await Order.findById(orderId).populate({
       path: "orderedItems.product",
     });
 
     if (!order) return res.status(404).send("Order not found");
 
-    const doc = new PDFDocument({ margin: 40 });
-
-    res.setHeader("Content-Type", "application/pdf");
-    res.setHeader(
-      "Content-Disposition",
-      `attachment; filename=invoice-${order.orderId}.pdf`
-    );
-
-    doc.pipe(res);
-
-    /* ---------------- HEADER ---------------- */
-    doc
-      .fontSize(22)
-      .text("NUVE", 40, 40) // your brand name
-      .fontSize(16)
-      .text("INVOICE", 400, 40);
-
-    doc.moveDown(2);
-
-    doc
-      .fontSize(10)
-      .text(`Order ID: ${order.orderId}`)
-      .text(`Date: ${new Date(order.createdOn).toLocaleDateString()}`);
-
-    doc.moveDown();
-
-    /* ---------------- ADDRESS ---------------- */
-    doc.fontSize(12).text("Shipping Address:", 40);
-    doc
-      .fontSize(10)
-      .text(order.address.name)
-      .text(order.address.landMark)
-      .text(`${order.address.city}, ${order.address.state}`)
-      .text(`PIN: ${order.address.pincode}`)
-      .text(`Phone: ${order.address.phone}`);
-
-    doc.moveDown();
-
-    /* ---------------- TABLE HEADER ---------------- */
-    const tableTop = doc.y;
-
-    doc.fontSize(11);
-    doc.text("Item", 40, tableTop);
-    doc.text("Qty", 300, tableTop);
-    doc.text("Price", 350, tableTop);
-    doc.text("Total", 450, tableTop);
-
-    doc.moveTo(40, tableTop + 15)
-      .lineTo(550, tableTop + 15)
-      .stroke();
-
-    /* ---------------- ITEMS ---------------- */
-    let y = tableTop + 25;
-
-    order.orderedItems.forEach((item) => {
-      doc.fontSize(10);
-
-      doc.text(item.product.productName, 40, y, { width: 240 });
-      doc.text(item.quantity, 300, y);
-      doc.text(`₹${item.price}`, 350, y);
-      doc.text(`₹${item.price * item.quantity}`, 450, y);
-
-      y += 25;
-    });
-
-    /* ---------------- TOTALS ---------------- */
-    const totalMRP = order.orderedItems.reduce(
-      (sum, i) => sum + (i.regularPrice || i.price) * i.quantity,
-      0
-    );
-
-    const totalSale = order.orderedItems.reduce(
-      (sum, i) => sum + i.price * i.quantity,
-      0
-    );
-
-    const discount = totalMRP - totalSale;
-    const delivery = totalSale >= 999 ? 0 : 99;
-    const grandTotal = totalSale + delivery;
-
-    doc.moveDown(2);
-
-    doc.text(`Subtotal: ₹${totalMRP}`, { align: "right" });
-    doc.text(`Discount: -₹${discount}`, { align: "right" });
-    doc.text(`Delivery: ₹${delivery}`, { align: "right" });
-
-    doc.moveDown();
-
-    doc
-      .fontSize(14)
-      .text(`TOTAL: ₹${grandTotal}`, { align: "right" });
-
-    doc.moveDown();
-
-    doc.fontSize(10).text("Thank you for shopping with us!", {
-      align: "center",
-    });
-
-    doc.end();
+    const doc = await generateInvoice(order, res);
 
   } catch (err) {
     console.error(err);

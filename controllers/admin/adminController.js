@@ -3,6 +3,7 @@ const Order = require("../../models/orderSchema")
 const mongoose = require("mongoose")
 const bcrypt = require("bcrypt")
 
+
 const pageNotFound = async (req, res) => {
   try {
     return res.render("pageError");
@@ -121,6 +122,8 @@ const loadDashboard = async(req,res) =>{
         { $unwind: "$productDetails" }
       ]);
 
+      
+
       // Top 10 Best Selling Categories
       const topCategories = await Order.aggregate([
         { $match: { status: "Delivered" } },
@@ -152,6 +155,7 @@ const loadDashboard = async(req,res) =>{
         },
         { $unwind: "$categoryDetails" }
       ]);
+
 
       // Top 10 Best Selling Brands
       const topBrands = await Order.aggregate([
@@ -201,6 +205,7 @@ const loadDashboard = async(req,res) =>{
       return res.redirect("/admin/pageNotFound")   
     }
 }
+
 
 const logout = async (req,res) =>{
   try {
