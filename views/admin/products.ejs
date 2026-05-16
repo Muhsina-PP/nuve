@@ -1,6 +1,8 @@
 <%- include("../../views/partials/admin/header") %>
 <head>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <style>
         /* Main Content */
         .content-main {
@@ -250,6 +252,92 @@
             color: #ffffff;
             border-color: #d4145a;
         }
+        /* ────────────────────────────────────────────────
+   Improved Search Wrapper & Clear Button
+───────────────────────────────────────────────── */
+
+.search-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;                  /* space between search group & clear */
+    flex-wrap: wrap;            /* responsive: clear goes below on very small screens */
+    margin-bottom: 20px;
+}
+
+.search-group {
+    position: relative;
+    flex: 1 1 300px;           /* grows but has minimum width */
+    min-width: 280px;
+}
+
+.search-input {
+    width: 100%;
+    padding: 12px 20px 12px 20px;
+    border: 2px solid #e8e8e8;
+    border-radius: 50px;
+    font-size: 15px;
+    transition: all 0.3s ease;
+    background: #fafafa;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    background: white;
+    box-shadow: 0 0 0 4px rgba(212, 20, 90, 0.1);
+}
+
+.search-btn {
+    position: absolute;
+    right: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 50px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.search-btn:hover {
+    transform: translateY(-50%) scale(1.05);
+    box-shadow: 0 4px 12px rgba(212, 20, 90, 0.3);
+}
+
+/* Clear Button – matches search bar height & style */
+.clear-btn {
+    white-space: nowrap;
+    font-weight: 600;
+    padding: 12px 20px !important;
+    border-radius: 50px !important;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.clear-btn:hover {
+    background: #f0f0f0;
+    color: var(--primary);
+}
+
+/* Responsive – stack on very small screens */
+@media (max-width: 576px) {
+    .search-wrapper {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .search-group {
+        width: 100%;
+    }
+    
+    .clear-btn {
+        width: 100%;
+        text-align: center;
+    }
+}
 
         /* Responsive */
         @media (max-width: 768px) {
@@ -296,17 +384,36 @@
 <section class="content-main">
     <!-- Header with Search and Add Button -->
     <div class="products-header">
-        <form action="" method="get" class="search-wrapper">
-            <input 
-                type="text" 
-                class="search-input" 
-                placeholder="Search products or brands" 
-                name="search"
-            />
-            <button class="search-btn" type="submit">
-                <i class="fas fa-search"></i> Search
-            </button>
-        </form>
+            <form action="/admin/products" method="get" class="search-wrapper d-flex align-items-center gap-2 flex-wrap">
+                <div class="search-group flex-grow-1 position-relative">
+                    <input 
+                        type="text" 
+                        class="search-input form-control" 
+                        placeholder="Search products or brands" 
+                        name="search"
+                        value="<%= search || '' %>"
+                    />
+                    <button class="search-btn" type="submit">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                </div>
+
+                <% if (search && search.length > 0) { %>
+                    <a href="/admin/products" class="btn btn-outline-secondary clear-btn">
+                        Clear
+                    </a>
+                <% } %>
+
+                <% if (noProductFound) { %>
+                    <script>
+                        Swal.fire({
+                            icon: "warning",
+                            title: "Product Not Found",
+                            text: "This product is not registered"
+                        });
+                    </script>
+                <% } %>
+            </form>
         
         <a href="/admin/addProducts" class="add-product-btn">
             <i class="fas fa-plus-circle"></i> Add New Product
@@ -320,12 +427,13 @@
                 <table class="table table-striped">
                     <thead>
                         <tr>
+                            <th scope="col">Image</th>
                             <th scope="col">Product Name</th>
                             <th scope="col">Brand</th>
                             <th scope="col">Category</th>
-                            <th scope="col">Price</th>
-                            <th scope="col">Offer Price</th>
+                            <th scope="col">SalePrice</th>
                             <th scope="col">Offer</th>
+                            <th scope="col"></th>
                             <th scope="col">Quantity</th>
                             <th scope="col">Action</th>
                             <th scope="col">Edit</th>
@@ -333,47 +441,272 @@
                     </thead>
                     <tbody>
                       
-                      
+                      <% for( let i = 0; i < product.length; i++ ) { %>
+
                         <tr>
-                            <td class="text-start"></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td>
-                                <button class="btn btn-info" style="width: 100px;">
-                                    <a href="#" class="text-white">Add Offer</a>
-                                </button>
-                                <button class="btn btn-info" style="width: 100px;">
-                                    <a href="#" class="text-white">Remove</a>
-                                </button>
+                            <td class="text-start">
+                                <div class="d-flex align-items-center justify-content-center"></div>
+                                      <img src="/uploads/product-images/<%= product[i].productImage[0] %>" alt="<%= product[i].productName %>" class="img-fluid rounded-circle"
+                                      style="width: 100%; height: auto">
                             </td>
-                            <td></td>
+
+                            <td class="text-start"><%= product[i].productName  %></td>
+                            <td class="text-start"><%= product[i].brand.brandName %></td>
+                            <td class="text-start"><%= product[i].category.name%></td>
+                            <td class="text-start"><%= product[i].salePrice%></td>
                             <td>
-                                <button class="btn btn-danger" style="width: 80px;">
+                                <% if (product[i].productOffer) { %>
+                                    <%= product[i].productOffer %>
+                                   <% } else { %>
+                                    0%                                 
+                                <% } %>
+                            </td>
+                            <td>
+                              <% if (!product[i].productOffer || product[i].productOffer === 0  ) { %>
+                                    <button class="btn btn-info" onclick="addOffer('<%=product[i]._id%>')" style="width: 100px;">
+                                        <a href="#" class="text-white">Add Offer</a>
+                                    </button>
+                                    <% } else { %>
+                                    <button class="btn btn-info" onclick="removeOffer('<%=product[i]._id%>')" style="width: 100px;">
+                                        <a href="#" class="text-white">Remove offer</a>
+                                    </button>
+                              <% } %>
+                            </td>
+                            <td>
+                                <%
+                                    let totalQty = 0;
+                                    if (product[i].variants) {
+                                        for (let s = 0; s < product[i].variants.length; s++) {
+                                            totalQty += product[i].variants[s].stock;
+                                        }
+                                    }
+                                %>
+                                <%= totalQty %>
+                            </td>
+
+                            <td>
+                                <% if (product[i].isBlocked === false) { %>                      
+                                <button class="btn btn-danger" style="width: 80px;" onclick="blockProduct('<%= product[i]._id %>')">
                                     <a href="#" class="text-white">Block</a>
                                 </button>
-                                <button class="btn btn-success" style="width: 80px;">
+                                <% } else { %>
+                                 
+                                <button class="btn btn-success" style="width: 80px;" onclick="unblockProduct('<%= product[i]._id %>')">
                                     <a href="#" class="text-white">Unblock</a>
                                 </button>
+                                <% } %>
                             </td>
                             <td>
                                 <button class="btn btn-info" style="width: 80px;">
-                                    <a href="#" class="text-white">Edit</a>
+                                    <a href="/admin/editProduct?id=<%=product[i]._id%>" class="text-white">Edit</a>
                                 </button>
                             </td>
                         </tr>
+                      <% } %>
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
 
-    <!-- Pagination -->
+     <!-- Pagination -->
+    <div class="container mt-3">
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center mb-20" style="margin-right: 200px;">
+                  <% for( let i = 1; i <= totalPages ; i++ ) { %>
+                    <li class="page-item <%= (i===currentPage) ? 'active' : '' %>">
+                        <a class="page-link" href="?page=<%= i %>&search=<%= search %>"><%= i %></a>                 
+                    </li>             
+                  <% } %>
+                </ul>
+          </nav>
+    </div>
 
 </section>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+<script>
+
+    async function addOffer(productId) {
+        try {
+            // Fetch active product offers
+            const res = await fetch('/admin/active-offers?type=product');
+            const data = await res.json();
+
+            if (!data.success || !data.offers || data.offers.length === 0) {
+                return Swal.fire('No Offers', 'There are no active product offers available. Please create one first.', 'info');
+            }
+
+            // Prepare options for select
+            const offerOptions = {};
+            data.offers.forEach(offer => {
+                offerOptions[offer._id] = `${offer.name} (${offer.discount}%)`;
+            });
+
+            const { value: selectedOfferId } = await Swal.fire({
+                title: 'Select an Offer',
+                input: 'select',
+                inputOptions: offerOptions,
+                inputPlaceholder: 'Select an offer',
+                showCancelButton: true,
+                inputValidator: (value) => {
+                    return new Promise((resolve) => {
+                        if (value) {
+                            resolve();
+                        } else {
+                            resolve('You need to select an offer');
+                        }
+                    });
+                }
+            });
+
+            if (selectedOfferId) {
+                const response = await fetch('/admin/addProductOffer', {
+                    method : 'POST',
+                    headers : {'content-type' : 'application/json'},
+                    body : JSON.stringify({
+                        offerId : selectedOfferId, 
+                        productId : productId
+                    })
+                })
+                const result = await response.json()
+                
+                if(response.ok && result.success === true){
+                    Swal.fire({
+                        title : 'Success',
+                        text : 'Offer applied successfully',
+                        icon : 'success'
+                    })
+                    .then(()=>{
+                        location.reload();
+                    })
+                }else{
+                    Swal.fire({
+                        icon : 'error',
+                        title : 'Error',
+                        text : result.message || 'Offer application failed'
+                    })
+                }
+            }
+        } catch (error) {
+            Swal.fire({
+                    icon : 'error',
+                    title : 'Error',
+                    text : 'An error occured while applying offer '
+                })
+            console.error('An error occured while applying offer : ',error);                  
+        }
+    }
+
+    async function removeOffer(productId) {
+        try {
+            const response = await fetch ('/admin/removeProductOffer', {
+                method : 'POST',
+                headers : {'content-type': 'application/json'},
+                body : JSON.stringify({
+                    productId : productId
+                })
+            })
+            const data = await response.json();
+
+            if(response.ok && data.success === true){
+                Swal.fire({
+                    icon : 'success',
+                    title : 'success',
+                    text : 'Offer removed succesfully'
+                })
+                .then(()=>{
+                    location.reload()
+                })  
+            }else{
+                Swal.fire({
+                    icon : 'error',
+                    title : 'error',
+                    text : 'Offer removing failed'
+                })
+                console.log("Offer removing failed", error)
+            }
+        } catch (error) {
+            Swal.fire({
+                    icon : 'error',
+                    title : 'error',
+                    text : 'An error occured while removing offer'
+                })
+            console.log("An error occured while removing offer : ",error)    
+        }
+    }
+
+
+    async function blockProduct(productId){
+        const confirm = await Swal.fire({
+            title : 'Are you sure?',
+            text : 'Do you want to block this product?',
+            icon :'warning',
+            showCancelButton : true,
+            cancelButtonText : 'Cancel',
+            confirmButtonText : 'Yess, block!'
+        })
+        if(!confirm.isConfirmed) return;
+
+        const response = await fetch(`/admin/blockProduct?productId=${productId}`,{
+            method : 'GET'
+        })
+        if(response.redirected){
+        Swal.fire({
+          icon : 'success',
+          title: "Product blocked succesfully",
+          text: "The product has been blocked successfully!",
+          timer: 1500,
+          showConfirmButton: false          
+        }).then(()=>{
+          window.location.reload()
+        })
+      }else{
+        Swal.fire({
+            icon : 'error',
+            title : 'error',
+            text : 'Product blocking failed'
+        })
+      }
+    }
+
+
+    async function unblockProduct(productId){
+        const confirm = await Swal.fire({
+            title : 'Are you sure?',
+            text : 'Do you want to unblock this product?',
+            icon :'warning',
+            showCancelButton : true,
+            cancelButtonText : 'Cancel',
+            confirmButtonText : 'Yess, unblock!'
+        })
+        if(!confirm.isConfirmed) return;
+
+        const response = await fetch(`/admin/unblockProduct?productId=${productId}`,{
+            method : 'GET'
+        })
+        if(response.redirected){
+        Swal.fire({
+          icon : 'success',
+          title: "Product unblocked succesfully",
+          text: "The product has been unblocked successfully!",
+          timer: 1500,
+          showConfirmButton: false          
+        }).then(()=>{
+          window.location.reload()
+        })
+      }else{
+        Swal.fire({
+            icon : 'error',
+            title : 'error',
+            text : 'Product unblocking failed'
+        })
+      }
+    }
+
+
+</script>
 
 <%- include("../../views/partials/admin/footer") %>

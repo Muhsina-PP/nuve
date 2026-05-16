@@ -1,0 +1,209 @@
+<%- include("../../views/partials/user/header") %>
+
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+  .ep-page {
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 16px;
+    background: #fdfbfc;
+  }
+
+  .ep-card {
+    width: 100%;
+    max-width: 520px;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 8px 32px rgba(212,20,90,0.10);
+    overflow: hidden;
+    border: 1px solid #eedde5;
+  }
+
+  /* Header */
+  .ep-card-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 24px 32px;
+    background: linear-gradient(135deg, #d4145a 0%, #9e0f44 100%);
+  }
+
+  .ep-card-icon {
+    width: 42px; height: 42px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.18);
+    display: flex; align-items: center; justify-content: center;
+    color: white;
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+
+  .ep-card-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: white;
+    margin: 0;
+    line-height: 1.2;
+  }
+
+  .ep-card-subtitle {
+    font-size: 0.78rem;
+    color: rgba(255,255,255,0.65);
+    margin: 3px 0 0;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  /* Body */
+  .ep-card-body {
+    padding: 32px;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .ep-field { margin-bottom: 20px; }
+
+  .ep-label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: #8a8aa0;
+    margin-bottom: 7px;
+  }
+
+  .ep-input-wrap { position: relative; }
+
+  .ep-input-icon {
+    position: absolute;
+    left: 14px; top: 50%;
+    transform: translateY(-50%);
+    color: #d4145a;
+    font-size: 0.8rem;
+    pointer-events: none;
+  }
+
+  .ep-input {
+    width: 100%;
+    padding: 11px 14px 11px 38px;
+    border: 1.5px solid #eedde5;
+    border-radius: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.92rem;
+    color: #1a1a2e;
+    background: #fdfbfc;
+    outline: none;
+    transition: all 0.2s;
+  }
+
+  .ep-input:focus {
+    border-color: #d4145a;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(212,20,90,0.10);
+  }
+
+  /* Footer buttons */
+  .ep-footer {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-top: 28px;
+  }
+
+  .ep-btn-cancel {
+    padding: 11px 24px;
+    border-radius: 50px;
+    border: 1.5px solid #eedde5;
+    background: white;
+    color: #8a8aa0;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    font-size: 0.88rem;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+
+  .ep-btn-cancel:hover { border-color: #d4145a; color: #d4145a; }
+
+  .ep-btn-save {
+    padding: 11px 28px;
+    border-radius: 50px;
+    border: none;
+    background: linear-gradient(135deg, #d4145a 0%, #9e0f44 100%);
+    color: white;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    font-size: 0.88rem;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(212,20,90,0.28);
+    transition: all 0.2s;
+    display: inline-flex; align-items: center; gap: 7px;
+  }
+
+  .ep-btn-save:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(212,20,90,0.38);
+  }
+</style>
+
+<div class="ep-page">
+  <div class="ep-card">
+
+    <div class="ep-card-header">
+      <div class="ep-card-icon"><i class="fas fa-user-pen"></i></div>
+      <div>
+        <h4 class="ep-card-title">Edit Profile</h4>
+        <p class="ep-card-subtitle">Update your personal information</p>
+      </div>
+    </div>
+
+    <div class="ep-card-body">
+      <form action="/edit-profile" method="POST">
+
+        <div class="ep-field">
+          <label class="ep-label" for="epName">Full Name</label>
+          <div class="ep-input-wrap">
+            <i class="fas fa-user ep-input-icon"></i>
+            <input type="text" id="epName" name="name" class="ep-input"
+                   value="<%= user.name %>" placeholder="Your full name" required>
+          </div>
+        </div>
+
+        <div class="ep-field">
+          <label class="ep-label" for="epEmail">Email Address</label>
+          <div class="ep-input-wrap">
+            <i class="fas fa-envelope ep-input-icon"></i>
+            <input type="email" id="epEmail" name="email" class="ep-input"
+                   value="<%= user.email %>" placeholder="your@email.com" required>
+          </div>
+        </div>
+
+        <div class="ep-field">
+          <label class="ep-label" for="epPhone">Phone Number</label>
+          <div class="ep-input-wrap">
+            <i class="fas fa-phone ep-input-icon"></i>
+            <input type="tel" id="epPhone" name="phone" class="ep-input"
+                   value="<%= user.phone || '' %>" placeholder="+91 00000 00000">
+          </div>
+        </div>
+
+        <div class="ep-footer">
+          <a href="/userProfile" class="ep-btn-cancel">
+            <i class="fas fa-arrow-left"></i> Cancel
+          </a>
+          <button type="submit" class="ep-btn-save">
+            <i class="fas fa-check"></i> Save Changes
+          </button>
+        </div>
+
+      </form>
+    </div>
+
+  </div>
+</div>

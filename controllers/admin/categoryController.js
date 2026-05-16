@@ -1,14 +1,20 @@
 const Category = require("../../models/categorySchema") 
 const Product = require("../../models/productSchema")
+const {applyBestOffer} = require("../../helpers/offerHelper")
 
 const categoryInfo = async (req,res) =>{
   try {
-  
+
+    const search = req.query.search?.trim() || "";
     const page = parseInt(req.query.page) || 1;
     const limit = 3;
     const skip = (page-1) * limit;
 
-    const categoryData = await Category.find({})
+    const categoryData = await Category.find({
+      $or : [
+        {name : {$regex : ".*"+search+".*"}}
+      ]
+    })
     .sort({createdAt : -1})
     .skip(skip)
     .limit(limit);
@@ -17,10 +23,12 @@ const categoryInfo = async (req,res) =>{
     const totalPages = Math.ceil( totalCategoories / limit);
 
     res.render("category",{
+      title : 'Category',
       category : categoryData,
       currentPage : page,
       totalPages : totalPages,
-      totalCategoories : totalCategoories
+      totalCategoories : totalCategoories,
+      search : search
     })
     
   } catch (error) {
@@ -55,57 +63,99 @@ const addCategory = async (req, res) =>{
 }
 
 
-const addCategoryOffer = async (req,res) =>{
-  try {
-    const percentage = parseInt(req.body.percentage);
-    const categoryId = req.body.categoryId;
+// const addCategoryOffer = async (req,res) =>{
+//   try {
+//     const percentage = parseInt(req.body.percentage);
+//     const categoryId = req.body.categoryId;
 
-    console.log("CATEGORY ID RECEIVED:", req.body.categoryId);
+//     console.log("CATEGORY ID RECEIVED:", req.body.categoryId);
     
-    if (!categoryId || categoryId.trim() === "") {
-      return res.status(400).json({
-          status: false,
-          message: "Category ID is required"
-      });
+//     if (!categoryId || categoryId.trim() === "") {
+//       return res.status(400).json({
+//           status: false,
+//           message: "Category ID is required"
+//       });
+//     }
+
+//     if (!percentage || isNaN(percentage) || percentage <= 0 || percentage > 90) {
+//       return res.send({ success: false, message: "Invalid percentage" });
+//     }
+
+//     const category = await Category.findById(categoryId);
+//     if(!category){
+//       return res.status(400).send({success: false, message : "This category doesn't exist"})
+//     }
+
+//     const products = await Product.find({ category : categoryId})
+
+//     const hasProductOffer = products.some(product =>product.productOffer > 0);
+//     if(hasProductOffer){
+//       return res.send({
+//         success : false,
+//         message : 'Cannot add offers, because Products in this category already have product-level offers'
+//       })
+//     }
+
+//     category.categoryOffer = percentage;
+//     await category.save();
+
+//     for (const product of products){
+//       product.productOffer = 0;
+//        product.salePrice = Math.floor(
+//         product.regularPrice - (product.regularPrice * percentage) / 100
+//       );
+//       await product.save();
+//     }
+
+//     return res.send({success : true, message : 'Added product offer succesfully'})
+
+//   } catch (error) {
+//     console.error("Error adding category offer  : ",error);
+//     return res.status(400).send({success : false, message : 'Error adding category offer'})
+//   }
+// }
+
+const addCategoryOffer = async (req, res) => {
+  try {
+    const { categoryId, offerId } = req.body;
+
+    if (!categoryId || !offerId) {
+      return res.status(400).json({ success: false, message: "Category ID and Offer ID required" });
     }
 
-    if (!percentage || isNaN(percentage) || percentage <= 0 || percentage > 90) {
-      return res.send({ success: false, message: "Invalid percentage" });
+    const offer = await require('../../models/offerSchema').findById(offerId);
+    if (!offer || !offer.isActive) {
+      return res.status(400).json({ success: false, message: "Invalid or inactive offer" });
     }
+
+    const percentage = offer.discount;
 
     const category = await Category.findById(categoryId);
-    if(!category){
-      return res.status(400).send({success: false, message : "This category doesn't exist"})
+    if (!category) {
+      return res.status(400).json({ success: false, message: "Category not found" });
     }
 
-    const products = await Product.find({ category : categoryId})
-
-    const hasProductOffer = products.some(product =>product.productOffer > 0);
-    if(hasProductOffer){
-      return res.send({
-        success : false,
-        message : 'Products in this category already have product-level offers'
-      })
-    }
-
+    // Update category offer
     category.categoryOffer = percentage;
+    category.categoryOfferId = offerId;
     await category.save();
 
-    for (const product of products){
-      product.productOffer = 0;
-       product.salePrice = Math.floor(
-        product.regularPrice - (product.regularPrice * percentage) / 100
-      );
+    // Update all products inside this category
+    const products = await Product.find({ category: categoryId });
+
+    for (const product of products) {
+      applyBestOffer(product, category.categoryOffer); // compare productOffer vs categoryOffer
       await product.save();
     }
 
-    return res.send({success : true, message : 'Added product offer succesfully'})
+    return res.send({ success: true, message: "Category offer applied successfully" });
 
   } catch (error) {
-    console.error("Error adding category offer  : ",error);
-    return res.status(400).send({success : false, message : 'Error adding category offer'})
+    console.error("Error adding category offer:", error);
+    return res.status(500).json({ success: false, message: "Server error" });
   }
-}
+};
+
 
 const removeCategoryOffer = async (req, res) =>{
   try {
@@ -116,22 +166,19 @@ const removeCategoryOffer = async (req, res) =>{
       return res.status(400).send({success : false, message : 'This category doesnt exist'})
     }
 
-
-    const percentage = category.categoryOffer;
     const products = await  Product.find({category : category._id})
 
- // Remove offer and reset price
-      for (let product of products){
-        product.productOffer = 0;
-        product.salePrice = product.regularPrice;
-        await product.save();
-      }
+    // Remove offer and reset price
+    for (let product of products){
+      applyBestOffer(product, 0);
+      await product.save();
+    }
 
-    
     // Reset category offer
     category.categoryOffer = 0;
+    category.categoryOfferId = null;
     await category.save();
-    return res.status(200).send({success : true, message : "Removed product offer succesfully"})
+    return res.status(200).send({success : true, message : "Removed category offer succesfully"})
 
   } catch (error) {
     console.error("Error removing category offer  : ",error);
@@ -166,7 +213,7 @@ const getEditCategory = async (req, res) =>{
   try {
     const id = req.params.id;
     const category = await Category.findOne({_id: id})
-    res.render("edit-category", {category : category})    
+    res.render("edit-category", {category : category, title : 'Category' })    
   } catch (error) {
     console.log("Error loading edit-category page : ", error);
     res.redirect("/admin/pageNotFound")
@@ -177,10 +224,7 @@ const getEditCategory = async (req, res) =>{
 const editCategory = async (req,res) =>{
   try {
     const id = req.params.id;
-        console.log("Request body : ",req.body);
     const { categoryName, description} = req.body;
-
-    
 
     const existingCategory = await Category.findOne({name : categoryName, _id:{ $ne : id}});
     if(existingCategory){

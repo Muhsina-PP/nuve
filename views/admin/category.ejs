@@ -498,6 +498,9 @@
           name="search"
         />
         <button class="search-btn" type="submit">Search</button>
+        <% if(search && search.length > 0){ %>
+            <a href="/admin/category" class="btn btn-sm btn-outline-secondary">Clear</a>
+        <% } %>
       </form>
     </div>
 
@@ -752,48 +755,74 @@
 
 
     async function addCategoryOffer(categoryId) {
-      const {value : amount} = await Swal.fire({
-        title : "Offer in percentage",
-        input : "number",
-        inputLabel : "Percentage",
-        inputPlaceholder : "%"
-      })
-
       try {
-        const response = await fetch("/admin/addCategoryOffer",{
-          method : "POST",
-          headers : {'content-type' : 'application/json'},
-          body : JSON.stringify({
-            percentage : amount,
-            categoryId : categoryId
-          })
+        // Fetch active category offers
+        const res = await fetch('/admin/active-offers?type=category');
+        const data = await res.json();
+
+        if (!data.success || !data.offers || data.offers.length === 0) {
+            return Swal.fire('No Offers', 'There are no active category offers available. Please create one first.', 'info');
+        }
+
+        // Prepare options for select
+        const offerOptions = {};
+        data.offers.forEach(offer => {
+            offerOptions[offer._id] = `${offer.name} (${offer.discount}%)`;
         });
 
-        const data = await response.json();
+        const { value: selectedOfferId } = await Swal.fire({
+            title: 'Select an Offer',
+            input: 'select',
+            inputOptions: offerOptions,
+            inputPlaceholder: 'Select an offer',
+            showCancelButton: true,
+            inputValidator: (value) => {
+                return new Promise((resolve) => {
+                    if (value) {
+                        resolve();
+                    } else {
+                        resolve('You need to select an offer');
+                    }
+                });
+            }
+        });
 
-        if(response.ok && data.success === true){
-          Swal.fire({
-            title : 'success',
-            text : 'Offer added succesfully',
-            icon : 'success'
-          })
-          .then(()=>{
-            location.reload();
-          })
-        }else{
-          Swal.fire({
-            icon : 'error',
-            title : 'Error',
-            text : 'Offer adding failed'
-          })
-        }      
+        if (selectedOfferId) {
+            const response = await fetch("/admin/addCategoryOffer",{
+              method : "POST",
+              headers : {'content-type' : 'application/json'},
+              body : JSON.stringify({
+                offerId : selectedOfferId,
+                categoryId : categoryId
+              })
+            });
+
+            const result = await response.json();
+
+            if(response.ok && result.success === true){
+              Swal.fire({
+                title : 'Success',
+                text : 'Offer added successfully',
+                icon : 'success'
+              })
+              .then(()=>{
+                location.reload();
+              })
+            }else{
+              Swal.fire({
+                icon : 'error',
+                title : 'Error',
+                text : result.message || 'Offer adding failed'
+              })
+            }      
+        }
       } catch (error) {
         Swal.fire({
            icon : 'error',
             title : 'Error',
             text : 'An error occured while adding offer'
         })
-        console.log('An error occured while adding offer', error);     
+        console.error('An error occured while adding offer', error);     
       }    
     }
 

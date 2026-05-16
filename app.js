@@ -13,6 +13,10 @@ const adminRoutes = require('./routes/adminRoutes')
 const {injectedUser} = require("./middlewares/auth")
 
 app.use(morgan('dev'));
+app.use((req, res, next) => {
+  res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+  next();
+});
 
 app.use( express.json())
 app.use (express.urlencoded({extended : true}))
@@ -41,16 +45,6 @@ app.use(injectedUser)
 
 app.use("/", userRoutes)
 app.use("/admin", adminRoutes)
-
-//404 router
-// app.use((req,res,next) =>{
-//   res.status(404).render('page-404')
-// })
-// app.use((err, req, res, next) =>{
-//   console.log('SERVER ERROR : ',err);
-//   res.status(404).render('page-404')
-// })
-
 
 app.listen(process.env.PORT, ()=>{
   console.log(`Server running on 3000`);

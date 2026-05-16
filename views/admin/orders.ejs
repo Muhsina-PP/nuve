@@ -1,0 +1,361 @@
+<%- include("../../views/partials/admin/header") %>
+
+<style>
+  :root {
+    --primary: #d4145a;
+    --primary-dark: #a81049;
+    --light-bg: #f8f9fa;
+    --card-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    --transition: all 0.3s ease;
+  }
+
+  .content-main {
+    padding: 30px;
+    background-color: var(--light-bg);
+  }
+
+  .page-header {
+    background: white;
+    padding: 20px 25px;
+    border-radius: 12px;
+    box-shadow: var(--card-shadow);
+    margin-bottom: 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+
+  .search-form {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    max-width: 420px;
+  }
+
+  .search-input {
+    flex: 1;
+    padding: 12px 18px;
+    border: 2px solid #eee;
+    border-radius: 50px;
+    font-size: 15px;
+  }
+
+  .search-btn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 50px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .clear-btn {
+    color: #666;
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .sort-select {
+    padding: 12px 20px;
+    border: 2px solid #eee;
+    border-radius: 50px;
+    font-size: 15px;
+    min-width: 200px;
+  }
+
+  .table-container {
+    background: white;
+    border-radius: 12px;
+    box-shadow: var(--card-shadow);
+    overflow: hidden;
+  }
+
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .table thead {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  }
+
+  .table thead th {
+    padding: 16px 12px;
+    color :#d4145a ;
+    font-weight: 600;
+    text-align: left;
+  }
+
+  .table tbody tr {
+    border-bottom: 1px solid #f0f0f0;
+    transition: var(--transition);
+  }
+
+  .table tbody tr:hover {
+    background-color: #f8f9fa;
+  }
+
+  .table tbody td {
+    padding: 16px 12px;
+    vertical-align: middle;
+  }
+
+  .status-badge {
+    padding: 6px 14px;
+    border-radius: 30px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .status-pending { background: #fff3cd; color: #856404; }
+  .status-shipped { background: #d1ecf1; color: #0c5460; }
+  .status-outfordelivery { background: #d4edda; color: #155724; }
+  .status-delivered { background: #d4edda; color: #155724; }
+  .status-cancelled { background: #f8d7da; color: #721c24; }
+
+  .btn-sm {
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .orders-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f5f5f5;
+  padding: 20px 25px;
+  border-radius: 15px;
+}
+
+.page-title {
+  font-size: 28px;
+  font-weight: 600;
+}
+
+.toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* Search box */
+.search-wrapper input {
+  padding: 10px 18px;
+  border-radius: 25px;
+  border: 1px solid #ddd;
+  outline: none;
+  width: 260px;
+  transition: 0.3s;
+}
+
+.search-wrapper input:focus {
+  border-color: #e91e63;
+}
+
+/* Search button */
+.btn-search {
+  background: #e91e63;
+  color: white;
+  border: none;
+  padding: 10px 22px;
+  border-radius: 25px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.btn-search:hover {
+  background: #d81b60;
+}
+
+/* Clear button */
+.btn-clear {
+  color: #555;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+/* Dropdown */
+.sort-dropdown {
+  padding: 10px 15px;
+  border-radius: 25px;
+  border: 1px solid #ddd;
+  background: white;
+  cursor: pointer;
+}
+
+  .pagination {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 30px;
+  }
+
+  .page-link {
+    padding: 10px 16px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    text-decoration: none;
+    color: #555;
+  }
+
+  .page-link.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+  }
+</style>
+
+<section class="content-main">
+  <div class="orders-toolbar">
+
+  <h2 class="page-title">All Orders</h2>
+
+  <form action="/admin/orders" method="GET" class="toolbar-actions">
+
+    <!-- Search -->
+    <div class="search-wrapper">
+      <input 
+        type="text" 
+        name="search" 
+        placeholder="Search by Order ID or Customer..."
+        value="<%= search || '' %>"
+      >
+    </div>
+
+    <!-- Search Button -->
+    <button type="submit" class="btn-search">Search</button>
+
+    <!-- Clear -->
+    <a href="/admin/orders" class="btn-clear">Clear</a>
+
+    <!-- Sort -->
+    <select name="sort" onchange="this.form.submit()" class="sort-dropdown">
+      <option value="">Sort by Date</option>
+      <option value="oldest" <%= sort === "oldest" ? "selected" : "" %>>Oldest</option>
+      <option value="total-high" <%= sort === "total-high" ? "selected" : "" %>>High to Low</option>
+      <option value="total-low" <%= sort === "total-low" ? "selected" : "" %>>Low to High</option>
+    </select>
+
+  </form>
+
+</div>
+
+  <div class="table-container">
+    <table class="table" >
+      <thead>
+        <tr>
+          <th>Order ID</th>
+          <th>Date</th>
+          <th>Customer</th>
+          <th>Total Amount</th>
+          <th>Status</th>
+          <th>Actions</th>
+          <th>Update</th>
+          
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Static Sample Rows -->
+         <% orders.forEach(order =>{ %>
+        <tr>
+          <td><strong><%= order.orderId ? order.orderId.slice(0,8).toUpperCase() : "N/A" %></strong></td>
+          <td><%= new Date(order.createdOn).toLocaleDateString() %></td>
+          <td><%= order.address?.name || "User" %></td>
+          <td><strong>₹<%= order.finalAmount %></strong></td>
+          <td><span class="status-badge status-pending"><%= order.status.toLowerCase() %></span></td>
+          <td>
+            <button class="btn btn-sm btn-primary" onclick="viewOrder('<%= order._id %>')"> View</button>
+          </td>
+          <td>
+            <select class="btn btn-sm" onchange="updateStatus('<%= order._id %>', this.value)">
+              <option value="Pending" <%= order.status==='Pending'?'selected':'' %>>Pending</option>
+              <option value="Shipped" <%= order.status==='Shipped'?'selected':'' %>>Shipped</option>
+              <option value="Out Of Delivery" <%= order.status==='Out Of Delivery'?'selected':'' %>>Out of Delivery</option>
+              <option value="Delivered" <%= order.status==='Delivered'?'selected':'' %>>Delivered</option>
+              <option value="Cancelled" <%= order.status==='Cancelled'?'selected':'' %>>Cancelled</option>
+            </select>
+          </td>
+        </tr>
+        <% }) %>
+        
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div class="pagination">
+
+      <!-- Previous -->
+      <a 
+        href="?page=<%= currentPage - 1 %>&search=<%= search %>" 
+        class="page-link <%= currentPage === 1 ? 'disabled' : '' %>">
+        Previous
+      </a>
+
+      <!-- Page Numbers -->
+      <% for(let i = 1; i <= totalPages; i++) { %>
+        <a 
+          href="?page=<%= i %>&search=<%= search %>&sort=<%= sort %>" 
+          class="page-link <%= currentPage === i ? 'active' : '' %>">
+          <%= i %>
+        </a>
+      <% } %>
+
+      <!-- Next -->
+      <a 
+        href="?page=<%= currentPage + 1 %>&search=<%= search %>" 
+        class="page-link <%= currentPage === totalPages ? 'disabled' : '' %>">
+        Next
+      </a>
+
+  </div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+  function viewOrder(orderId) {
+     window.location.href = `/admin/order-details/${orderId}`;
+  }
+
+ async function updateStatus(orderId, newStatus) {
+
+  if (!newStatus) return;
+  const result = await Swal.fire({
+    title: `Change status to ${newStatus}?`,
+    icon: 'question',
+    showCancelButton: true,
+    confirmButtonText: 'Yes'
+  });
+
+  if (!result.isConfirmed) return;
+
+  try {
+    const res = await fetch(`/admin/update-order-status/${orderId}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ status: newStatus })
+    });
+
+    const data = await res.json();
+    if (data.success) {
+      await Swal.fire('Updated!', data.message, 'success');
+      location.reload(); 
+    } else {
+      Swal.fire('Error', data.message, 'error');
+    }
+
+  } catch (err) {
+    Swal.fire('Error', 'Something went wrong', 'error');
+  }
+}
+</script>
+
+<%- include("../../views/partials/admin/footer") %>

@@ -13,6 +13,11 @@ const wishlistSchema = new Schema ({
       ref : "Product",
       required : true
     },
+    variant : {
+       type: String,
+        enum: ["S", "M", "L", "XL", "XXL"], 
+        required: true
+    },
     addedOn :{
       type : Date,
       default : Date.now
