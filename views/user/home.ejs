@@ -377,7 +377,7 @@
                     <div class="hero-content">
                         <h1><%= banner[i].title || "New Collection 2026" %></h1>
                         <p><%= banner[i].description || "Discover the latest trends in women's fashion" %></p>
-                        <a href="<%= banner[i].link && banner[i].link.startsWith('http') ? banner[i].link : 'https://' + banner[i].link %>" 
+                        <a href="/shop" 
                             class="btn-primary"
                             target="_blank"
                             >
@@ -418,9 +418,9 @@
                             <img src="/uploads/product-images/<%=products[i].productImage?.[0]%>" alt="<%=products[i].productName%>">
                         </a>
                         <span class="product-badge">NEW</span>
-                        <div class="wishlist-btn">
+                        <!-- <div class="wishlist-btn">
                             <i class="far fa-heart"><a href="/addToWishlist?id=<%=products[i]._id%>"></a></i>
-                        </div>
+                        </div> -->
                     </div>
                     <div class="product-info">
                         <h3 class="product-title"><%=products[i].productName%></h3>

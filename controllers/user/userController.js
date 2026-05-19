@@ -5,6 +5,8 @@ const Banner = require("../../models/bannerSchema")
 const Brand = require("../../models/brandSchema")
 const Offer = require("../../models/offerSchema")
 const Coupen = require("../../models/coupenSchema")
+const Cart = require("../../models/cartSchema");
+const Wishlist = require("../../models/wishlistSchema")
 const nodemailer = require("nodemailer");
 const env = require("dotenv").config();
 const bcrypt = require("bcrypt");
@@ -67,6 +69,8 @@ const loadHomepage = async (req, res) => {
     })
     .sort({ createdAt : -1})
     .limit(4)
+
+    
 
     if(user){
       const userData = await User.findById(user)

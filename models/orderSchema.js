@@ -75,9 +75,9 @@ const orderSchema = new Schema({
     required: true,
   },
   gstAmount: {
-  type: Number,
-  default: 0
-},
+    type: Number,
+    default: 0
+  },
   address: {
     addressType: {
       type: String,
@@ -123,7 +123,7 @@ const orderSchema = new Schema({
     type: String,
     enum: ["COD", "Online", "Wallet"],
     required: true,
-    default  : "COD"
+    default: "COD"
   },
 
   paymentStatus: {
@@ -152,7 +152,7 @@ const orderSchema = new Schema({
     default: Date.now,
     required: true,
   },
-  walletUsed :{
+  walletUsed: {
     type: Number,
     default: 0
   },
@@ -160,12 +160,12 @@ const orderSchema = new Schema({
     type: Boolean,
     default: false,
   },
-  coupon :{
-    type : String,
-    default  : null
+  coupon: {
+    type: String,
+    default: null
   },
-  couponDiscount :{
-    type : Number
+  couponDiscount: {
+    type: Number
   }
 });
 
