@@ -57,26 +57,26 @@ const loadHomepage = async (req, res) => {
     const user = req.session.user;
     const today = new Date().toISOString();
     const findBanner = await Banner.find({
-      startDate : {$lt: new Date(today)},
-      endDate : {$gt: new Date(today)}
+      startDate: { $lt: new Date(today) },
+      endDate: { $gt: new Date(today) }
     })
-    
-    const categories = await Category.find({isListed : true});
+
+    const categories = await Category.find({ isListed: true });
     const productsData = await Product.find({
-      isBlocked : false,
-      category : { $in :categories.map(category => category._id)},
-      "variants.stock" : {$gt : 0}
+      isBlocked: false,
+      category: { $in: categories.map(category => category._id) },
+      "variants.stock": { $gt: 0 }
     })
-    .sort({ createdAt : -1})
-    .limit(4)
+      .sort({ createdAt: -1 })
+      .limit(4)
 
-    
 
-    if(user){
+
+    if (user) {
       const userData = await User.findById(user)
-      res.render("home", { user : userData, products : productsData, banner : findBanner || []})
-    }else{
-      res.render("home", {products : productsData, banner : findBanner || []})
+      res.render("home", { user: userData, products: productsData, banner: findBanner || [] })
+    } else {
+      res.render("home", { products: productsData, banner: findBanner || [] })
     }
 
   } catch (error) {
@@ -128,8 +128,8 @@ const signup = async (req, res) => {
     req.session.userData = { name, phone, email, password, referredBy: ref };
 
     res.render("verify-otp");
-    console.log("OTP : ",otp);
-    
+    console.log("OTP : ", otp);
+
 
   } catch (error) {
     console.error("Signup error : ", error);
@@ -172,12 +172,12 @@ const verifyOtp = async (req, res) => {
         const referrer = await User.findOne({ referalCode: user.referredBy });
         if (referrer) {
           saveUserData.referredBy = referrer._id;
-          
+
           let activeReferralOffer = await Offer.findOne({ type: 'referral', isActive: true });
-          
+
           // Use fallback if no active referral offer is found
           const discountAmount = activeReferralOffer ? activeReferralOffer.discount : 10; // Default 10%
-          
+
           // Generate unique coupon for referrer
           const couponCode = `REF-${Math.random().toString(36).slice(-6).toUpperCase()}`;
           const expiryDate = new Date();
@@ -197,7 +197,7 @@ const verifyOtp = async (req, res) => {
           });
           await newCoupon.save();
           console.log(`Referral coupon ${couponCode} created for user ${referrer._id}`);
-          
+
           await saveUserData.save(); // Save first to get _id
           referrer.redeemedUsers.push(saveUserData._id);
           await referrer.save();
@@ -257,8 +257,8 @@ const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    if(!email || !password){
-      return res.render("login" ,{message : "All fields are required"})
+    if (!email || !password) {
+      return res.render("login", { message: "All fields are required" })
     }
 
     const findUser = await User.findOne({ isAdmin: 0, email: email });
@@ -272,7 +272,7 @@ const login = async (req, res) => {
     const passwordMatch = await bcrypt.compare(password, findUser.password);
 
     if (!passwordMatch) {
-        return res.status(400).json({ message: "Incorrect password" });
+      return res.status(400).json({ message: "Incorrect password" });
     }
 
     req.session.user = findUser._id;
@@ -283,137 +283,38 @@ const login = async (req, res) => {
   }
 };
 
-const logout = async (req,res) =>{
+const logout = async (req, res) => {
   try {
 
-    req.session.destroy((err)=>{
-      if(err){
+    req.session.destroy((err) => {
+      if (err) {
         console.error("Session destruction error");
         return res.redirect("/pageNotFound")
       }
       return res.redirect("/login")
     })
   } catch (error) {
-    console.log("Logout error : ",error);
+    console.log("Logout error : ", error);
     res.redirect("/pageNotFound")
   }
 }
 
-// const loadShopPage = async (req, res) =>{
-//   try {
-//     const user = req.session.user;
-//     const userData = await User.findOne({_id : user})
 
-//     const categories = await Category.find({isListed : true})
-//     const brands = await Brand.find({isBlocked : false})
-    
-//     const categoryIds = categories.map((category) => category._id)
-
-//     const search = req.query.search || "";
-
-//     const page = parseInt(req.query.page) ||1;
-//     const limit = 6;
-//     const skip = (page-1) * limit;
-
-//     // filter values
-//     const selectedCategory = req.query.category?.trim()
-//     const selectedBrand = req.query.brand?.trim()
-//     const minPrice = req.query.minPrice ? Number(req.query.minPrice) : undefined;
-//     const maxPrice = req.query.maxPrice ? Number(req.query.maxPrice) : undefined;
-
-
-//     // query object 
-//     let query = {
-//       productName : {$regex : search, $options : 'i'},
-//       isBlocked : false,
-//       category : {$in : categoryIds},
-//       variants: { $elemMatch: { stock: { $gt: 0 } } }
-//     }
-
-//    if(selectedCategory){
-//       query.category = selectedCategory
-//     }
-
-//     if(selectedBrand){
-//       query.brand = selectedBrand
-//     }
-
-//     if(minPrice !== undefined && maxPrice !== undefined){
-//       query.salePrice = { $gte: minPrice, $lte: maxPrice }
-//     }
-
-//     else if(minPrice !== undefined && maxPrice === undefined){
-//       query.salePrice = { $gte: minPrice }
-//     }
-
-//      // sorting value
-//     const sort = req.query.sort || "";
-//     const sortOption = req.query.sort || ""
-//     let sortQuery = {_id : -1};
-
-//     if(sortOption === "priceLow"){
-//       sortQuery = {salePrice : 1}
-//     }
-//     else if(sortOption === "priceHigh"){
-//       sortQuery = {salePrice : -1}
-//     }
-//     else if(sortOption === "a-z"){
-//       sortQuery = {productName : 1}
-//     }
-//     else if(sortOption === "z-a"){
-//       sortQuery = {productName : -1}
-//     }
-
-//     const products = await Product.find(query)
-//     .populate('brand')
-//     .sort(sortQuery)
-//     .skip(skip)
-//     .limit(limit)
-    
-
-//     const totalProducts = await Product.countDocuments(query)
-//     const totalPages = Math.ceil(totalProducts / limit)
-//     const categoryWithIds = categories.map(category => ({ 
-//       _id : category._id,
-//       name : category.name
-//     }))
-
-//     res.render("shop",{
-//       user : userData,
-//       products : products ,
-//       category : categoryWithIds,
-//       brand : brands,
-//       totalProducts : totalProducts,
-//       currentPage : page,
-//       totalPages : totalPages,
-//       search : search,
-//       sortOption,
-//       selectedCategory,
-//       selectedBrand,
-//       minPrice,
-//       maxPrice,
-//       sort
-//     })
-//   } catch (error) {
-//     console.log("Cannot get shop page : ",error);
-//     res.redirect("/pageNotFound")
-//   }
-// }
-const loadShopPage = async (req, res) =>{
+const loadShopPage = async (req, res) => {
   try {
     const user = req.session.user;
-    const userData = await User.findOne({_id : user})
+    const userData = await User.findOne({ _id: user })
 
-    const categories = await Category.find({isListed : true})
-    const brands = await Brand.find({isBlocked : false})
-    
+    const categories = await Category.find({ isListed: true })
+    const brands = await Brand.find({ isBlocked: false })
+
     const categoryIds = categories.map((category) => category._id)
 
     const search = req.query.search || "";
 
-    const page = parseInt(req.query.page) ||1;
+    const page = parseInt(req.query.page) || 1;
     const limit = 6;
-    const skip = (page-1) * limit;
+    const skip = (page - 1) * limit;
 
     // filter values
     const selectedCategory = req.query.category || "";
@@ -421,19 +322,48 @@ const loadShopPage = async (req, res) =>{
     const minPrice = req.query.minPrice || "";
     const maxPrice = req.query.maxPrice || "";
 
+    const matchedCategories = await Category.find({
+      name: { $regex: search, $options: 'i' },
+      isListed: true
+    })
+    const matchedCategoryIds = matchedCategories.map(cat => cat._id)
 
+    const matchedBrands = await Brand.find({
+      brandName: { $regex: search, $options: 'i' },
+      isBlocked: false
+    })
+    const matchedBrandIds = matchedBrands.map(brand => brand._id)
     // query object 
+    // let query = {
+    //   productName: { $regex: search, $options: 'i' },
+    //   isBlocked: false,
+    //   category: { $in: categoryIds }
+    // }
+
     let query = {
-      productName : {$regex : search, $options : 'i'},
-      isBlocked : false,
-      category : {$in : categoryIds}
+      isBlocked: false,
+      category: { $in: categoryIds }
     }
 
-   if(selectedCategory){
+    if (search.trim()) {
+      query.$or = [
+        {
+          productName: { $regex: search, $options: 'i' }
+        },
+        {
+          category: { $in: matchedCategoryIds }
+        },
+        {
+          brand: { $in: matchedBrandIds }
+        }
+      ]
+    }
+
+    if (selectedCategory) {
       query.category = selectedCategory
     }
 
-    if(selectedBrand){
+    if (selectedBrand) {
       query.brand = selectedBrand
     }
 
@@ -445,55 +375,55 @@ const loadShopPage = async (req, res) =>{
       query.salePrice = { $lte: Number(maxPrice) };
     }
 
-     // sorting value
+    // sorting value
     const sort = req.query.sort || "";
     const sortOption = req.query.sort || ""
-    let sortQuery = {_id : -1};
+    let sortQuery = { _id: -1 };
 
-    if(sortOption === "priceLow"){
-      sortQuery = {salePrice : 1}
+    if (sortOption === "priceLow") {
+      sortQuery = { salePrice: 1 }
     }
-    else if(sortOption === "priceHigh"){
-      sortQuery = {salePrice : -1}
+    else if (sortOption === "priceHigh") {
+      sortQuery = { salePrice: -1 }
     }
-    else if(sortOption === "a-z"){
-      sortQuery = {productName : 1}
+    else if (sortOption === "a-z") {
+      sortQuery = { productName: 1 }
     }
-    else if(sortOption === "z-a"){
-      sortQuery = {productName : -1}
+    else if (sortOption === "z-a") {
+      sortQuery = { productName: -1 }
     }
 
     const products = await Product.find(query)
-    .populate('brand')
-    .sort(sortQuery)
-    .skip(skip)
-    .limit(limit)
+      .populate('brand')
+      .sort(sortQuery)
+      .skip(skip)
+      .limit(limit)
 
-    const productsWithStockStatus  = products.map( p => {
-      const totalStock = p.variants.reduce((sum,v)=>sum+v.stock,0);
-      return{
+    const productsWithStockStatus = products.map(p => {
+      const totalStock = p.variants.reduce((sum, v) => sum + v.stock, 0);
+      return {
         ...p._doc,
-        stockStatus:totalStock === 0 ? 'Out of stock' : 'Available'
+        stockStatus: totalStock === 0 ? 'Out of stock' : 'Available'
       }
     })
-    
+
 
     const totalProducts = await Product.countDocuments(query)
     const totalPages = Math.ceil(totalProducts / limit)
-    const categoryWithIds = categories.map(category => ({ 
-      _id : category._id,
-      name : category.name
+    const categoryWithIds = categories.map(category => ({
+      _id: category._id,
+      name: category.name
     }))
 
-    res.render("shop",{
-      user : userData,
-      products : productsWithStockStatus ,
-      category : categoryWithIds,
-      brand : brands,
-      totalProducts : totalProducts,
-      currentPage : page,
-      totalPages : totalPages,
-      search : search,
+    res.render("shop", {
+      user: userData,
+      products: productsWithStockStatus,
+      category: categoryWithIds,
+      brand: brands,
+      totalProducts: totalProducts,
+      currentPage: page,
+      totalPages: totalPages,
+      search: search,
       sortOption,
       selectedCategory,
       selectedBrand,
@@ -502,10 +432,31 @@ const loadShopPage = async (req, res) =>{
       sort
     })
   } catch (error) {
-    console.log("Cannot get shop page : ",error);
+    console.log("Cannot get shop page : ", error);
     res.redirect("/pageNotFound")
   }
 }
+
+
+const loadAboutPage = async (req, res) => {
+  try {
+    res.render("about")
+  } catch (error) {
+    console.log("Error loading about page : ", error)
+    res.redirect("/pageNotFound")
+  }
+}
+
+
+const loadContactPage = async (req, res) => {
+  try {
+    res.render("contact")
+  } catch (error) {
+    console.log("Error loading contact page : ", error)
+    res.redirect("/pageNotFound")
+  }
+}
+
 
 
 module.exports = {
@@ -519,4 +470,6 @@ module.exports = {
   login,
   logout,
   loadShopPage,
+  loadAboutPage,
+  loadContactPage,
 };

@@ -70,32 +70,21 @@ const loadDashboard = async(req,res) =>{
       const totalUsers = await User.countDocuments({
         isAdmin : false
       })
+      
 
       const revenueData = await Order.aggregate([
-        {
-          $match: {
-            status: "Delivered"
-          }
-        },
-        {
-          $unwind: "$orderedItems"
-        },
-        {
-          $match: {
-            "orderedItems.status": {
-              $nin: ["Returned", "Cancelled"]
-            }
-          }
-        },
-        {
-          $group: {
-            _id: null,
-            totalRevenue: {
-              $sum: "$orderedItems.finalItemPrice"
-            }
+        { $match : {status :'Delivered'}},
+        { $unwind : '$orderedItems'},
+        { $match : {
+          'orderedItems.status' : { $nin : ['Returned', 'Cancelled']}
+        }},
+        { 
+          $group : {
+            _id : null,
+            totalRevenue : { $sum : '$orderedItems.finalItemPrice'}
           }
         }
-      ]);
+      ])
 
       const totalRevenue = revenueData.length > 0 ? revenueData[0].totalRevenue : 0;
 
@@ -121,8 +110,7 @@ const loadDashboard = async(req,res) =>{
         },
         { $unwind: "$productDetails" }
       ]);
-
-      
+ 
 
       // Top 10 Best Selling Categories
       const topCategories = await Order.aggregate([

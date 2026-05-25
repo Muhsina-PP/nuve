@@ -6,7 +6,7 @@ const productController = require("../controllers/user/productController")
 const cartController = require("../controllers/user/cartController")
 const checkoutController = require("../controllers/user/checkoutController")
 const walletController = require("../controllers/user/walletController")
-const {userAuth , adminAuth} = require("../middlewares/auth")
+const { userAuth, adminAuth } = require("../middlewares/auth")
 const wishlistController = require("../controllers/user/wishlistController")
 const orderController = require("../controllers/user/orderController")
 const passport = require("passport");
@@ -34,18 +34,18 @@ router.get(
   })
 );
 router.get(
-  "/google/callback", (req, res, next) =>{
-     passport.authenticate("google", (err, user, infor)=>{
-      if(err) return next(err);
+  "/google/callback", (req, res, next) => {
+    passport.authenticate("google", (err, user, infor) => {
+      if (err) return next(err);
 
-      if(!user){
-        return res.render("login", {message : "User is blocked by admin"})
+      if (!user) {
+        return res.render("login", { message: "User is blocked by admin" })
       }
-      req.logIn(user, (err) =>{
-        if(err) return next(err);
+      req.logIn(user, (err) => {
+        if (err) return next(err);
         res.redirect("/");
       })
-     })(req, res, next);
+    })(req, res, next);
   }
 );
 
@@ -63,9 +63,9 @@ router.post("/resend-forgot-otp", profileController.resendOtp)
 router.post("/reset-password", profileController.postNewPassword)
 router.get("/userProfile", userAuth, profileController.userProfile)
 router.get("/edit-profile", userAuth, profileController.getEditProfile)
-router.post("/edit-profile",userAuth, profileController.editProfile)
-router.post("/edit-profileImage", userAuth, upload.single("image"), profileController.editProfileImage )
-router.post("/validate-otp", userAuth,profileController.otpVerify)
+router.post("/edit-profile", userAuth, profileController.editProfile)
+router.post("/edit-profileImage", userAuth, upload.single("image"), profileController.editProfileImage)
+router.post("/validate-otp", userAuth, profileController.otpVerify)
 router.get("/change-password", userAuth, profileController.getChangePassword)
 router.post("/change-password", userAuth, profileController.changePassword)
 
@@ -84,19 +84,19 @@ router.get("/deleteAddress/:id", userAuth, profileController.deleteAddress)
 router.get("/productDetails", userAuth, productController.productDetails)
 
 // Wishlist management
-router.get("/wishlist",userAuth,wishlistController.loadWishlist)
-router.post('/addToWishlist',userAuth, wishlistController.addToWishlist)
+router.get("/wishlist", userAuth, wishlistController.loadWishlist)
+router.post('/addToWishlist', userAuth, wishlistController.addToWishlist)
 router.get('/removeFromWishlist', userAuth, wishlistController.removeFromWishlist)
 
 // Cart management
 router.get("/cart", userAuth, cartController.loadCart)
 router.post("/addToCart", userAuth, cartController.addToCart);
 router.get('/updateCart', userAuth, cartController.updateCart);
-router.get("/removeFromCart",userAuth, cartController.removeFromCart);
+router.get("/removeFromCart", userAuth, cartController.removeFromCart);
 
 
 // Checkout management
-router.get("/checkout", userAuth, checkoutController.loadCheckoutPage )
+router.get("/checkout", userAuth, checkoutController.loadCheckoutPage)
 router.post("/deleteAddress", userAuth, checkoutController.deleteAddress)
 router.post("/placeOrder", userAuth, checkoutController.placeOrder)
 router.get("/orderSuccess", userAuth, checkoutController.orderSuccess)
@@ -118,6 +118,10 @@ router.get('/orderDetails/:id', userAuth, orderController.loadOrderDetails);
 router.get("/download-invoice/:id", userAuth, orderController.downloadInvoice);
 router.post("/cancel-full-order", userAuth, orderController.cancelFullOrder);
 router.post("/cancel-order", userAuth, orderController.cancelSingleItem);
-router.patch("/return-item",userAuth, orderController.returnOrder);
+router.patch("/return-item", userAuth, orderController.returnOrder);
+
+// Navbar management
+router.get("/about", userAuth, userController.loadAboutPage)
+router.get("/contact-us", userAuth, userController.loadContactPage)
 
 module.exports = router;

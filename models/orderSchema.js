@@ -39,6 +39,8 @@ const orderSchema = new Schema({
         type: String,
         enum: [
           "Ordered",
+          "Shipped",
+          "Out Of Delivery",
           "Cancelled",
           "Delivered",
           "Return Requested",
