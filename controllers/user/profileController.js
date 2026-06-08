@@ -50,7 +50,7 @@ const securePsssword = async (password) => {
   }
 };
 
-const getForgotPassPage = async (req,res) =>{
+const getForgotPassPage = async (req, res) => {
   try {
     res.render("forgot-password-page")
   } catch (error) {
@@ -59,29 +59,29 @@ const getForgotPassPage = async (req,res) =>{
   }
 }
 
-const forgotEmailValid = async (req, res) =>{
+const forgotEmailValid = async (req, res) => {
   try {
-    
-    const {email} = req.body;
-    const findUser = await User.findOne({email : email})
-    if(findUser){
+
+    const { email } = req.body;
+    const findUser = await User.findOne({ email: email })
+    if (findUser) {
       const otp = generateOtp();
       const emailSent = await sendVerificationEmail(email, otp);
-      if(emailSent){
+      if (emailSent) {
         req.session.otp = otp;
         req.session.email = email;
         res.render("forgotpass-otp-page")
-        console.log("Forgot password OTP : ",otp)
-      }else{
+        console.log("Forgot password OTP : ", otp)
+      } else {
         res.render("forgot-password-page", {
-          success : false,
-          message : 'Failed to send otp, please try again',
+          success: false,
+          message: 'Failed to send otp, please try again',
         })
       }
-    }else{
+    } else {
       res.render("forgot-password-page", {
-        success : false,
-        message : 'User with this email does not exist, Please try again'
+        success: false,
+        message: 'User with this email does not exist, Please try again'
       })
     }
 
@@ -91,33 +91,34 @@ const forgotEmailValid = async (req, res) =>{
   }
 }
 
-const verifyForgotPassOtp = async (req, res) =>{
+const verifyForgotPassOtp = async (req, res) => {
   try {
-    
+
     const enteredOtp = req.body.otp;
-    const otp = generateOtp()
-    if( enteredOtp == req.session.otp){
+    // No need to generate a new OTP here; compare with the one stored in session
+    if (enteredOtp == req.session.otp) {
       res.json({
-        success : true,
-        message : 'OTP verified succefully',
-        redirectUrl : '/reset-password'        
+        success: true,
+        message: 'OTP verified succefully',
+        redirectUrl: '/reset-password'
       })
-    }else{
+    } else {
       res.json({
-        success : false,
-        message : 'OTP not matching'})
+        success: false,
+        message: 'OTP not matching'
+      })
     }
 
   } catch (error) {
     console.log("An error occured while verifying otp, please try again : ", error);
     res.json({
-      success : false,
-      message : 'An error occured while verifying otp, please try again'
+      success: false,
+      message: 'An error occured while verifying otp, please try again'
     })
   }
 }
 
-const getResetPassPage = async (req, res) =>{
+const getResetPassPage = async (req, res) => {
   try {
     res.render("reset-password")
   } catch (error) {
@@ -126,84 +127,92 @@ const getResetPassPage = async (req, res) =>{
   }
 }
 
-const resendOtp = async (req, res)=>{
+const resendOtp = async (req, res) => {
   try {
     const otp = generateOtp();
     req.session.otp = otp;
     const email = req.session.email;
-    console.log("Resending otp to email : ", email, "OTP : ",otp )
-    const emailSent = await sendVerificationEmail( email, otp);
-    if(emailSent){
-      console.log("Resent OTP : ",otp)
+    console.log("Resending otp to email : ", email, "OTP : ", otp)
+    const emailSent = await sendVerificationEmail(email, otp);
+    if (emailSent) {
+      console.log("Resent OTP : ", otp)
       res.status(200).json({
-        success : true,
-        message : 'OTP resent succesfully'
+        success: true,
+        message: 'OTP resent succesfully'
       })
     }
 
   } catch (error) {
     console.log("Error resending otp : ", error);
     return res.status(500).json({
-      success : false,
-      message : 'Internal Server Error'
+      success: false,
+      message: 'Internal Server Error'
     })
   }
 }
 
-const postNewPassword = async ( req, res) =>{
+const postNewPassword = async (req, res) => {
   try {
-    const {newPass1, newPass2} = req.body;
+    const { newPass1, newPass2 } = req.body;
     const email = req.session.email;
-    if(newPass1 === newPass2){
+    if (newPass1 === newPass2) {
       const passwordHash = await securePsssword(newPass1);
       await User.updateOne(
-        {email : email},
-        {$set : {password : passwordHash}}
+        { email: email },
+        { $set: { password: passwordHash } }
       )
       res.redirect('/login?reset=success');
-    }else{
+    } else {
       res.render("reset-password", {
-        success : false,
-        message : 'Passwords do not match'
+        success: false,
+        message: 'Passwords do not match'
       })
     }
   } catch (error) {
-    console.log("Error resetting password : ",error);
+    console.log("Error resetting password : ", error);
     return res.status(500).json({
-      success : false,
-      message : 'An error occured while restting password'
+      success: false,
+      message: 'An error occured while restting password'
     })
   }
 }
 
-const userProfile = async (req, res) =>{
+const userProfile = async (req, res) => {
   try {
     const userId = req.session.user;
     const userData = await User.findById(userId);
-    
+
     if (!userData.referalCode) {
       const referalCode = Math.random().toString(36).slice(-6).toUpperCase() + Math.floor(1000 + Math.random() * 9000);
       userData.referalCode = referalCode;
       await userData.save();
     }
-    
-    const addressData = await Address.findOne({userId : userId});
-    const wallet = await Wallet.findOne({userId})
-    const coupons = await Coupen.find({ userId: userId });
 
-    const totalOrders = await Order.countDocuments({ userId})
+    const addressData = await Address.findOne({ userId: userId });
+    const wallet = await Wallet.findOne({ userId })
+    const coupons = await Coupen.find({
+      isActive: true,
+      expiry: { $gt: new Date() },
+      $or: [
+        { userId: { $exists: false } },
+        { userId: null },
+        { userId: userId }
+      ]
+    });
+
+    const totalOrders = await Order.countDocuments({ userId })
     const deliveredOrders = await Order.countDocuments({
       userId,
-      status : 'Delivered'
+      status: 'Delivered'
     })
     const pendingOrders = await Order.countDocuments({
       userId,
-      status : 'Pending'
+      status: 'Pending'
     })
 
     res.render("user-profile", {
-      user : userData,
-      userAddress : addressData ? addressData.address : [],
+      user: userData,
+      userAddress: addressData ? addressData.address : [],
       totalOrders,
       deliveredOrders,
       pendingOrders,
@@ -211,7 +220,7 @@ const userProfile = async (req, res) =>{
       coupons
     })
   } catch (error) {
-    console.log("Error getting user profile : ",error);
+    console.log("Error getting user profile : ", error);
     res.status(500).json({
       success: false,
       message: "Intrenal Server Error - Error getting user profile, Please try again",
@@ -219,15 +228,15 @@ const userProfile = async (req, res) =>{
   }
 }
 
-const getEditProfile = async(req, res) =>{
+const getEditProfile = async (req, res) => {
   try {
     const userId = req.session.user;
     const userData = await User.findById(userId)
-    res.render("edit-profile",{
-      user : userData
+    res.render("edit-profile", {
+      user: userData
     })
   } catch (error) {
-    console.log("Error getting edit profile page : ",error);
+    console.log("Error getting edit profile page : ", error);
     res.status(500).json({
       success: false,
       message: "Intrenal Server Error - Error getting edit profile page, Please try again",
@@ -235,40 +244,50 @@ const getEditProfile = async(req, res) =>{
   }
 }
 
-const editProfile = async(req, res) =>{
+const editProfile = async (req, res) => {
   try {
     const userId = req.session.user;
-    const {name, email, phone} = req.body;
+    const { name, email, phone } = req.body;
     const user = await User.findById(userId)
     // email not changed
-    if(user.email === email){
-        await User.findByIdAndUpdate(userId, {
-          name : name,
-          phone : phone
-        })
-        return res.redirect("/userProfile?success=1")
+    if (user.email === email) {
+      await User.findByIdAndUpdate(userId, {
+        name: name,
+        phone: phone
+      })
+      return res.redirect("/userProfile?success=1")
     }
     // email changed → send OTP
 
+    // Check if the new email is already registered by another user
+    const existingUser = await User.findOne({ email });
+    if (existingUser && existingUser._id.toString() !== userId) {
+      // Email already taken, render edit page with error message
+      return res.render("edit-profile", {
+        user: user,
+        errorMessage: "This email is already registered"
+      });
+    }
+
     const otp = generateOtp();
     const emailSent = await sendVerificationEmail(email, otp);
-    if(emailSent){
+    if (emailSent) {
       req.session.otp = otp
       req.session.newname = name
       req.session.newemail = email
       req.session.newphone = phone
       res.render("verify-otp-emailchange")
-      console.log("OTP for email change : ",otp)
-    }else{
+      console.log("OTP for email change : ", otp)
+    } else {
       console.log("Failed to send otp")
       res.render("user-profile", {
-          success : false,
-          message : 'Failed to send otp, please try again',
-        })
+        success: false,
+        message: 'Failed to send otp, please try again',
+      })
     }
 
   } catch (error) {
-    console.log("Error  editing profile  : ",error);
+    console.log("Error  editing profile  : ", error);
     res.status(500).json({
       success: false,
       message: "Intrenal Server Error - Error editing profile , Please try again",
@@ -276,18 +295,18 @@ const editProfile = async(req, res) =>{
   }
 }
 
-const otpVerify = async (req, res) =>{
+const otpVerify = async (req, res) => {
   try {
     const enteredOtp = req.body.otp;
     const userId = req.session.user;
 
     console.log("OTPs : ", req.session.otp, enteredOtp)
-    if( enteredOtp == req.session.otp){
+    if (enteredOtp == req.session.otp) {
 
-      await User.findByIdAndUpdate(userId,{
-        name : req.session.newname,
-        email : req.session.newemail,
-        phone : req.session.newphone
+      await User.findByIdAndUpdate(userId, {
+        name: req.session.newname,
+        email: req.session.newemail,
+        phone: req.session.newphone
       })
 
       delete req.session.otp;
@@ -295,71 +314,72 @@ const otpVerify = async (req, res) =>{
       delete req.session.newemail;
       delete req.session.newphone;
       res.json({
-        success : true,
-        message : 'OTP verified succefully',
-        redirectUrl : '/userProfile'        
+        success: true,
+        message: 'OTP verified succefully',
+        redirectUrl: '/userProfile'
       })
-    }else{
+    } else {
       res.json({
-        success : false,
-        message : 'OTP not matching'})
+        success: false,
+        message: 'OTP not matching'
+      })
     }
 
   } catch (error) {
     console.log("An error occured while verifying otp, please try again : ", error);
     res.json({
-      success : false,
-      message : 'An error occured while verifying otp, please try again'
+      success: false,
+      message: 'An error occured while verifying otp, please try again'
     })
   }
 }
 
 
 
-const editProfileImage = async (req,res) =>{
+const editProfileImage = async (req, res) => {
   try {
     const userId = req.session.user;
-    console.log("image : ",  req.file)
+    console.log("image : ", req.file)
     const image = `/uploads/product-images/${req.file.filename}`
-    await User.findByIdAndUpdate(userId ,{
-      profileImage : image
+    await User.findByIdAndUpdate(userId, {
+      profileImage: image
     })
     res.status(200).json({
-      success : true,
-      message : 'image uploaded successfully'
+      success: true,
+      message: 'image uploaded successfully'
     })
   } catch (error) {
-    console.log("Error editing pro pic : ",error)
+    console.log("Error editing pro pic : ", error)
     res.status(500).json({
-      success : false,
-      message : 'Internal server error while  editing pro pic'
+      success: false,
+      message: 'Internal server error while  editing pro pic'
     })
   }
 }
 
-const getChangePassword = async (req, res) =>{
+const getChangePassword = async (req, res) => {
   try {
     res.render("change-password")
   } catch (error) {
-    console.log("Error gettting change password page : ",error)
+    console.log("Error gettting change password page : ", error)
     res.status(500).json({
-      success : false,
-      message : 'Internal server error while getting change password page'
+      success: false,
+      message: 'Internal server error while getting change password page'
     })
   }
 }
 
-const changePassword = async(req, res) =>{
+const changePassword = async (req, res) => {
   try {
     const userId = req.session.user;
-    const {currentPassword, newPassword, confirmPassword} = req.body;
+    const { currentPassword, newPassword, confirmPassword } = req.body;
     const user = await User.findById(userId);
     const passwordMatch = await bcrypt.compare(currentPassword, user.password);
-    if(!passwordMatch){
-      return res.status(400).json({success : false, message :'Current password is wrong'})
+    if (!passwordMatch) {
+      return res.status(400).json({ success: false, message: 'Current password is wrong' })
     }
     if (newPassword !== confirmPassword) {
-      return res.status(400).json({success : false, message :'New passwords do not match'})
+      return res.status(400).json({ success: false, message: 'New passwords do not match' })
     }
     const hashedPassword = await bcrypt.hash(newPassword, 10)
     await User.findByIdAndUpdate(userId, {
@@ -369,56 +389,56 @@ const changePassword = async(req, res) =>{
     return res.redirect("/userProfile?passsuccess=1")
 
   } catch (error) {
-    console.log("Error changing password : ",error)
+    console.log("Error changing password : ", error)
     res.status(500).json({
-      success : false,
-      message : 'Internal server error while  changing password '
+      success: false,
+      message: 'Internal server error while  changing password '
     })
   }
 }
 
-const getAddAddress = async (req, res) =>{
+const getAddAddress = async (req, res) => {
   try {
     const user = req.session.user;
     res.render("add-address")
   } catch (error) {
-    console.log("Error geting add-address page : ",error)
+    console.log("Error geting add-address page : ", error)
     res.status(500).json({
-      success : false,
-      message : 'Internal server error while geting add-address page'
+      success: false,
+      message: 'Internal server error while geting add-address page'
     })
   }
 }
 
-const addAddress = async(req, res) =>{
+const addAddress = async (req, res) => {
   try {
     console.log("hhhooooooooooo")
     const userId = req.session.user;
     const userData = await User.findById(userId)
-    const {addressType, name, city, landMark, state, pincode, phone, altPhone, isDefault} = req.body;
-    console.log("BOSY : ",req.body)
-    const userAddress = await Address.findOne({userId : userData._id})
-    if(!userAddress){
+    const { addressType, name, city, landMark, state, pincode, phone, altPhone, isDefault } = req.body;
+    console.log("BOSY : ", req.body)
+    const userAddress = await Address.findOne({ userId: userData._id })
+    if (!userAddress) {
       const newAddress = new Address({
-        userId : userData._id,
-        address : [{addressType, name, city, landMark, state, pincode, phone, altPhone, isDefault : true}]
+        userId: userData._id,
+        address: [{ addressType, name, city, landMark, state, pincode, phone, altPhone, isDefault: true }]
       })
       await newAddress.save();
-    }else{
-     
+    } else {
+
       if (isDefault) {
         userAddress.address.forEach(addr => addr.isDefault = false);
       }
       const newAddress = {
-          addressType,
-          name,
-          city,
-          landMark,
-          state,
-          pincode,
-          phone,
-          altPhone,
-          isDefault: isDefault
+        addressType,
+        name,
+        city,
+        landMark,
+        state,
+        pincode,
+        phone,
+        altPhone,
+        isDefault: isDefault
       }
       userAddress.address.push(newAddress)
       await userAddress.save()
@@ -426,41 +446,41 @@ const addAddress = async(req, res) =>{
     // res.redirect("/userProfile?success=1")
     res.status(200).json({ success: true });
   } catch (error) {
-    console.log("Error adding address : ",error)
+    console.log("Error adding address : ", error)
     res.status(500).json({
-      success : false,
-      message : 'Internal server error while adding address'
+      success: false,
+      message: 'Internal server error while adding address'
     })
   }
 }
 
-const getEditAddress = async (req, res) =>{
+const getEditAddress = async (req, res) => {
   try {
     const addressId = req.params.id;
     const userId = req.session.user;
-    const addressData = await Address.findOne({userId : userId})
+    const addressData = await Address.findOne({ userId: userId })
     const address = addressData.address.id(addressId)
     res.render("edit-address", {
-      address : address
+      address: address
     })
 
   } catch (error) {
     console.log("Error loading edit address:", error)
     res.status(500).json({
-      success : false,
-      message : 'Error loading edit address'
+      success: false,
+      message: 'Error loading edit address'
     })
   }
 }
 
 
-const editAddress = async (req, res) =>{
+const editAddress = async (req, res) => {
   try {
     const userId = req.session.user;
     const { addressId } = req.body;
-    console.log("Address id : ",addressId)
-    const {addressType, name, city, landMark, state, pincode, phone, altPhone, isDefault} = req.body;
-    const addressData = await Address.findOne({userId : userId})
+    console.log("Address id : ", addressId)
+    const { addressType, name, city, landMark, state, pincode, phone, altPhone, isDefault } = req.body;
+    const addressData = await Address.findOne({ userId: userId })
     const address = addressData.address.id(addressId)
 
     address.addressType = addressType
@@ -485,25 +505,25 @@ const editAddress = async (req, res) =>{
     await addressData.save()
     // res.redirect("/userProfile?updatesuccess=1")
     res.status(200).json({ success: true });
-    
+
   } catch (error) {
-     console.log("Error updating address:", error)
+    console.log("Error updating address:", error)
     res.status(500).json({
-      success : false,
-      message : 'Error updating address'
+      success: false,
+      message: 'Error updating address'
     })
   }
 }
 
-const deleteAddress = async (req, res) =>{
+const deleteAddress = async (req, res) => {
   try {
     const addressId = req.params.id;
     const userId = req.session.user;
-    const addressData = await Address.findOne({userId : userId})
-    if(!addressData){
+    const addressData = await Address.findOne({ userId: userId })
+    if (!addressData) {
       return res.redirect("/userProfile")
     }
-    addressData.address.pull({_id : addressId})
+    addressData.address.pull({ _id: addressId })
     await addressData.save();
     res.redirect("/userProfile?deletesuccess=1")
   } catch (error) {

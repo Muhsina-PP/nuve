@@ -12,6 +12,7 @@ const userRoutes = require('./routes/userRoutes')
 const adminRoutes = require('./routes/adminRoutes')
 const { injectedUser } = require("./middlewares/auth")
 const userCounts = require("./middlewares/userCounts")
+const checkUserBlocked = require("./middlewares/checkUserBlocked")
 
 app.use(morgan('dev'));
 app.use((req, res, next) => {
@@ -57,9 +58,13 @@ app.use(express.static(path.join(__dirname, 'public')))
 
 app.use(injectedUser)
 app.use(userCounts)
+app.use(checkUserBlocked)
 
 app.use("/", userRoutes)
 app.use("/admin", adminRoutes)
+app.use((req, res) => {
+  res.status(404).render("page-404");
+});
 
 app.listen(process.env.PORT, () => {
   console.log(`Server running on 3000`);

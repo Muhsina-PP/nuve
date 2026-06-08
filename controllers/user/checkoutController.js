@@ -39,7 +39,12 @@ const loadCheckoutPage = async (req, res) => {
       expiry : {$gt : new Date()},
       $expr: {
         $lt: ["$usedCount", "$usageLimit"]
-      }
+      },
+      $or: [
+        { userId: { $exists: false } },
+        { userId: null },
+        { userId: userId }
+      ]
     })
     if (!cart || cart.items.length === 0) {
       return res.redirect("/cart");
@@ -51,6 +56,11 @@ const loadCheckoutPage = async (req, res) => {
       const product = item.productId;
 
       const variant = product.variants.find((v) => v.size === item.variant);
+      // Check if product is blocked
+      if (product.isBlocked) {
+        invalidItems.push(item);
+        continue;
+      }
       if (!product || !variant || variant.stock <= 0) {
         invalidItems.push(item);
         continue;
@@ -93,7 +103,8 @@ const loadCheckoutPage = async (req, res) => {
       grandTotal,
       razorpayKey: process.env.RAZORPAY_KEY_ID,
       gstAmount,
-      coupons : coupons
+      coupons : coupons,
+      blockedProducts: invalidItems
     });
   } catch (error) {
     console.error("error loading checkout page : ", error);
@@ -240,14 +251,14 @@ const placeOrder = async (req, res) => {
       });
     }
 
-    if( walletUsed > 0){
-      await debitWallet(
-        userId,
-        walletUsed,
-        "Wallet used",
-         null
-      )
+    //  block if Wallet is selected but balance is insufficient
+    if (paymentMethod === "Wallet" && walletUsed < finalAmount) {
+      return res.json({
+        success: false,
+        message: "Insufficient wallet balance to place this order"
+      });
     }
+
 
     const totalMRP = cart.items.reduce((sum, item) => {
       return sum + item.productId.regularPrice * item.quantity;
@@ -308,6 +319,14 @@ const placeOrder = async (req, res) => {
 
     await newOrder.save();
 
+    if( walletUsed > 0){
+      await debitWallet(
+        userId,
+        walletUsed,
+        "Wallet used",
+        newOrder._id
+      )
+    }
 
     if(req.appliedCoupon){
       const coupon = req.appliedCoupon;
@@ -405,7 +424,7 @@ const createRazorpayOrder = async (req, res) => {
       if (!variant || variant?.stock < item.quantity) {
         return res.status(500).json({
           success: false,
-          message: "Selecetd quantity more thanavailable quantity",
+          message: `${product.productName} (${item.variant}) exceeds available stock (${variant.stock})`,
         });
       }
     }
@@ -475,7 +494,7 @@ const createRazorpayOrder = async (req, res) => {
     }
 
     const options = {
-      amount: remainingAmount * 100,
+      amount: Math.round(remainingAmount * 100),
       currency: "INR",
       receipt: "receipt_" + Date.now(),
     };
@@ -618,7 +637,7 @@ const verifyPayment = async (req, res) => {
       if (!variant || variant?.stock < item.quantity) {
         return res.status(500).json({
           success: false,
-          message: "Selecetd quantity more thanavailable quantity",
+          message: `${product.productName} (${item.variant}) exceeds available stock (${variant.stock})`,
         });
       }
 
@@ -708,7 +727,7 @@ const verifyPayment = async (req, res) => {
         userId,
         walletUsed,
         "Partial payment",
-        null
+        newOrder._id
       )
     }
 
@@ -987,7 +1006,7 @@ const paymentFailed = async (req, res) => {
         userId,
         walletUsed,
         "Partial payment (Order Failed)",
-        null
+        newOrder._id
       )
     }
 

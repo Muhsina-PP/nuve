@@ -203,6 +203,14 @@
         </div>
 
       </form>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+  const errorMessage = "<%= typeof errorMessage !== 'undefined' ? errorMessage : '' %>";
+  if (errorMessage) {
+    Swal.fire({icon: 'error', title: 'Error', text: errorMessage});
+  }
+</script>
     </div>
 
   </div>

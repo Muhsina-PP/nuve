@@ -680,6 +680,7 @@
   <!-- TOP: Gallery + Info -->
   <div class="pdp-top">
 
+
     <!-- ── Gallery Column ── -->
     <div class="gallery-col">
       <div class="main-img-wrap" id="zoomWrapper" onclick="openZoomModal(document.getElementById('mainImage').src)">
@@ -711,8 +712,11 @@
         <% }) %>
       </div>
     </div>
-
+    
     <!-- ── Info Column ── -->
+
+    
+     
     <div class="info-col">
       <!-- Wishlist Icon - Top Right Corner -->
       <div class="wishlist-top-right">
@@ -722,6 +726,14 @@
       </div>
       <div class="info-brand"><%= product.brand?.brandName || 'NUVE' %></div>
       <h1 class="info-title"><%= product.productName %></h1>
+
+      <% if(blockedMessage){ %>
+        <div class="alert alert-warning" style="color: red;">
+            <i class="fa fa-exclamation-triangle"></i>
+            <%= blockedMessage %>
+        </div>
+      <% } %>
+
 
       <!-- Rating -->
       <div class="rating-row">
@@ -733,6 +745,7 @@
       </div>
 
       <div class="hdivider"></div>
+      
 
       <!-- Price -->
       <div class="price-row">
@@ -743,6 +756,8 @@
         <% } %>
       </div>
       <div class="price-note"><strong>Free delivery</strong> on orders above ₹499</div>
+
+
 
       <!-- Stock Status -->
       <% if(stockStatus === "Available"){ %>

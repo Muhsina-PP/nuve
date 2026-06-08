@@ -199,6 +199,23 @@ const verifyOtp = async (req, res) => {
           console.log(`Referral coupon ${couponCode} created for user ${referrer._id}`);
 
           await saveUserData.save(); // Save first to get _id
+
+          // Generate unique coupon for referred user (new user)
+          const newCouponForReferredUser = new Coupen({
+            code: `REF-${Math.random().toString(36).slice(-6).toUpperCase()}`,
+            discount: discountAmount,
+            minAmount: 1000,
+            expiry: expiryDate,
+            type: 'percentage',
+            usageLimit: 1,
+            perUserLimit: 1,
+            isActive: true,
+            userId: saveUserData._id, // Assign to referred user
+            usedBy: []
+          });
+          await newCouponForReferredUser.save();
+          console.log(`Referral coupon ${newCouponForReferredUser.code} created for referred user ${saveUserData._id}`);
+
           referrer.redeemedUsers.push(saveUserData._id);
           await referrer.save();
         } else {

@@ -1289,6 +1289,15 @@
     const GRAND_TOTAL = <%= grandTotal %>
   </script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<% if (blockedProducts && blockedProducts.length > 0) { %>
+<script>
+Swal.fire({
+  icon: 'warning',
+  title: 'Some items were removed from your cart',
+  text: 'Items blocked by admin were removed. Please review your cart.',
+});
+</script>
+<% } %>
   <script>
     /* ── Modal ── */
     function openAddModal() {
@@ -1484,7 +1493,7 @@
         .then(data => {
           if (data.walletOnly) { placeOrderRequest(addressId, 'Wallet', true); return; }
           if (data.success) { openRazorpayPopup(data.order, addressId, useWallet, coupon); }
-          else { Swal.fire("Error", "Payment verification failed, Available quantity less than ordering quantity", "error"); }
+          else { Swal.fire("Error", data.message || "Payment verification failed", "error"); }
         })
         .catch(err => { console.log("Error:", err); });
     }
@@ -1531,7 +1540,18 @@
       })
         .then(res => res.json())
         .then(data => {
-          if (data.success) { window.location.href = '/orderSuccess?orderId=' + data.orderId; }
+          if (data.success) { 
+            window.location.href = '/orderSuccess?orderId=' + data.orderId; 
+          } else {
+            document.getElementById('placeOrderBtn').disabled = false;
+            document.getElementById('placeOrderBtn').innerHTML = '<i class="fas fa-lock" style="margin-right:8px; font-size:13px;"></i> Place Order';
+            Swal.fire({ icon: 'error', title: 'Oops...', text: data.message || 'Error placing order', confirmButtonColor: '#d4145a' });
+          }
+        })
+        .catch(err => {
+          document.getElementById('placeOrderBtn').disabled = false;
+          document.getElementById('placeOrderBtn').innerHTML = '<i class="fas fa-lock" style="margin-right:8px; font-size:13px;"></i> Place Order';
+          Swal.fire({ icon: 'error', title: 'Network error', confirmButtonColor: '#d4145a' });
         });
     }
 

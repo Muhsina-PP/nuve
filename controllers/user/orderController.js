@@ -10,6 +10,7 @@ const loadOrders = async (req, res) => {
   try {
 
     const { status, date } = req.query;
+    const userId = req.session.user;
 
     const search = req.query.search || "";
     const page = parseInt(req.query.page) || 1;
@@ -17,10 +18,10 @@ const loadOrders = async (req, res) => {
     const limit = 6;
     const skip = (page - 1) * limit;
 
-    let query = {};
+    let query = { userId: userId };
 
     if (search) {
-      query = {
+      query.$or = {
         $or: [
           { orderId: { $regex: search, $options: "i" } },
           { "address.name": { $regex: search, $options: "i" } }
@@ -63,7 +64,7 @@ const loadOrders = async (req, res) => {
       .skip(skip)
       .limit(limit);
 
-    const totalOrders = await Order.countDocuments();
+    const totalOrders = await Order.countDocuments(query);
     const totalPages = Math.ceil(totalOrders / limit)
 
     res.render("my-orders", {

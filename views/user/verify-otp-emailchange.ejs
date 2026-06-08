@@ -432,36 +432,36 @@
       });
 
       // Form submission handler
-      document
-        .getElementById("otpForm")
-        .addEventListener("submit", function (e) {
-          e.preventDefault();
+      // document
+      //   .getElementById("otpForm")
+      //   .addEventListener("submit", function (e) {
+      //     e.preventDefault();
 
-          const otpValue = document.getElementById("otp").value;
+      //     const otpValue = document.getElementById("otp").value;
 
-          if (otpValue.length !== 6) {
-            Swal.fire({
-              icon: "error",
-              title: "Invalid Code",
-              text: "Please enter a 6-digit verification code.",
-              confirmButtonColor: "#d4145a",
-            });
-            return;
-          }
+      //     if (otpValue.length !== 6) {
+      //       Swal.fire({
+      //         icon: "error",
+      //         title: "Invalid Code",
+      //         text: "Please enter a 6-digit verification code.",
+      //         confirmButtonColor: "#d4145a",
+      //       });
+      //       return;
+      //     }
 
-          // Submit the form (uncomment for actual submission)
-          // this.submit();
+      //     // Submit the form (uncomment for actual submission)
+      //     // this.submit();
 
-          // Demo success message
-          Swal.fire({
-            icon: "success",
-            title: "Verified!",
-            text: "Your email has been successfully verified.",
-            confirmButtonColor: "#d4145a",
-          }).then(() => {
-            // window.location.href = '/login';
-          });
-        });
+      //     // Demo success message
+      //     Swal.fire({
+      //       icon: "success",
+      //       title: "Verified!",
+      //       text: "Your email has been successfully verified.",
+      //       confirmButtonColor: "#d4145a",
+      //     }).then(() => {
+      //       // window.location.href = '/login';
+      //     });
+      //   });
 
       function validateOtpForm() {
         const otpInput = document.getElementById("otp").value;

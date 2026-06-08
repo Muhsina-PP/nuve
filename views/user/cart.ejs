@@ -456,51 +456,38 @@
 <script>
   function updateQty(itemId, variant, change, btn, price) {
     const input = btn.parentElement.querySelector('.qty-val');
-     let currentQty = parseInt(input.value) || 1;
-     let newQty = currentQty + change;
-     if(newQty >10){
-       Swal.fire({
-        icon: 'warning',
-        title: 'Limit reached',
-        text: 'You can only add up to 10 items',
-        confirmButtonText: 'OK'
-      });
-      return;
-     }
-     if (newQty < 1) {
+    let currentQty = parseInt(input.value) || 1;
+    let newQty = currentQty + change;
+    if (newQty < 1) {
       confirmRemove(null, `/removeFromCart?productId=${itemId}&variant=${variant}`);
       return;
     }
-
-     input.value = newQty;
-     fetch(`/updateCart?id=${itemId}&quantity=${newQty}&variant=${variant}`)
+    input.value = newQty;
+    fetch(`/updateCart?id=${itemId}&quantity=${newQty}&variant=${variant}`)
       .then(res => res.json())
       .then(data => {
         if (!data.success) {
-          Swal.fire({
-            icon: 'error',
-            title: data.message || 'Update failed'
-          });
-        }else{
-            const cartItem = btn.closest('.cart-item');
-            const subtotalEl = cartItem.querySelector('.item-total');
-
-            subtotalEl.textContent = '₹' + (price * newQty).toLocaleString('en-IN');
-
-            const totalPrice = document.querySelector('.cart-mrp');
-            const grandTotal = document.querySelector('.grand-total');
-
-            totalPrice.textContent = '₹' + data.finalAmount.toLocaleString('en-IN');
-            grandTotal.textContent = '₹' + data.finalAmount.toLocaleString('en-IN');
+          Swal.fire({ icon: 'error', title: data.message || 'Update failed' });
+          input.value = currentQty;
+          return;
         }
+        if (data.limited) {
+          Swal.fire({ icon: 'warning', title: data.message || 'Quantity adjusted due to stock', confirmButtonText: 'OK' });
+          input.value = data.adjustedQuantity;
+          newQty = data.adjustedQuantity;
+        }
+        const cartItem = btn.closest('.cart-item');
+        const subtotalEl = cartItem.querySelector('.item-total');
+        subtotalEl.textContent = '₹' + (price * newQty).toLocaleString('en-IN');
+        const totalPrice = document.querySelector('.cart-mrp');
+        const grandTotal = document.querySelector('.grand-total');
+        totalPrice.textContent = '₹' + data.finalAmount.toLocaleString('en-IN');
+        grandTotal.textContent = '₹' + data.finalAmount.toLocaleString('en-IN');
       })
       .catch(() => {
-        Swal.fire({
-          icon: 'error',
-          title: 'Network error'
-        });
+        Swal.fire({ icon: 'error', title: 'Network error' });
+        input.value = currentQty;
       });
-  
   }
 
   function confirmRemove(e, url) {

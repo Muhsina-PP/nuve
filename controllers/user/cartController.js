@@ -227,7 +227,7 @@ const updateCart = async (req, res) => {
     const userId = req.session.user;
     const { id, quantity, variant } = req.query;
 
-    const qty = Number(quantity);
+    let qty = Number(quantity);
 
     let cart = await Cart.findOne({ userId }).populate("items.productId");
     const item = cart.items.find(
@@ -235,12 +235,12 @@ const updateCart = async (req, res) => {
         item.productId._id.toString() === id && item.variant === variant,
     );
     console.log("item : ", item);
-    if (!item){
+    if (!item) {
       return res.status(400).json({
-        success : false,
-        message : 'Items not found in cart'
+        success: false,
+        message: 'Items not found in cart'
       })
-    } 
+    }
 
     const product = item.productId;
 
@@ -248,10 +248,10 @@ const updateCart = async (req, res) => {
       v => v.size === variant
     )
 
-    if(!variantData){
+    if (!variantData) {
       return res.status(400).json({
-        success : false,
-        message : 'Variant not found'
+        success: false,
+        message: 'Variant not found'
       })
     }
 
@@ -259,36 +259,35 @@ const updateCart = async (req, res) => {
 
     if (stock === 0) {
       return res.status(400).json({
-        success : false,
-        message : 'Stock is zero'
+        success: false,
+        message: 'Stock is zero'
       })
     }
 
-    if (qty < 1) {
-      item.remove();
-    } else if (qty > stock) {
-      item.quantity = stock;
-      item.totalPrice = stock * item.price;
-    } else {
-      item.quantity = qty;
-      item.totalPrice = qty * item.price;
+    let limited = false;
+    if (qty > stock) {
+      qty = stock;
+      limited = true;
     }
 
+    item.quantity = qty;
+    item.totalPrice = qty * item.price;
     await cart.save();
-    let finalAmount = cart.items.reduce(
-      (acc, item) => acc + item.totalPrice,
-      0,
-    );
 
-    // return res.redirect('/cart');
-    return res
-      .status(200)
-      .json({ success: true, message: "Updated succesfully", finalAmount });
+    let finalAmount = cart.items.reduce((acc, i) => acc + i.totalPrice, 0);
+
+    return res.json({
+      success: true,
+      finalAmount,
+      adjustedQuantity: qty,
+      limited,
+      message: limited ? `Only ${stock} items are available in stock` : "Updated successfully",
+    });
   } catch (error) {
     console.log("Error updating cart:", error);
     return res.status(400).json({
-      success : false,
-      message : "Error while updating quantity"
+      success: false,
+      message: "Error while updating quantity"
     })
   }
 };
