@@ -401,7 +401,7 @@
             <!-- SAMPLE ROWS — replace with EJS forEach loop -->
 
             <tr>
-              <td><span class="order-id">#<%= order.orderId.slice(0,8).toUpperCase() %></span></td>
+              <td><span class="order-id">#ORD-<%= order.orderId.slice(0,8).toUpperCase() %></span></td>
               <td><span class="user-name"><%= order.address.name %></span></td>
               <td class="order-date"><i class="far fa-calendar-alt"></i><%= new Date(order.createdOn).toLocaleDateString() %></td>
               <td><span class="status-badge status-shipped"><%= order.status %></span></td>

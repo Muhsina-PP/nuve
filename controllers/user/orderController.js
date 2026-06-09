@@ -318,40 +318,41 @@ const cancelSingleItem = async (req, res) => {
       return res.status(400).json({ message: "Item already cancelled" });
     }
 
+    const refundAmount = item.finalItemPrice || (item.quantity * item.price);
+
     // If the order was not paid (failed), just mark item as cancelled without stock or wallet changes
     if (order.paymentStatus !== "Paid") {
-        item.status = "Cancelled";
-        item.returnReason = reason || "No reason";
+      item.status = "Cancelled";
+      item.returnReason = reason || "No reason";
     } else {
-        // Restore stock for paid orders
-        await Product.findOneAndUpdate(
-            {
-                _id: item.product._id,
-                "variants.size": item.variant
-            },
-            {
-                $inc: { "variants.$.stock": item.quantity }
-            }
-        );
-
-        item.status = "Cancelled";
-        item.returnReason = reason || "No reason";
-
-        const refundAmount = item.finalItemPrice || (item.quantity * item.price);
-
-        // Wallet credit only for paid orders
-        if (
-            order.paymentMethod === "Online" ||
-            (order.paymentMethod === "COD" && order.status === "Delivered") ||
-            order.paymentMethod === "Wallet"
-        ) {
-            await creditWallet(
-                order.userId,
-                refundAmount,
-                "Item Cancelled",
-                order._id
-            );
+      // Restore stock for paid orders
+      await Product.findOneAndUpdate(
+        {
+          _id: item.product._id,
+          "variants.size": item.variant
+        },
+        {
+          $inc: { "variants.$.stock": item.quantity }
         }
+      );
+
+      item.status = "Cancelled";
+      item.returnReason = reason || "No reason";
+
+
+      // Wallet credit only for paid orders
+      if (
+        order.paymentMethod === "Online" ||
+        (order.paymentMethod === "COD" && order.status === "Delivered") ||
+        order.paymentMethod === "Wallet"
+      ) {
+        await creditWallet(
+          order.userId,
+          refundAmount,
+          "Item Cancelled",
+          order._id
+        );
+      }
     }
 
     //  Update order total

@@ -81,9 +81,11 @@ router.post("/verifyReturn", adminAuth, orderController.verifyReturn)
 
 
 // Coupen management
-router.get("/coupon", adminAuth, coupenController.loadCoupen )
-router.post("/create-coupon", adminAuth, coupenController.createCoupen)
+router.get("/coupon", adminAuth, coupenController.loadCoupen);
+router.post("/create-coupon", adminAuth, coupenController.createCoupen);
 router.delete("/delete-coupon/:id", adminAuth, coupenController.deleteCoupon);
+router.get("/edit-coupon/:id", adminAuth, coupenController.editCouponForm);
+router.post("/edit-coupon/:id", adminAuth, coupenController.updateCoupon);
 
 // Offer management
 router.get("/offers", adminAuth, offerController.loadOffers);

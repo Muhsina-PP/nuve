@@ -159,7 +159,7 @@ const addToCart = async (req, res) => {
         items: [
           {
             productId,
-            quantity: quantity ? quantity : 1,
+            quantity: Math.min(quantity ? quantity : 1, 10),
             price,
             totalPrice: price,
             variant: finalVariant,
@@ -175,20 +175,27 @@ const addToCart = async (req, res) => {
 
       console.log("index : ", index);
       if (index > -1) {
+        // Enforce maximum purchase quantity of 10
+        if (cart.items[index].quantity >= 10) {
+          return res.json({
+            success: false,
+            message: "Maximum purchase limit of 10 reached",
+          });
+        }
+        // Then enforce stock limit
         if (cart.items[index].quantity >= variantData.stock) {
           return res.json({
             success: false,
             message: "Maximum stock reached",
           });
         }
-
         cart.items[index].quantity += 1;
         cart.items[index].totalPrice =
           cart.items[index].quantity * cart.items[index].price;
       } else {
         cart.items.push({
           productId,
-          quantity: quantity ? quantity : 1,
+          quantity: Math.min(quantity ? quantity : 1, 10),
           price,
           totalPrice: price,
           variant: finalVariant,
@@ -227,7 +234,8 @@ const updateCart = async (req, res) => {
     const userId = req.session.user;
     const { id, quantity, variant } = req.query;
 
-    let qty = Number(quantity);
+    // Store the original requested quantity
+    const requestedQty = Number(quantity);
 
     let cart = await Cart.findOne({ userId }).populate("items.productId");
     const item = cart.items.find(
@@ -257,21 +265,24 @@ const updateCart = async (req, res) => {
 
     const stock = variantData.stock;
 
-    if (stock === 0) {
-      return res.status(400).json({
-        success: false,
-        message: 'Stock is zero'
-      })
-    }
-
+    // Determine final quantity respecting stock and max limit of 10
+    let finalQty = requestedQty;
     let limited = false;
-    if (qty > stock) {
-      qty = stock;
+    let message = "Updated successfully";
+
+    if (finalQty > stock) {
+      finalQty = stock;
       limited = true;
+      message = `Only ${stock} items are available in stock`;
+    } else if (finalQty > 10) {
+      finalQty = 10;
+      limited = true;
+      message = `Can't add more than 10 quantities`;
     }
 
-    item.quantity = qty;
-    item.totalPrice = qty * item.price;
+    // Update item
+    item.quantity = finalQty;
+    item.totalPrice = finalQty * item.price;
     await cart.save();
 
     let finalAmount = cart.items.reduce((acc, i) => acc + i.totalPrice, 0);
@@ -279,9 +290,9 @@ const updateCart = async (req, res) => {
     return res.json({
       success: true,
       finalAmount,
-      adjustedQuantity: qty,
+      adjustedQuantity: finalQty,
       limited,
-      message: limited ? `Only ${stock} items are available in stock` : "Updated successfully",
+      message,
     });
   } catch (error) {
     console.log("Error updating cart:", error);

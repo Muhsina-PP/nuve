@@ -12,6 +12,7 @@ const loadOrders = async (req, res) => {
     const search = req.query.search || "";
     const page = parseInt(req.query.page) || 1;
     const sort = req.query.sort || "";
+    const statusFilter = req.query.status || "";
     const limit = 6;
     const skip = (page - 1) * limit;
 
@@ -24,6 +25,10 @@ const loadOrders = async (req, res) => {
           { "address.name": { $regex: search, $options: "i" } }
         ]
       };
+    }
+
+    if (statusFilter) {
+      query.status = statusFilter;
     }
 
     let sortOption = { createdOn: -1 };
@@ -53,7 +58,8 @@ const loadOrders = async (req, res) => {
       search: search,
       totalPages,
       totalOrders,
-      sort
+      sort,
+      status: statusFilter,
     })
 
   } catch (error) {
@@ -73,7 +79,9 @@ const updateOrderStatus = async (req, res) => {
       "Shipped",
       "Out Of Delivery",
       "Delivered",
-      "Cancelled"
+      "Cancelled",
+      "Returned",
+      "Return Requested"
     ];
 
     if (!validStatuses.includes(status)) {
@@ -93,7 +101,9 @@ const updateOrderStatus = async (req, res) => {
       "Pending": ["Shipped", "Cancelled"],
       "Shipped": ["Out Of Delivery"],
       "Out Of Delivery": ["Delivered"],
-      "Delivered": [],
+      "Delivered": ["Returned", "Return Requested"],
+      "Return Requested": ["Returned"],
+      "Returned": [],
       "Cancelled": []
     };
     if (!flow[order.status].includes(status)) {

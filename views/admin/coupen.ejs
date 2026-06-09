@@ -235,12 +235,22 @@
 
     /* ── Delete btn ── */
     .btn-delete {
-        background: rgba(220,53,69,0.08); color: var(--danger);
-        border: none; padding: 7px 13px; border-radius: 7px;
-        font-size: 12px; font-weight: 700; cursor: pointer; transition: var(--transition);
-        display: inline-flex; align-items: center; gap: 5px;
-    }
-    .btn-delete:hover { background: var(--danger); color: white; }
+    background: rgba(220,53,69,0.08); color: var(--danger);
+    border: none; padding: 7px 13px; border-radius: 7px;
+    font-size: 12px; font-weight: 700; cursor: pointer; transition: var(--transition);
+    display: inline-flex; align-items: center; gap: 5px;
+}
+.btn-delete:hover { background: var(--danger); color: white; }
+
+/* Edit button style */
+.btn-edit {
+    background: rgba(40,167,69,0.08); color: var(--success);
+    border: none; padding: 7px 13px; border-radius: 7px;
+    font-size: 12px; font-weight: 700; cursor: pointer; transition: var(--transition);
+    display: inline-flex; align-items: center; gap: 5px;
+    text-decoration: none;
+}
+.btn-edit:hover { background: var(--success); color: white; }
 
     /* ── Toggle active btn ── */
     .btn-toggle {
@@ -521,12 +531,8 @@
 
                                 <td>
                                     <div class="actions-cell">
-                                        
-                                        <button
-                                            class="btn-delete"
-                                            onclick="confirmDelete(event, '<%= coupon._id %>', '<%= coupon.code %>')">
-                                            🗑
-                                        </button>
+                                        <a href="/admin/edit-coupon/<%= coupon._id %>" class="btn-edit">✏️ Edit</a>
+                                        <button class="btn-delete" onclick="confirmDelete(event, '<%= coupon._id %>', '<%= coupon.code %>')">🗑</button>
                                     </div>
                                 </td>
                             </tr>

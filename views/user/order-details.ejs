@@ -454,7 +454,7 @@
       <div class="order-header">
         <div>
           <div class="order-id-label">Order ID</div>
-          <div class="order-id-val">#<%= order.orderId.slice(0,8).toUpperCase() %></div>
+          <div class="order-id-val">#ORD-<%= order.orderId.slice(0,8).toUpperCase() %></div>
           <div class="order-meta">
             <span><i class="fas fa-calendar-alt"></i> <%= new Date(order.createdOn).toLocaleDateString() %></span>
             <span><i class="fas fa-box"></i> <%= order.orderedItems.length %> items</span>

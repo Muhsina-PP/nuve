@@ -136,12 +136,12 @@
       color: #721c24;
     }
 
-    .btn-sm {
-      padding: 6px 14px;
-      border-radius: 6px;
-      font-size: 13px;
-      font-weight: 600;
+    .status-returned {
+      background: #d1e7dd;
+      color: #0f5132;
     }
+
+    
 
     .orders-toolbar {
       display: flex;
@@ -257,6 +257,18 @@
           <option value="total-low" <%=sort==="total-low" ? "selected" : "" %>>Low to High</option>
         </select>
 
+        <!-- Status Filter -->
+        <select name="status" onchange="this.form.submit()" class="sort-dropdown">
+  <option value="" <%= (status || '') === '' ? 'selected' : '' %>>Filter by Status</option>
+  <option value="Pending" <%= status==='Pending' ? 'selected' : '' %>>Pending</option>
+  <option value="Shipped" <%= status==='Shipped' ? 'selected' : '' %>>Shipped</option>
+  <option value="Out Of Delivery" <%= status==='Out Of Delivery' ? 'selected' : '' %>>Out Of Delivery</option>
+  <option value="Delivered" <%= status==='Delivered' ? 'selected' : '' %>>Delivered</option>
+  <option value="Cancelled" <%= status==='Cancelled' ? 'selected' : '' %>>Cancelled</option>
+  <option value="Return Requested" <%= status==='Return Requested' ? 'selected' : '' %>>Return Requested</option>
+  <option value="Returned" <%= status==='Returned' ? 'selected' : '' %>>Returned</option>
+</select>
+
       </form>
 
     </div>
@@ -280,7 +292,7 @@
           <% orders.forEach(order=>{ %>
             <tr>
               <td><strong>
-                  <%= order.orderId ? order.orderId.slice(0,8).toUpperCase() : "N/A" %>
+                  ORD-<%= order.orderId ? order.orderId.slice(0,8).toUpperCase() : "N/A" %>
                 </strong></td>
               <td>
                 <%= new Date(order.createdOn).toLocaleDateString() %>
@@ -289,20 +301,19 @@
                 <%= order.address?.name || "User" %>
               </td>
               <td><strong>₹<%= order.finalAmount %></strong></td>
-              <td><span class="status-badge status-pending">
-                  <%= order.status.toLowerCase() %>
-                </span></td>
+              <td><span class="status-badge status-<%= order.status.toLowerCase().replace(/\s+/g, '-') %>"><%= order.status %></span></td>
               <td>
                 <button class="btn btn-sm btn-primary" onclick="viewOrder('<%= order._id %>')"> View</button>
               </td>
               <td>
                 <select class="btn btn-sm" onchange="updateStatus('<%= order._id %>', this.value)">
-                  <option value="Pending" <%=order.status==='Pending' ?'selected':'' %>>Pending</option>
-                  <option value="Shipped" <%=order.status==='Shipped' ?'selected':'' %>>Shipped</option>
-                  <option value="Out Of Delivery" <%=order.status==='Out Of Delivery' ?'selected':'' %>>Out of Delivery
-                  </option>
-                  <option value="Delivered" <%=order.status==='Delivered' ?'selected':'' %>>Delivered</option>
-                  <option value="Cancelled" <%=order.status==='Cancelled' ?'selected':'' %>>Cancelled</option>
+                    <option value="Pending" <%=order.status==='Pending' ?'selected':'' %>>Pending</option>
+                    <option value="Shipped" <%=order.status==='Shipped' ?'selected':'' %>>Shipped</option>
+                    <option value="Out Of Delivery" <%=order.status==='Out Of Delivery' ?'selected':'' %>>Out of Delivery</option>
+                    <option value="Delivered" <%=order.status==='Delivered' ?'selected':'' %>>Delivered</option>
+                    <option value="Cancelled" <%=order.status==='Cancelled' ?'selected':'' %>>Cancelled</option>
+                    <option value="Return Requested" <%=order.status==='Return Requested' ?'selected':'' %>>Return Requested</option>
+                    <option value="Returned" <%=order.status==='Returned' ?'selected':'' %>>Returned</option>
                 </select>
               </td>
             </tr>
