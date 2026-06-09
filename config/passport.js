@@ -8,7 +8,9 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_SECRET,
-      callbackURL: "http://localhost:3000/google/callback",
+      callbackURL: process.env.NODE_ENV === "production"
+        ? "https://nuve.websi/google/callback"
+        : "http://localhost:3000/google/callback"
     },
 
     async (accessToken, refreshToken, profile, done) => {

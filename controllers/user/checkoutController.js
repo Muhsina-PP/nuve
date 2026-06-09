@@ -35,8 +35,8 @@ const loadCheckoutPage = async (req, res) => {
     const cart = await Cart.findOne({ userId }).populate("items.productId");
     const addresses = await Address.findOne({ userId });
     const coupons = await Coupon.find({
-      isActive : true,
-      expiry : {$gt : new Date()},
+      isActive: true,
+      expiry: { $gt: new Date() },
       $expr: {
         $lt: ["$usedCount", "$usageLimit"]
       },
@@ -103,7 +103,7 @@ const loadCheckoutPage = async (req, res) => {
       grandTotal,
       razorpayKey: process.env.RAZORPAY_KEY_ID,
       gstAmount,
-      coupons : coupons,
+      coupons: coupons,
       blockedProducts: invalidItems
     });
   } catch (error) {
@@ -116,7 +116,7 @@ const placeOrder = async (req, res) => {
   try {
     const userId = req.session.user;
 
-    const { addressId, paymentMethod , useWallet, coupon} = req.body;
+    const { addressId, paymentMethod, useWallet, coupon } = req.body;
     console.log("coupon  : ", coupon)
 
     const cart = await Cart.findOne({ userId }).populate("items.productId");
@@ -149,7 +149,7 @@ const placeOrder = async (req, res) => {
     }, 0);
 
     let gstRate = 18;
-    const gstAmount = (totalPrice * gstRate ) / (100 + gstRate);
+    const gstAmount = (totalPrice * gstRate) / (100 + gstRate);
 
     const basePrice = totalPrice - gstAmount;
 
@@ -157,49 +157,49 @@ const placeOrder = async (req, res) => {
     let couponDiscount = 0;
     let validCoupon = null
 
-    if(coupon){
-         validCoupon = await Coupon.findOne({ code : coupon});
+    if (coupon) {
+      validCoupon = await Coupon.findOne({ code: coupon });
 
-         if (!validCoupon) {
-            return res.json({
-              success: false,
-              message: "Invalid coupon"
-            });
-          }
+      if (!validCoupon) {
+        return res.json({
+          success: false,
+          message: "Invalid coupon"
+        });
+      }
 
-        if(validCoupon.usedCount >= validCoupon.usageLimit){
-          return res.json({
-            success: false,
-            message: "Coupon limit reached"
-          });
+      if (validCoupon.usedCount >= validCoupon.usageLimit) {
+        return res.json({
+          success: false,
+          message: "Coupon limit reached"
+        });
+      }
+
+      const userUsage = validCoupon.usedBy.find(
+        u => u.userId.toString() === userId.toString()
+      )
+
+      if (userUsage && userUsage.count >= validCoupon.perUserLimit) {
+        return res.json({
+          success: false,
+          message: "You already used this coupon"
+        });
+      }
+
+      if (validCoupon && new Date() < validCoupon.expiry && totalPrice >= validCoupon.minAmount) {
+        if (validCoupon.type === "percentage") {
+          couponDiscount = (totalPrice * validCoupon.discount) / 100;
+        } else {
+          couponDiscount = validCoupon.discount;
         }
-
-        const userUsage = validCoupon.usedBy.find(
-          u => u.userId.toString() === userId.toString()
-        )
-
-        if( userUsage && userUsage.count >= validCoupon.perUserLimit){
-          return res.json({
-            success: false,
-            message: "You already used this coupon"
-          });
-        }
-
-         if(validCoupon && new Date() < validCoupon.expiry && totalPrice >= validCoupon.minAmount ){
-            if(validCoupon.type === "percentage"){
-              couponDiscount = (totalPrice * validCoupon.discount) / 100;
-            }else{
-              couponDiscount = validCoupon.discount;
-            }
-            req.appliedCoupon = validCoupon;
-        }
+        req.appliedCoupon = validCoupon;
+      }
     }
-    
+
     const finalAmount = totalPrice - couponDiscount;
 
-    if(paymentMethod === "COD" && finalAmount >1000){
+    if (paymentMethod === "COD" && finalAmount > 1000) {
       return res.json({
-        success : false,
+        success: false,
         message: "Cash on Delivery is not available for orders above ₹1000"
       })
     }
@@ -241,7 +241,7 @@ const placeOrder = async (req, res) => {
       }
     }
 
-    const { walletUsed, remainingAmount } = await calculateWalletUsage( userId, finalAmount, useWallet);
+    const { walletUsed, remainingAmount } = await calculateWalletUsage(userId, finalAmount, useWallet);
 
     //  wallet partially used but COD selected → block
     if (paymentMethod === "COD" && remainingAmount > 0 && walletUsed > 0) {
@@ -269,15 +269,15 @@ const placeOrder = async (req, res) => {
       couponCode: couponDiscount > 0 ? coupon : null,
       userId: userId,
       paymentMethod: walletUsed === finalAmount ? "Wallet" : paymentMethod,
-      paymentStatus: walletUsed === finalAmount ? "Paid"  : "Pending",
+      paymentStatus: walletUsed === finalAmount ? "Paid" : "Pending",
       walletUsed,
       orderedItems: cart.items.map((item) => {
 
         const itemPrice = (item.productId.salePrice || item.productId.regularPrice) * item.quantity;
-          
-        const itemCouponShare = totalPrice > 0  ? (itemPrice / totalPrice) * couponDiscount  : 0;
-          
-        const finalItemPrice = itemPrice - itemCouponShare;       
+
+        const itemCouponShare = totalPrice > 0 ? (itemPrice / totalPrice) * couponDiscount : 0;
+
+        const finalItemPrice = itemPrice - itemCouponShare;
 
         return {
           product: item.productId,
@@ -299,7 +299,7 @@ const placeOrder = async (req, res) => {
       totalPrice: totalPrice,
       finalAmount,
       status: "Pending",
-      couponDiscount ,
+      couponDiscount,
       coupon: couponDiscount > 0 ? coupon : null,
       discount: productDiscount,
       basePrice,
@@ -319,27 +319,27 @@ const placeOrder = async (req, res) => {
 
     await newOrder.save();
 
-    if( walletUsed > 0){
-      await debitWallet(
-        userId,
-        walletUsed,
-        "Wallet used",
-        newOrder._id
+    if (order.paymentMethod !== 'COD' && order.paymentStatus === 'Paid') {
+      await creditWallet(
+        order.userId,
+        order.finalAmount,
+        "Order Cancelled",
+        order._id
       )
     }
 
-    if(req.appliedCoupon){
+    if (req.appliedCoupon) {
       const coupon = req.appliedCoupon;
       coupon.usedCount += 1;
 
-      const userIndex  = coupon.usedBy.findIndex(
+      const userIndex = coupon.usedBy.findIndex(
         u => u.userId.toString() === userId.toString()
       )
 
-      if(userIndex  > -1){
+      if (userIndex > -1) {
         coupon.usedBy[userIndex].count += 1;
-      }else{
-        coupon.usedBy.push({ userId, count:1})
+      } else {
+        coupon.usedBy.push({ userId, count: 1 })
       }
       await coupon.save();
     }
@@ -404,7 +404,7 @@ const createRazorpayOrder = async (req, res) => {
     }, 0)
 
     let gstRate = 18;
-    const gstAmount = (totalPrice * gstRate ) / (100 + gstRate);
+    const gstAmount = (totalPrice * gstRate) / (100 + gstRate);
 
     const basePrice = totalPrice - gstAmount;
 
@@ -436,45 +436,45 @@ const createRazorpayOrder = async (req, res) => {
     let couponDiscount = 0;
     let validCoupon = null
 
-    if(coupon){
-         validCoupon = await Coupon.findOne({ code : coupon});
+    if (coupon) {
+      validCoupon = await Coupon.findOne({ code: coupon });
 
-         if (!validCoupon) {
-            return res.json({
-              success: false,
-              message: "Invalid coupon"
-            });
-          }
+      if (!validCoupon) {
+        return res.json({
+          success: false,
+          message: "Invalid coupon"
+        });
+      }
 
-        if(validCoupon.usedCount >= validCoupon.usageLimit){
-          return res.json({
-            success: false,
-            message: "Coupon limit reached"
-          });
+      if (validCoupon.usedCount >= validCoupon.usageLimit) {
+        return res.json({
+          success: false,
+          message: "Coupon limit reached"
+        });
+      }
+
+      const userUsage = validCoupon.usedBy.find(
+        u => u.userId.toString() === userId.toString()
+      )
+
+      if (userUsage && userUsage.count >= validCoupon.perUserLimit) {
+        return res.json({
+          success: false,
+          message: "You already used this coupon"
+        });
+      }
+
+      if (validCoupon && new Date() < validCoupon.expiry && totalPrice >= validCoupon.minAmount) {
+        if (validCoupon.type === "percentage") {
+          couponDiscount = (totalPrice * validCoupon.discount) / 100;
+        } else {
+          couponDiscount = validCoupon.discount;
         }
-
-        const userUsage = validCoupon.usedBy.find(
-          u => u.userId.toString() === userId.toString()
-        )
-
-        if( userUsage && userUsage.count >= validCoupon.perUserLimit){
-          return res.json({
-            success: false,
-            message: "You already used this coupon"
-          });
-        }
-
-         if(validCoupon && new Date() < validCoupon.expiry && totalPrice >= validCoupon.minAmount ){
-            if(validCoupon.type === "percentage"){
-              couponDiscount = (totalPrice * validCoupon.discount) / 100;
-            }else{
-              couponDiscount = validCoupon.discount;
-            }
-            req.appliedCoupon = validCoupon;
-        }
+        req.appliedCoupon = validCoupon;
+      }
     }
-    
-    
+
+
     const finalAmount = totalPrice - couponDiscount;
 
     console.log("Total price : ", totalPrice);
@@ -482,11 +482,11 @@ const createRazorpayOrder = async (req, res) => {
     console.log("Discount : ", couponDiscount)
 
 
-    const { walletUsed, remainingAmount} = await calculateWalletUsage( userId, finalAmount, useWallet);
+    const { walletUsed, remainingAmount } = await calculateWalletUsage(userId, finalAmount, useWallet);
 
-    console.log("Remaining amount : ",remainingAmount)
+    console.log("Remaining amount : ", remainingAmount)
 
-   if (remainingAmount === 0) {
+    if (remainingAmount === 0) {
       return res.json({
         success: true,
         walletOnly: true
@@ -566,60 +566,60 @@ const verifyPayment = async (req, res) => {
     }, 0);
 
     let gstRate = 18;
-    const gstAmount = (totalPrice * gstRate ) / (100 + gstRate);
+    const gstAmount = (totalPrice * gstRate) / (100 + gstRate);
 
     const basePrice = totalPrice - gstAmount;
 
     let couponDiscount = 0;
     let validCoupon = null
 
-    if(coupon){
-         validCoupon = await Coupon.findOne({ code : coupon});
+    if (coupon) {
+      validCoupon = await Coupon.findOne({ code: coupon });
 
-         if (!validCoupon) {
-            return res.json({
-              success: false,
-              message: "Invalid coupon"
-            });
-          }
+      if (!validCoupon) {
+        return res.json({
+          success: false,
+          message: "Invalid coupon"
+        });
+      }
 
-        if(validCoupon.usedCount >= validCoupon.usageLimit){
-          return res.json({
-            success: false,
-            message: "Coupon limit reached"
-          });
+      if (validCoupon.usedCount >= validCoupon.usageLimit) {
+        return res.json({
+          success: false,
+          message: "Coupon limit reached"
+        });
+      }
+
+      const userUsage = validCoupon.usedBy.find(
+        u => u.userId.toString() === userId.toString()
+      )
+
+      if (userUsage && userUsage.count >= validCoupon.perUserLimit) {
+        return res.json({
+          success: false,
+          message: "You already used this coupon"
+        });
+      }
+
+      if (validCoupon && new Date() < validCoupon.expiry && totalPrice >= validCoupon.minAmount) {
+        if (validCoupon.type === "percentage") {
+          couponDiscount = (totalPrice * validCoupon.discount) / 100;
+        } else {
+          couponDiscount = validCoupon.discount;
         }
-
-        const userUsage = validCoupon.usedBy.find(
-          u => u.userId.toString() === userId.toString()
-        )
-
-        if( userUsage && userUsage.count >= validCoupon.perUserLimit){
-          return res.json({
-            success: false,
-            message: "You already used this coupon"
-          });
-        }
-
-         if(validCoupon && new Date() < validCoupon.expiry && totalPrice >= validCoupon.minAmount ){
-            if(validCoupon.type === "percentage"){
-              couponDiscount = (totalPrice * validCoupon.discount) / 100;
-            }else{
-              couponDiscount = validCoupon.discount;
-            }
-            req.appliedCoupon = validCoupon;
-        }
+        req.appliedCoupon = validCoupon;
+      }
     }
-    
-    
+
+
     const finalAmount = totalPrice - couponDiscount;
 
 
     const { walletUsed, remainingAmount } = await calculateWalletUsage(
-        userId,
-        finalAmount,
-        useWallet
-      );
+      userId,
+      finalAmount,
+      useWallet
+    );
 
     for (let item of cart.items) {
       if (!item.productId) {
@@ -666,8 +666,8 @@ const verifyPayment = async (req, res) => {
     const productDiscount = totalMRP - totalPrice;
 
     const newOrder = new Order({
-      couponCode : couponDiscount > 0 ? coupon : null,
-      coupon : couponDiscount > 0 ? coupon : null,
+      couponCode: couponDiscount > 0 ? coupon : null,
+      coupon: couponDiscount > 0 ? coupon : null,
       userId,
       paymentMethod: "Online",
       paymentStatus: "Paid",
@@ -677,10 +677,10 @@ const verifyPayment = async (req, res) => {
       orderedItems: cart.items.map((item) => {
 
         const itemPrice = (item.productId.salePrice || item.productId.regularPrice) * item.quantity;
-          
-        const itemCouponShare = totalPrice > 0  ? (itemPrice / totalPrice) * couponDiscount  : 0;
-          
-        const finalItemPrice = itemPrice - itemCouponShare;       
+
+        const itemCouponShare = totalPrice > 0 ? (itemPrice / totalPrice) * couponDiscount : 0;
+
+        const finalItemPrice = itemPrice - itemCouponShare;
 
         return {
           product: item.productId,
@@ -721,8 +721,8 @@ const verifyPayment = async (req, res) => {
 
     await newOrder.save();
 
-    
-    if( walletUsed > 0){
+
+    if (walletUsed > 0) {
       await debitWallet(
         userId,
         walletUsed,
@@ -731,18 +731,18 @@ const verifyPayment = async (req, res) => {
       )
     }
 
-    if(req.appliedCoupon){
+    if (req.appliedCoupon) {
       const coupon = req.appliedCoupon;
       coupon.usedCount += 1;
 
-      const userIndex  = coupon.usedBy.findIndex(
+      const userIndex = coupon.usedBy.findIndex(
         u => u.userId.toString() === userId.toString()
       )
 
-      if(userIndex  > -1){
+      if (userIndex > -1) {
         coupon.usedBy[userIndex].count += 1;
-      }else{
-        coupon.usedBy.push({ userId, count:1})
+      } else {
+        coupon.usedBy.push({ userId, count: 1 })
       }
       await coupon.save();
     }
@@ -785,9 +785,9 @@ const checkCart = async (req, res) => {
   }
 };
 
-const applyCoupon = async (req, res) =>{
+const applyCoupon = async (req, res) => {
   try {
-    
+
     const userId = req.session.user;
     const { code, totalAmount } = req.body;
     const coupon = await Coupon.findOne({ code });
@@ -808,33 +808,33 @@ const applyCoupon = async (req, res) =>{
       return res.json({ success: false, message: "This coupon is not valid for your account" });
     }
 
-    if(!coupon.isActive){
-      return res.json({ success : false, message : "Coupon is no longer active"})
+    if (!coupon.isActive) {
+      return res.json({ success: false, message: "Coupon is no longer active" })
     }
 
     if (new Date() > coupon.expiry) {
       return res.json({ success: false, message: "Coupon expired" });
     }
 
-    if (totalAmount < coupon.minAmount ) {
+    if (totalAmount < coupon.minAmount) {
       return res.json({ success: false, message: "Minimum amount not met" });
     }
 
-    if(coupon.usedCount >= coupon.usageLimit ){
-      return res.json({ success : false, message : "Your limit has reached, can;t access this coupon again"})
+    if (coupon.usedCount >= coupon.usageLimit) {
+      return res.json({ success: false, message: "Your limit has reached, can;t access this coupon again" })
     }
 
-    const userUsage = coupon.usedBy.find( u => u.userId.toString() === userId);   
+    const userUsage = coupon.usedBy.find(u => u.userId.toString() === userId);
 
-    if( userUsage && userUsage.count >= coupon.perUserLimit){
-      return res.json({ success : false, message : "You have already used this coupon"})
+    if (userUsage && userUsage.count >= coupon.perUserLimit) {
+      return res.json({ success: false, message: "You have already used this coupon" })
     }
 
-    let couponDiscount  = 0;
+    let couponDiscount = 0;
 
-    if( coupon.type === "percentage" ){
-      couponDiscount = (totalAmount * coupon.discount ) / 100;
-    }else{
+    if (coupon.type === "percentage") {
+      couponDiscount = (totalAmount * coupon.discount) / 100;
+    } else {
       couponDiscount = coupon.discount;
     }
 
@@ -843,15 +843,15 @@ const applyCoupon = async (req, res) =>{
     const finalAmount = totalPrice - couponDiscount + deliveryCharge;
 
     return res.json({
-      success : true,
-      couponDiscount ,
-      message : 'Coupon applied succesfully',
-      couponCode : coupon.code,
+      success: true,
+      couponDiscount,
+      message: 'Coupon applied succesfully',
+      couponCode: coupon.code,
       finalAmount
     })
 
   } catch (error) {
-    console.log("Error applying coupon : ",error);
+    console.log("Error applying coupon : ", error);
     res.json({ success: false });
   }
 }
@@ -883,92 +883,63 @@ const paymentFailed = async (req, res) => {
     }, 0);
 
     let gstRate = 18;
-    const gstAmount = (totalPrice * gstRate ) / (100 + gstRate);
-
+    const gstAmount = (totalPrice * gstRate) / (100 + gstRate);
     const basePrice = totalPrice - gstAmount;
 
     let couponDiscount = 0;
-    let validCoupon = null
-
-    if(coupon){
-         validCoupon = await Coupon.findOne({ code : coupon});
-
-         if (!validCoupon) {
-            return res.json({ success: false, message: "Invalid coupon" });
-          }
-
-        if(validCoupon.usedCount >= validCoupon.usageLimit){
-          return res.json({ success: false, message: "Coupon limit reached" });
+    let validCoupon = null;
+    if (coupon) {
+      validCoupon = await Coupon.findOne({ code: coupon });
+      if (!validCoupon) {
+        return res.json({ success: false, message: "Invalid coupon" });
+      }
+      if (validCoupon.usedCount >= validCoupon.usageLimit) {
+        return res.json({ success: false, message: "Coupon limit reached" });
+      }
+      const userUsage = validCoupon.usedBy.find(u => u.userId.toString() === userId.toString());
+      if (userUsage && userUsage.count >= validCoupon.perUserLimit) {
+        return res.json({ success: false, message: "You already used this coupon" });
+      }
+      if (validCoupon && new Date() < validCoupon.expiry && totalPrice >= validCoupon.minAmount) {
+        if (validCoupon.type === "percentage") {
+          couponDiscount = (totalPrice * validCoupon.discount) / 100;
+        } else {
+          couponDiscount = validCoupon.discount;
         }
-
-        const userUsage = validCoupon.usedBy.find(
-          u => u.userId.toString() === userId.toString()
-        )
-
-        if( userUsage && userUsage.count >= validCoupon.perUserLimit){
-          return res.json({ success: false, message: "You already used this coupon" });
-        }
-
-         if(validCoupon && new Date() < validCoupon.expiry && totalPrice >= validCoupon.minAmount ){
-            if(validCoupon.type === "percentage"){
-              couponDiscount = (totalPrice * validCoupon.discount) / 100;
-            }else{
-              couponDiscount = validCoupon.discount;
-            }
-        }
-
         req.appliedCoupon = validCoupon;
+      }
     }
-    
+
     const finalAmount = totalPrice - couponDiscount;
+    const { walletUsed, remainingAmount } = await calculateWalletUsage(userId, finalAmount, useWallet);
 
-    const { walletUsed, remainingAmount } = await calculateWalletUsage(
-        userId,
-        finalAmount,
-        useWallet
-      );
-
+    // Verify stock availability without deducting stock
     for (let item of cart.items) {
       if (!item.productId) {
         return res.json({ success: false, message: "Some products are no longer available" });
       }
-
       const product = await Product.findById(item.productId);
-      const variant = product.variants.find((v) => v.size === item.variant);
-
+      const variant = product.variants.find(v => v.size === item.variant);
       if (!variant || variant?.stock < item.quantity) {
-        return res.status(500).json({ success: false, message: "Selected quantity more than available quantity" });
-      }
-
-      const updated = await Product.findOneAndUpdate(
-        {
-          _id: item.productId._id,
-          "variants.size": item.variant,
-        },
-        {
-          $inc: { "variants.$.stock": -item.quantity },
-        },
-      );
-
-      if (!updated) {
-        return res.json({ success: false, message: `Stock not changed for ${item.productId.productName}, try again` });
+        return res.status(500).json({
+          success: false,
+          message: `${product.productName} (${item.variant}) exceeds available stock (${variant?.stock})`
+        });
       }
     }
 
     const newOrder = new Order({
-      couponCode : coupon || null,
+      couponCode: coupon || null,
       coupon,
       userId,
       paymentMethod: "Online",
       paymentStatus: "Failed",
       walletUsed,
       razorpayPaymentId: null,
-
-      orderedItems: cart.items.map((item) => {
+      orderedItems: cart.items.map(item => {
         const itemPrice = (item.productId.salePrice || item.productId.regularPrice) * item.quantity;
-        const itemCouponShare = totalPrice > 0  ? (itemPrice / totalPrice) * couponDiscount  : 0;
-        const finalItemPrice = itemPrice - itemCouponShare;       
-
+        const itemCouponShare = totalPrice > 0 ? (itemPrice / totalPrice) * couponDiscount : 0;
+        const finalItemPrice = itemPrice - itemCouponShare;
         return {
           product: item.productId,
           variant: item.variant,
@@ -979,14 +950,12 @@ const paymentFailed = async (req, res) => {
           finalItemPrice: Number(finalItemPrice.toFixed(2))
         };
       }),
-
       totalPrice,
       finalAmount,
       status: "Pending",
       couponDiscount,
       basePrice,
       gstAmount,
-
       address: {
         addressType: selectedAddress.addressType,
         name: selectedAddress.name,
@@ -1001,27 +970,16 @@ const paymentFailed = async (req, res) => {
 
     await newOrder.save();
 
-    if( walletUsed > 0){
-      await debitWallet(
-        userId,
-        walletUsed,
-        "Partial payment (Order Failed)",
-        newOrder._id
-      )
-    }
+    // No stock deduction and no wallet debit for failed payment
 
-    if(req.appliedCoupon){
+    if (req.appliedCoupon) {
       const couponDoc = req.appliedCoupon;
       couponDoc.usedCount += 1;
-
-      const userIndex  = couponDoc.usedBy.findIndex(
-        u => u.userId.toString() === userId.toString()
-      )
-
-      if(userIndex  > -1){
+      const userIndex = couponDoc.usedBy.findIndex(u => u.userId.toString() === userId.toString());
+      if (userIndex > -1) {
         couponDoc.usedBy[userIndex].count += 1;
-      }else{
-        couponDoc.usedBy.push({ userId, count:1})
+      } else {
+        couponDoc.usedBy.push({ userId, count: 1 });
       }
       await couponDoc.save();
     }
@@ -1036,6 +994,188 @@ const paymentFailed = async (req, res) => {
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
+
+
+// try {
+//   const { addressId, useWallet, coupon } = req.body;
+//   const userId = req.session.user;
+
+//   const cart = await Cart.findOne({ userId }).populate("items.productId");
+//   if (!cart || cart.items.length === 0) {
+//     return res.json({ success: false, message: "Cart is empty" });
+//   }
+
+//   const addressData = await Address.findOne({ userId });
+//   let selectedAddress;
+//   if (addressId) {
+//     selectedAddress = addressData.address.id(addressId);
+//   } else {
+//     selectedAddress = addressData.address.find((addr) => addr.isDefault);
+//   }
+//   if (!selectedAddress) {
+//     return res.json({ success: false, message: "Invalid address" });
+//   }
+
+//   const totalPrice = cart.items.reduce((sum, item) => {
+//     const price = item.productId.salePrice || item.productId.regularPrice;
+//     return sum + price * item.quantity;
+//   }, 0);
+
+//   let gstRate = 18;
+//   const gstAmount = (totalPrice * gstRate) / (100 + gstRate);
+
+//   const basePrice = totalPrice - gstAmount;
+
+//   let couponDiscount = 0;
+//   let validCoupon = null
+
+//   if (coupon) {
+//     validCoupon = await Coupon.findOne({ code: coupon });
+
+//     if (!validCoupon) {
+//       return res.json({ success: false, message: "Invalid coupon" });
+//     }
+
+//     if (validCoupon.usedCount >= validCoupon.usageLimit) {
+//       return res.json({ success: false, message: "Coupon limit reached" });
+//     }
+
+//     const userUsage = validCoupon.usedBy.find(
+//       u => u.userId.toString() === userId.toString()
+//     )
+
+//     if (userUsage && userUsage.count >= validCoupon.perUserLimit) {
+//       return res.json({ success: false, message: "You already used this coupon" });
+//     }
+
+// if (validCoupon && new Date() < validCoupon.expiry && totalPrice >= validCoupon.minAmount) {
+//   if (validCoupon.type === "percentage") {
+//     couponDiscount = (totalPrice * validCoupon.discount) / 100;
+//   } else {
+//     couponDiscount = validCoupon.discount;
+//   }
+// }
+
+// req.appliedCoupon = validCoupon;
+//   }
+
+// const finalAmount = totalPrice - couponDiscount;
+
+// const { walletUsed, remainingAmount } = await calculateWalletUsage(
+//   userId,
+//   finalAmount,
+//   useWallet
+// );
+
+// for (let item of cart.items) {
+//   if (!item.productId) {
+//     return res.json({ success: false, message: "Some products are no longer available" });
+//   }
+
+//   const product = await Product.findById(item.productId);
+//   const variant = product.variants.find((v) => v.size === item.variant);
+
+//   if (!variant || variant?.stock < item.quantity) {
+//     return res.status(500).json({ success: false, message: `${product.productName} (${item.variant}) exceeds available stock (${variant.stock})` });
+//   }
+
+//   // Verify stock availability without deducting
+//   for (let item of cart.items) {
+//     if (!item.productId) {
+//       return res.json({ success: false, message: "Some products are no longer available" });
+//     }
+
+//     const product = await Product.findById(item.productId);
+//     const variant = product.variants.find((v) => v.size === item.variant);
+
+//     if (!variant || variant?.stock < item.quantity) {
+//       return res.status(500).json({ success: false, message: `${product.productName} (${item.variant}) exceeds available stock (${variant?.stock})` });
+//     }
+//     // No stock deduction performed here
+//   }
+// }
+
+// const newOrder = new Order({
+//   couponCode: coupon || null,
+//   coupon,
+//   userId,
+//   paymentMethod: "Online",
+//   paymentStatus: "Failed",
+//   walletUsed,
+//   razorpayPaymentId: null,
+
+//   orderedItems: cart.items.map((item) => {
+//     const itemPrice = (item.productId.salePrice || item.productId.regularPrice) * item.quantity;
+//     const itemCouponShare = totalPrice > 0 ? (itemPrice / totalPrice) * couponDiscount : 0;
+//     const finalItemPrice = itemPrice - itemCouponShare;
+
+//     return {
+//       product: item.productId,
+//       variant: item.variant,
+//       quantity: item.quantity,
+//       price: item.productId.salePrice || item.productId.regularPrice,
+//       regularPrice: item.productId.regularPrice,
+//       couponShare: Number(itemCouponShare.toFixed(2)),
+//       finalItemPrice: Number(finalItemPrice.toFixed(2))
+//     };
+//   }),
+
+//   totalPrice,
+//   finalAmount,
+//   status: "Pending",
+//   couponDiscount,
+//   basePrice,
+//   gstAmount,
+
+//   address: {
+//     addressType: selectedAddress.addressType,
+//     name: selectedAddress.name,
+//     city: selectedAddress.city,
+//     landMark: selectedAddress.landMark,
+//     state: selectedAddress.state,
+//     pincode: selectedAddress.pincode,
+//     phone: selectedAddress.phone,
+//     altPhone: selectedAddress.altPhone,
+//   },
+// });
+
+// await newOrder.save();
+
+// if (walletUsed > 0) {
+//   await debitWallet(
+//     userId,
+//     walletUsed,
+//     "Partial payment (Order Failed)",
+//     newOrder._id
+//   )
+// }
+
+// if (req.appliedCoupon) {
+//   const couponDoc = req.appliedCoupon;
+//   couponDoc.usedCount += 1;
+
+//   const userIndex = couponDoc.usedBy.findIndex(
+//     u => u.userId.toString() === userId.toString()
+//   )
+
+//   if (userIndex > -1) {
+//     couponDoc.usedBy[userIndex].count += 1;
+//   } else {
+//     couponDoc.usedBy.push({ userId, count: 1 })
+//   }
+//   await couponDoc.save();
+// }
+
+// // clear cart
+// cart.items = [];
+// await cart.save();
+
+// res.json({ success: true, orderId: newOrder._id });
+// } catch (error) {
+//   console.error("Payment failed error:", error);
+//   res.status(500).json({ success: false, message: "Server error" });
+// }
+// };
 
 const paymentFailurePage = async (req, res) => {
   try {
@@ -1065,13 +1205,13 @@ const createRetryRazorpayOrder = async (req, res) => {
     }
 
     if (order.paymentStatus === "Paid" || order.status === "Cancelled") {
-       return res.status(400).json({ success: false, message: "Order cannot be paid" });
+      return res.status(400).json({ success: false, message: "Order cannot be paid" });
     }
 
     const remainingAmount = order.finalAmount - order.walletUsed;
 
     if (remainingAmount <= 0) {
-        return res.status(400).json({ success: false, message: "No amount to be paid" });
+      return res.status(400).json({ success: false, message: "No amount to be paid" });
     }
 
     const options = {
@@ -1111,7 +1251,7 @@ const verifyRetryPayment = async (req, res) => {
 
     const order = await Order.findOne({ _id: orderId, userId });
     if (!order) {
-       return res.status(404).json({ success: false, message: "Order not found" });
+      return res.status(404).json({ success: false, message: "Order not found" });
     }
 
     order.paymentStatus = "Paid";
