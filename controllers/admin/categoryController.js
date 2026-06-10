@@ -22,13 +22,16 @@ const categoryInfo = async (req, res) => {
     const totalCategoories = await Category.countDocuments();
     const totalPages = Math.ceil(totalCategoories / limit);
 
+
+
     res.render("category", {
       title: 'Category',
       category: categoryData,
       currentPage: page,
       totalPages: totalPages,
       totalCategoories: totalCategoories,
-      search: search
+      search: search,
+      count: count
     })
 
   } catch (error) {
