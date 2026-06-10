@@ -1,0 +1,598 @@
+<%-include("../../views/partials/user/header")%>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us – NUVE</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --brand:    #d4145a;
+            --brand-dk: #a81049;
+            --dark:     #1a1a1a;
+            --mid:      #555;
+            --light:    #f8f9fa;
+            --white:    #ffffff;
+            --border:   #e8e8e8;
+        }
+
+        body {
+            font-family: 'Jost', 'Segoe UI', Tahoma, sans-serif;
+            color: var(--dark);
+            line-height: 1.7;
+        }
+
+        /* ── Hero ─────────────────────────────────────── */
+        .contact-hero {
+            position: relative;
+            height: 400px;
+            background: linear-gradient(135deg, #1a0a10 0%, #3d0e26 60%, #1a0a10 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .contact-hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 55% 70% at 20% 50%, rgba(212,20,90,0.2) 0%, transparent 70%),
+                radial-gradient(ellipse 40% 50% at 80% 30%, rgba(212,20,90,0.12) 0%, transparent 70%);
+        }
+
+        .contact-hero::after {
+            content: 'NUVE';
+            position: absolute;
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-size: 240px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.04);
+            letter-spacing: 0.15em;
+            pointer-events: none;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .contact-hero-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            color: var(--white);
+            animation: fadeInUp 0.9s ease both;
+        }
+
+        .contact-hero-content .eyebrow {
+            font-size: 13px;
+            letter-spacing: 0.35em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.5);
+            margin-bottom: 16px;
+        }
+
+        .contact-hero-content h1 {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-size: 60px;
+            font-weight: 600;
+            line-height: 1.1;
+            margin-bottom: 16px;
+        }
+
+        .contact-hero-content h1 em {
+            font-style: italic;
+            color: #f2a0bf;
+        }
+
+        .contact-hero-content p {
+            font-size: 16px;
+            font-weight: 300;
+            color: rgba(255,255,255,0.72);
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(28px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── Main Contact Layout ──────────────────────── */
+        .contact-section {
+            padding: 90px 5%;
+            background: var(--white);
+        }
+
+        .contact-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1.4fr;
+            gap: 80px;
+            align-items: start;
+        }
+
+        /* ── Info Panel ───────────────────────────────── */
+        .section-label {
+            font-size: 12px;
+            letter-spacing: 0.32em;
+            text-transform: uppercase;
+            color: var(--brand);
+            font-weight: 600;
+            margin-bottom: 14px;
+        }
+
+        .section-title {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-size: 40px;
+            font-weight: 600;
+            line-height: 1.2;
+            margin-bottom: 20px;
+        }
+
+        .contact-info-text {
+            font-size: 15px;
+            color: var(--mid);
+            margin-bottom: 40px;
+        }
+
+        .info-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+            margin-bottom: 44px;
+        }
+
+        .info-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 18px;
+        }
+
+        .info-icon {
+            width: 46px;
+            height: 46px;
+            min-width: 46px;
+            background: rgba(212,20,90,0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 17px;
+            color: var(--brand);
+            margin-top: 2px;
+        }
+
+        .info-detail strong {
+            display: block;
+            font-size: 14px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--dark);
+            margin-bottom: 3px;
+        }
+
+        .info-detail span {
+            font-size: 15px;
+            color: var(--mid);
+        }
+
+        .social-row {
+            display: flex;
+            gap: 14px;
+        }
+
+        .social-btn {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            border: 1.5px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--mid);
+            font-size: 16px;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .social-btn:hover {
+            background: var(--brand);
+            border-color: var(--brand);
+            color: var(--white);
+            transform: translateY(-2px);
+        }
+
+        /* ── Contact Form ─────────────────────────────── */
+        .contact-form-wrap {
+            background: var(--light);
+            border-radius: 18px;
+            padding: 50px 44px;
+        }
+
+        .contact-form-wrap h3 {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-size: 28px;
+            margin-bottom: 30px;
+            color: var(--dark);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 22px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-size: 12px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 8px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 13px 18px;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            font-family: 'Jost', sans-serif;
+            font-size: 15px;
+            color: var(--dark);
+            background: var(--white);
+            outline: none;
+            transition: border-color 0.25s, box-shadow 0.25s;
+            resize: none;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: var(--brand);
+            box-shadow: 0 0 0 3px rgba(212,20,90,0.1);
+        }
+
+        .form-group textarea {
+            height: 130px;
+        }
+
+        .btn-submit {
+            background: var(--brand);
+            color: var(--white);
+            padding: 15px 44px;
+            border: none;
+            border-radius: 50px;
+            font-family: 'Jost', sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-submit:hover {
+            background: var(--brand-dk);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 24px rgba(212,20,90,0.3);
+        }
+
+        .btn-submit i {
+            font-size: 14px;
+            transition: transform 0.3s;
+        }
+
+        .btn-submit:hover i {
+            transform: translateX(4px);
+        }
+
+        /* Success message */
+        .form-success {
+            display: none;
+            text-align: center;
+            padding: 28px;
+            background: rgba(212,20,90,0.06);
+            border: 1.5px solid rgba(212,20,90,0.25);
+            border-radius: 12px;
+            margin-top: 18px;
+        }
+
+        .form-success i {
+            font-size: 32px;
+            color: var(--brand);
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .form-success p {
+            font-size: 15px;
+            color: var(--mid);
+        }
+
+        /* ── FAQ Strip ────────────────────────────────── */
+        .faq-section {
+            padding: 80px 5%;
+            background: var(--light);
+        }
+
+        .faq-inner {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .faq-inner .section-label { display: inline-block; }
+
+        .faq-inner .section-title { margin-bottom: 14px; }
+
+        .faq-inner .faq-intro {
+            font-size: 15px;
+            color: var(--mid);
+            margin-bottom: 46px;
+        }
+
+        .faq-list {
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .faq-item {
+            background: var(--white);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1.5px solid var(--border);
+            transition: border-color 0.25s;
+        }
+
+        .faq-item.open {
+            border-color: rgba(212,20,90,0.3);
+        }
+
+        .faq-question {
+            padding: 20px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--dark);
+            user-select: none;
+        }
+
+        .faq-question i {
+            font-size: 13px;
+            color: var(--brand);
+            transition: transform 0.3s;
+        }
+
+        .faq-item.open .faq-question i {
+            transform: rotate(180deg);
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.35s ease, padding 0.3s;
+            font-size: 15px;
+            color: var(--mid);
+            padding: 0 24px;
+        }
+
+        .faq-item.open .faq-answer {
+            max-height: 200px;
+            padding: 0 24px 20px;
+        }
+
+        /* ── Responsive ───────────────────────────────── */
+        @media (max-width: 900px) {
+            .contact-inner  { grid-template-columns: 1fr; gap: 50px; }
+            .form-row       { grid-template-columns: 1fr; }
+            .contact-hero-content h1 { font-size: 42px; }
+        }
+
+        @media (max-width: 600px) {
+            .contact-hero-content h1 { font-size: 32px; }
+            .contact-form-wrap { padding: 32px 24px; }
+            .section-title { font-size: 32px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ── Hero ──────────────────────────────────────── -->
+    <section class="contact-hero">
+        <div class="contact-hero-content">
+            <p class="eyebrow">Reach Out</p>
+            <h1>We'd Love to <em>Hear from You</em></h1>
+            <p>Our team is here to help — styling advice, orders, or just a chat about fashion.</p>
+        </div>
+    </section>
+
+    <!-- ── Contact Main ───────────────────────────────── -->
+    <section class="contact-section">
+        <div class="contact-inner">
+
+            <!-- Left: Info -->
+            <div class="contact-info">
+                <p class="section-label">Get In Touch</p>
+                <h2 class="section-title">Let's Start a Conversation</h2>
+                <p class="contact-info-text">Whether you have a question about an order, need styling advice, or simply want to connect — we're just a message away.</p>
+
+                <ul class="info-list">
+                    <li>
+                        <div class="info-icon"><i class="fas fa-map-marker-alt"></i></div>
+                        <div class="info-detail">
+                            <strong>Our Store</strong>
+                            <span>MG Road, Ernakulam, Kerala – 686001</span>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="info-icon"><i class="fas fa-phone-alt"></i></div>
+                        <div class="info-detail">
+                            <strong>Phone</strong>
+                            <span>+91 98765 43210</span>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="info-icon"><i class="fas fa-envelope"></i></div>
+                        <div class="info-detail">
+                            <strong>Email</strong>
+                            <span>hello@nuve.in</span>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="info-icon"><i class="fas fa-clock"></i></div>
+                        <div class="info-detail">
+                            <strong>Store Hours</strong>
+                            <span>Mon – Sat: 10am – 8pm &nbsp;|&nbsp; Sun: 11am – 6pm</span>
+                        </div>
+                    </li>
+                </ul>
+
+                <div class="social-row">
+                    <a href="#" class="social-btn"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-btn"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-btn"><i class="fab fa-pinterest-p"></i></a>
+                    <a href="#" class="social-btn"><i class="fab fa-whatsapp"></i></a>
+                </div>
+            </div>
+
+            <!-- Right: Form -->
+            <div class="contact-form-wrap">
+                <h3>Send Us a Message</h3>
+
+                <div id="contactForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="firstName">First Name</label>
+                            <input type="text" id="firstName" placeholder="Muhsina">
+                        </div>
+                        <div class="form-group">
+                            <label for="lastName">Last Name</label>
+                            <input type="text" id="lastName" placeholder="PP">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" placeholder="muhsinapp@example.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="subject">Subject</label>
+                        <select id="subject">
+                            <option value="" disabled selected>Select a topic…</option>
+                            <option>Order Enquiry</option>
+                            <option>Returns & Exchanges</option>
+                            <option>Styling Advice</option>
+                            <option>Product Availability</option>
+                            <option>Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="message">Your Message</label>
+                        <textarea id="message" placeholder="Tell us how we can help…"></textarea>
+                    </div>
+
+                    <button class="btn-submit" onclick="handleSubmit()">
+                        Send Message <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+
+                <div class="form-success" id="formSuccess">
+                    <i class="fas fa-check-circle"></i>
+                    <p><strong>Message sent!</strong> We'll get back to you within 24 hours.</p>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ── FAQ ───────────────────────────────────────── -->
+    <section class="faq-section">
+        <div class="faq-inner">
+            <p class="section-label">Quick Answers</p>
+            <h2 class="section-title">Frequently Asked Questions</h2>
+            <p class="faq-intro">Before you write in, here are answers to the questions we hear most often.</p>
+
+            <div class="faq-list">
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        How long does delivery take?
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">Standard delivery within Kerala takes 2–4 business days. Pan-India orders are typically delivered within 5–7 business days. Express options are available at checkout.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        What is your return policy?
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">We accept returns within 7 days of delivery on unworn, unaltered items with original tags. Sale items are not eligible for return unless defective.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        Do you offer size exchanges?
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">Yes! Size exchanges are free within 14 days of delivery. Simply contact us and we'll arrange a pickup and resend the correct size at no extra charge.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        How do I track my order?
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">Once your order ships, you'll receive a tracking link via email and SMS. You can also check order status anytime from your account dashboard.</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        function handleSubmit() {
+            const first   = document.getElementById('firstName').value.trim();
+            const email   = document.getElementById('email').value.trim();
+            const message = document.getElementById('message').value.trim();
+
+            if (!first || !email || !message) {
+                alert('Please fill in your name, email, and message before sending.');
+                return;
+            }
+
+            document.getElementById('contactForm').style.display  = 'none';
+            document.getElementById('formSuccess').style.display  = 'block';
+        }
+
+        function toggleFaq(el) {
+            const item = el.parentElement;
+            const isOpen = item.classList.contains('open');
+
+            // Close all
+            document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
+
+            // Open clicked if it was closed
+            if (!isOpen) item.classList.add('open');
+        }
+    </script>
+
+</body>
+</html>
+<%-include("../../views/partials/user/footer")%>

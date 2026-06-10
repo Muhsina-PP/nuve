@@ -1,0 +1,437 @@
+<%-include("../../views/partials/user/header")%>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us – NUVE</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --brand:    #d4145a;
+            --brand-dk: #a81049;
+            --dark:     #1a1a1a;
+            --mid:      #555;
+            --light:    #f8f9fa;
+            --white:    #ffffff;
+        }
+
+        body {
+            font-family: 'Jost', 'Segoe UI', Tahoma, sans-serif;
+            color: var(--dark);
+            line-height: 1.7;
+        }
+
+        /* ── Hero ─────────────────────────────────────── */
+        .about-hero {
+            position: relative;
+            height: 520px;
+            background: linear-gradient(135deg, #1a0a10 0%, #3d0e26 60%, #1a0a10 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .about-hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 60% 50% at 30% 50%, rgba(212,20,90,0.18) 0%, transparent 70%),
+                radial-gradient(ellipse 40% 60% at 75% 40%, rgba(212,20,90,0.12) 0%, transparent 70%);
+        }
+
+        /* Decorative serif watermark */
+        .about-hero::after {
+            content: 'NUVE';
+            position: absolute;
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-size: 260px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.04);
+            letter-spacing: 0.15em;
+            pointer-events: none;
+            user-select: none;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .about-hero-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            color: var(--white);
+            animation: fadeInUp 0.9s ease both;
+        }
+
+        .about-hero-content .eyebrow {
+            font-size: 13px;
+            letter-spacing: 0.35em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.55);
+            margin-bottom: 18px;
+        }
+
+        .about-hero-content h1 {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-size: 64px;
+            font-weight: 600;
+            line-height: 1.1;
+            margin-bottom: 22px;
+        }
+
+        .about-hero-content h1 em {
+            font-style: italic;
+            color: #f2a0bf;
+        }
+
+        .about-hero-content p {
+            font-size: 17px;
+            font-weight: 300;
+            color: rgba(255,255,255,0.78);
+            max-width: 520px;
+            margin: 0 auto;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(28px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── Section Shell ────────────────────────────── */
+        .section { padding: 90px 5%; }
+        .section-inner { max-width: 1200px; margin: 0 auto; }
+
+        .section-label {
+            font-size: 12px;
+            letter-spacing: 0.32em;
+            text-transform: uppercase;
+            color: var(--brand);
+            font-weight: 600;
+            margin-bottom: 14px;
+        }
+
+        .section-title {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-size: 42px;
+            font-weight: 600;
+            color: var(--dark);
+            line-height: 1.2;
+            margin-bottom: 22px;
+        }
+
+        /* ── Story Section ────────────────────────────── */
+        .story-section { background: var(--white); }
+
+        .story-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            align-items: center;
+        }
+
+        .story-text p {
+            font-size: 16px;
+            color: var(--mid);
+            margin-bottom: 18px;
+        }
+
+        .story-image-wrap {
+            position: relative;
+        }
+
+        .story-image-wrap img {
+            width: 100%;
+            height: 520px;
+            object-fit: cover;
+            border-radius: 12px;
+            display: block;
+        }
+
+        /* Pink accent rectangle offset behind image */
+        .story-image-wrap::before {
+            content: '';
+            position: absolute;
+            top: -20px;
+            right: -20px;
+            bottom: 20px;
+            left: 20px;
+            border: 2px solid var(--brand);
+            border-radius: 12px;
+            z-index: -1;
+            opacity: 0.4;
+        }
+
+        /* ── Stats Strip ──────────────────────────────── */
+        .stats-strip {
+            background: var(--dark);
+            padding: 60px 5%;
+        }
+
+        .stats-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 40px;
+            text-align: center;
+        }
+
+        .stat-item .number {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-size: 54px;
+            font-weight: 600;
+            color: var(--brand);
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+
+        .stat-item .label {
+            font-size: 13px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.55);
+        }
+
+        /* ── Values ───────────────────────────────────── */
+        .values-section { background: var(--light); }
+
+        .values-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+
+        .value-card {
+            background: var(--white);
+            border-radius: 14px;
+            padding: 38px 32px;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+
+        .value-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 16px 40px rgba(0,0,0,0.1);
+            border-bottom-color: var(--brand);
+        }
+
+        .value-icon {
+            width: 54px;
+            height: 54px;
+            background: rgba(212,20,90,0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 22px;
+            font-size: 22px;
+            color: var(--brand);
+        }
+
+        .value-card h3 {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-size: 22px;
+            margin-bottom: 12px;
+            color: var(--dark);
+        }
+
+        .value-card p {
+            font-size: 15px;
+            color: var(--mid);
+            line-height: 1.65;
+        }
+
+        /* ── Team ─────────────────────────────────────── */
+        .team-section { background: var(--white); }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 36px;
+            margin-top: 50px;
+        }
+
+        .team-card {
+            text-align: center;
+        }
+
+        .team-card img {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            transition: transform 0.4s;
+        }
+
+        .team-card:hover img {
+            transform: scale(1.03);
+        }
+
+        .team-card h4 {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+        .team-card .role {
+            font-size: 13px;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--brand);
+        }
+
+        /* ── CTA Banner ───────────────────────────────── */
+        .cta-banner {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 90px 5%;
+            text-align: center;
+            color: var(--white);
+        }
+
+        .cta-banner h2 {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-size: 46px;
+            margin-bottom: 16px;
+        }
+
+        .cta-banner p {
+            font-size: 17px;
+            opacity: 0.85;
+            margin-bottom: 36px;
+            max-width: 480px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .btn-primary {
+            background: var(--brand);
+            color: var(--white);
+            padding: 15px 44px;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            display: inline-block;
+            transition: all 0.3s;
+            font-family: 'Jost', sans-serif;
+        }
+
+        .btn-primary:hover {
+            background: var(--brand-dk);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 24px rgba(0,0,0,0.22);
+        }
+
+        /* ── Responsive ───────────────────────────────── */
+        @media (max-width: 900px) {
+            .story-grid   { grid-template-columns: 1fr; gap: 40px; }
+            .stats-grid   { grid-template-columns: repeat(2, 1fr); }
+            .about-hero-content h1 { font-size: 46px; }
+        }
+
+        @media (max-width: 600px) {
+            .about-hero-content h1 { font-size: 34px; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 24px; }
+            .section-title { font-size: 32px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ── Hero ──────────────────────────────────────── -->
+    <section class="about-hero">
+        <div class="about-hero-content">
+            <p class="eyebrow">Our Story</p>
+            <h1>Crafted for the <em>Modern Woman</em></h1>
+            <p>Where confidence meets couture — fashion that celebrates every version of you.</p>
+        </div>
+    </section>
+
+    <!-- ── Story ─────────────────────────────────────── -->
+    <section class="section story-section">
+        <div class="section-inner">
+            <div class="story-grid">
+                <div class="story-text">
+                    <p class="section-label">Who We Are</p>
+                    <h2 class="section-title">Born from a Passion<br>for Authentic Style</h2>
+                    <p>NUVE was founded with a single belief: that every woman deserves clothing that makes her feel extraordinary — not just on special occasions, but every single day.</p>
+                    <p>What started as a small curated boutique has grown into a destination for women who refuse to compromise between comfort, quality, and self-expression. We source our pieces thoughtfully, keeping sustainability and craftsmanship at the heart of every collection.</p>
+                    <p>From everyday essentials to statement pieces, NUVE is where your wardrobe story begins.</p>
+                </div>
+                <div class="story-image-wrap">
+                    <img src="/images/heroin.jpg" alt="NUVE Brand Story">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── Stats ─────────────────────────────────────── -->
+    <div class="stats-strip">
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="number">12K+</div>
+                <div class="label">Happy Customers</div>
+            </div>
+            <div class="stat-item">
+                <div class="number">500+</div>
+                <div class="label">Curated Styles</div>
+            </div>
+            <div class="stat-item">
+                <div class="number">6</div>
+                <div class="label">Years of Fashion</div>
+            </div>
+            <div class="stat-item">
+                <div class="number">98%</div>
+                <div class="label">Satisfaction Rate</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Values ────────────────────────────────────── -->
+    <section class="section values-section">
+        <div class="section-inner">
+            <p class="section-label">What We Stand For</p>
+            <h2 class="section-title">Our Core Values</h2>
+            <div class="values-grid">
+                <div class="value-card">
+                    <div class="value-icon"><i class="fas fa-heart"></i></div>
+                    <h3>Curated with Love</h3>
+                    <p>Every piece in our collection is hand-picked by our style team to ensure it meets our standards of beauty, quality, and wearability.</p>
+                </div>
+                <div class="value-card">
+                    <div class="value-icon"><i class="fas fa-leaf"></i></div>
+                    <h3>Conscious Fashion</h3>
+                    <p>We partner with brands and makers who share our commitment to ethical production and sustainable materials wherever possible.</p>
+                </div>
+                <div class="value-card">
+                    <div class="value-icon"><i class="fas fa-gem"></i></div>
+                    <h3>Uncompromising Quality</h3>
+                    <p>From stitching to finish, we inspect every product so that what arrives at your door feels as good as it looks.</p>
+                </div>
+                <div class="value-card">
+                    <div class="value-icon"><i class="fas fa-users"></i></div>
+                    <h3>Community First</h3>
+                    <p>NUVE is more than a store — it's a community of women who inspire each other to dress boldly and live fully.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── CTA ───────────────────────────────────────── -->
+    <section class="cta-banner">
+        <h2>Your Next Favourite Look Awaits</h2>
+        <p>Explore our latest collection and find pieces that speak to your style.</p>
+        <a href="/shop" class="btn-primary">Shop the Collection</a>
+    </section>
+
+</body>
+</html>
+<%-include("../../views/partials/user/footer")%>

@@ -485,7 +485,7 @@
                       "
                     >
                       <img
-                        src="/uploads/re-image/<%= brand[i].brandImage[0] %>"
+                        src="/uploads/product-images/<%= brand[i].brandImage[0] %>"
                         alt="<%= brand.brandName%>"
                         class="img-fluid rounded-circle"
                         style="width: 100%; height: auto"
@@ -693,7 +693,7 @@
     
     if(!confirm.isConfirmed) return;
 
-    const response = await fetch(`/admin/unblockBrand?id=${brandId}`,{
+    const response = await fetch(`/admin/unblockBrand/${brandId}`,{
       method : 'GET'
     })
     if(response.redirected){

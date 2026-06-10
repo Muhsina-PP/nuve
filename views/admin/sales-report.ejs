@@ -1,0 +1,877 @@
+<%- include("../../views/partials/admin/header") %>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+<style>
+  :root {
+    --primary: #d4145a;
+    --primary-dark: #a81049;
+    --primary-light: rgba(212, 20, 90, 0.08);
+    --primary-mid: rgba(212, 20, 90, 0.15);
+    --light-bg: #f8f9fa;
+    --card-bg: #ffffff;
+    --card-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    --card-shadow-hover: 0 8px 25px rgba(0, 0, 0, 0.13);
+    --border: #eeeeee;
+    --border-mid: #e0e0e0;
+    --text: #1a1a2e;
+    --text-muted: #888;
+    --text-sub: #555;
+    --green: #198754;
+    --green-bg: #d1e7dd;
+    --red: #c0392b;
+    --red-bg: #f8d7da;
+    --orange: #d97706;
+    --orange-bg: #fff3cd;
+    --blue: #0369a1;
+    --blue-bg: #dbeafe;
+    --transition: all 0.25s ease;
+    --radius: 12px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  .sr-wrap {
+    padding: 30px;
+    background-color: var(--light-bg);
+    min-height: 100vh;
+  }
+
+  /* ── PAGE HEADER ── */
+  .sr-page-header {
+    background: var(--card-bg);
+    padding: 22px 28px;
+    border-radius: var(--radius);
+    box-shadow: var(--card-shadow);
+    margin-bottom: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .sr-page-title {
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .sr-page-title span { color: var(--primary); }
+
+  .sr-date-meta {
+    font-size: 13px;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+
+  /* ── FILTER CARD ── */
+  .sr-filter-card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--card-shadow);
+    padding: 24px 28px;
+    margin-bottom: 24px;
+  }
+
+  .sr-section-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .sr-section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .sr-pills {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 22px;
+  }
+
+  .sr-pill {
+    padding: 9px 20px;
+    border-radius: 50px;
+    border: 2px solid var(--border-mid);
+    background: transparent;
+    color: var(--text-sub);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    white-space: nowrap;
+  }
+
+  .sr-pill:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    background: var(--primary-light);
+  }
+
+  .sr-pill.active {
+    border-color: var(--primary);
+    background: var(--primary);
+    color: #fff;
+  }
+
+  .sr-date-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: flex-end;
+  }
+
+  .sr-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+    min-width: 160px;
+  }
+
+  .sr-field label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .sr-date-input {
+    padding: 11px 18px;
+    border: 2px solid var(--border-mid);
+    border-radius: 50px;
+    font-size: 14px;
+    color: var(--text);
+    background: var(--card-bg);
+    outline: none;
+    transition: var(--transition);
+    width: 100%;
+  }
+
+  .sr-date-input:focus { border-color: var(--primary); }
+
+  .sr-btn-generate {
+    padding: 11px 28px;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: #fff;
+    border: none;
+    border-radius: 50px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+    transition: var(--transition);
+    box-shadow: 0 4px 14px rgba(212,20,90,0.3);
+    align-self: flex-end;
+  }
+
+  .sr-btn-generate:hover {
+    box-shadow: 0 6px 20px rgba(212,20,90,0.4);
+    transform: translateY(-1px);
+  }
+
+  /* ── STAT CARDS ── */
+  .sr-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .sr-stat {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--card-shadow);
+    padding: 20px 22px;
+    border-top: 3px solid transparent;
+    transition: var(--transition);
+  }
+
+  .sr-stat:hover { box-shadow: var(--card-shadow-hover); transform: translateY(-2px); }
+  .sr-stat.pink   { border-top-color: var(--primary); }
+  .sr-stat.green  { border-top-color: var(--green); }
+  .sr-stat.red    { border-top-color: var(--red); }
+  .sr-stat.orange { border-top-color: var(--orange); }
+  .sr-stat.blue   { border-top-color: var(--blue); }
+
+  .sr-stat-icon {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    display: grid; place-items: center;
+    font-size: 18px;
+    margin-bottom: 14px;
+  }
+
+  .sr-stat.pink   .sr-stat-icon { background: var(--primary-light); }
+  .sr-stat.green  .sr-stat-icon { background: var(--green-bg); }
+  .sr-stat.red    .sr-stat-icon { background: var(--red-bg); }
+  .sr-stat.orange .sr-stat-icon { background: var(--orange-bg); }
+  .sr-stat.blue   .sr-stat-icon { background: var(--blue-bg); }
+
+  .sr-stat-label {
+    font-size: 11px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.07em;
+    color: var(--text-muted); margin-bottom: 5px;
+  }
+
+  .sr-stat-value { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; line-height: 1; }
+  .sr-stat.pink   .sr-stat-value { color: var(--primary); }
+  .sr-stat.green  .sr-stat-value { color: var(--green); }
+  .sr-stat.red    .sr-stat-value { color: var(--red); }
+  .sr-stat.orange .sr-stat-value { color: var(--orange); }
+  .sr-stat.blue   .sr-stat-value { color: var(--blue); }
+
+  .sr-stat-sub { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+  /* ── TABLE CARD ── */
+  .sr-table-card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--card-shadow);
+    overflow: hidden;
+    margin-bottom: 30px;
+    position: relative;
+  }
+
+  .sr-table-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 24px;
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .sr-table-title-wrap { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+  .sr-table-title { font-size: 16px; font-weight: 700; color: var(--text); }
+
+  .sr-badge {
+    background: var(--primary-light);
+    color: var(--primary);
+    border: 1px solid var(--primary-mid);
+    border-radius: 20px;
+    font-size: 12px; font-weight: 600;
+    padding: 3px 11px;
+  }
+
+  .sr-range-pill {
+    font-size: 12px; color: var(--text-muted);
+    background: var(--light-bg);
+    border: 1px solid var(--border-mid);
+    border-radius: 20px;
+    padding: 3px 12px; font-weight: 500;
+  }
+
+  .sr-dl-btns { display: flex; gap: 8px; }
+
+  .sr-btn-dl {
+    display: flex; align-items: center; gap: 6px;
+    padding: 8px 16px;
+    border-radius: 50px;
+    border: 2px solid var(--border-mid);
+    background: transparent;
+    font-size: 13px; font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    color: var(--text-sub);
+  }
+
+  .sr-btn-dl:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
+  .sr-btn-dl.pdf:hover   { border-color: var(--red);   color: var(--red);   background: var(--red-bg); }
+  .sr-btn-dl.excel:hover { border-color: var(--green); color: var(--green); background: var(--green-bg); }
+
+  /* Table */
+  .sr-table-wrap { overflow-x: auto; }
+
+  .sr-table { width: 100%; border-collapse: collapse; }
+
+  .sr-table thead {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  }
+
+  .sr-table thead th {
+    padding: 14px 14px;
+    color: #fff;
+    font-size: 12px; font-weight: 600;
+    text-align: left;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+  }
+
+  .sr-table tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: var(--transition);
+  }
+
+  .sr-table tbody tr:last-child { border-bottom: none; }
+  .sr-table tbody tr:hover { background: #fdf2f6; }
+
+  .sr-table tbody td {
+    padding: 13px 14px;
+    font-size: 14px;
+    color: var(--text-sub);
+    vertical-align: middle;
+    white-space: nowrap;
+  }
+
+  .sr-table td.order-id { font-weight: 700; color: var(--text); }
+  .sr-table td.amt      { color: var(--green); font-weight: 600; }
+  .sr-table td.disc     { color: var(--red); }
+  .sr-table td.coup     { color: var(--orange); }
+  .sr-table td.net-amt  { color: var(--primary); font-weight: 700; }
+
+  /* Status badges — same as existing orders page */
+  .status-badge {
+    padding: 5px 13px;
+    border-radius: 30px;
+    font-size: 12px; font-weight: 600;
+  }
+  .status-completed { background: #d1e7dd; color: #155724; }
+  .status-pending   { background: #fff3cd; color: #856404; }
+  .status-cancelled { background: #f8d7da; color: #721c24; }
+
+  /* Tfoot */
+  .sr-table tfoot tr {
+    background: #fdf2f6;
+    border-top: 2px solid var(--primary-mid);
+  }
+  .sr-table tfoot td {
+    padding: 13px 14px; font-size: 13px; font-weight: 700;
+    color: var(--text); white-space: nowrap;
+  }
+  .sr-table tfoot td.foot-amt  { color: var(--green); }
+  .sr-table tfoot td.foot-disc { color: var(--red); }
+  .sr-table tfoot td.foot-coup { color: var(--orange); }
+  .sr-table tfoot td.foot-net  { color: var(--primary); }
+
+  /* Empty state */
+  .sr-empty { padding: 60px 24px; text-align: center; }
+  .sr-empty-icon { font-size: 44px; margin-bottom: 14px; opacity: 0.25; }
+  .sr-empty-text { font-size: 16px; font-weight: 600; color: var(--text-muted); }
+  .sr-empty-sub  { font-size: 13px; color: var(--text-muted); margin-top: 5px; opacity: 0.7; }
+
+  /* Pagination — same style as existing orders page */
+  .sr-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px;
+    border-top: 1px solid var(--border);
+    flex-wrap: wrap; gap: 10px;
+  }
+
+  .sr-pag-info { font-size: 13px; color: var(--text-muted); font-weight: 500; }
+  .sr-pag-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+
+  .sr-page-btn {
+    padding: 8px 14px;
+    border: 1px solid var(--border-mid);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--text-sub);
+    font-size: 13px; font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    min-width: 36px; text-align: center;
+    text-decoration: none; display: inline-block;
+  }
+
+  .sr-page-btn:hover, .sr-page-btn.active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #fff;
+  }
+
+  .sr-page-btn:disabled { opacity: 0.4; cursor: default; pointer-events: none; }
+
+  /* Loading */
+  .sr-loading {
+    display: none;
+    position: absolute; inset: 0;
+    background: rgba(255,255,255,0.78);
+    backdrop-filter: blur(3px);
+    z-index: 10;
+    border-radius: var(--radius);
+    align-items: center; justify-content: center;
+    flex-direction: column; gap: 12px;
+  }
+  .sr-loading.show { display: flex; }
+
+  .sr-spinner {
+    width: 36px; height: 36px;
+    border: 3px solid var(--primary-mid);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: srSpin 0.7s linear infinite;
+  }
+
+  @keyframes srSpin { to { transform: rotate(360deg); } }
+  .sr-spinner-text { font-size: 13px; font-weight: 600; color: var(--text-muted); }
+
+  /* Toast */
+  .sr-toast {
+    position: fixed; bottom: 28px; right: 28px;
+    background: #fff;
+    border: 1px solid var(--border-mid);
+    border-left: 4px solid var(--primary);
+    border-radius: 10px;
+    padding: 12px 18px;
+    font-size: 14px; font-weight: 600; color: var(--text);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    z-index: 9999;
+    transform: translateY(70px); opacity: 0;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .sr-toast.show    { transform: translateY(0); opacity: 1; }
+  .sr-toast.success { border-left-color: var(--green); }
+  .sr-toast.error   { border-left-color: var(--red); }
+
+  @media (max-width: 768px) {
+    .sr-wrap { padding: 16px; }
+    .sr-date-row { flex-direction: column; }
+    .sr-table-header { flex-direction: column; align-items: flex-start; }
+    .sr-stats-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+
+<section class="sr-wrap">
+
+  <!-- PAGE HEADER -->
+  <div class="sr-page-header">
+    <div class="sr-page-title">Sales <span>Report</span></div>
+    <div class="sr-date-meta" id="srDateTime"></div>
+  </div>
+
+  <!-- FILTER CARD -->
+  <div class="sr-filter-card">
+    <div class="sr-section-label">Quick Period</div>
+    <div class="sr-pills">
+      <button class="sr-pill" data-period="today"  onclick="selectPeriod('today',  this)">Today</button>
+      <button class="sr-pill" data-period="week"   onclick="selectPeriod('week',   this)">This Week</button>
+      <button class="sr-pill" data-period="month"  onclick="selectPeriod('month',  this)">This Month</button>
+      <button class="sr-pill" data-period="year"   onclick="selectPeriod('year',   this)">This Year</button>
+      <button class="sr-pill" data-period="custom" onclick="selectPeriod('custom', this)">Custom Range</button>
+    </div>
+
+    <div class="sr-section-label">Custom Date Range</div>
+    <div class="sr-date-row">
+      <div class="sr-field">
+        <label>From Date</label>
+        <input type="date" class="sr-date-input" id="srFrom" onchange="onCustomDate()" />
+      </div>
+      <div class="sr-field">
+        <label>To Date</label>
+        <input type="date" class="sr-date-input" id="srTo" onchange="onCustomDate()" />
+      </div>
+      <button class="sr-btn-generate" onclick="generateReport()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        Generate Report
+      </button>
+    </div>
+  </div>
+
+  <!-- STAT CARDS -->
+  <div class="sr-stats-grid">
+    <div class="sr-stat pink">
+      <div class="sr-stat-icon">📦</div>
+      <div class="sr-stat-label">Total Sales</div>
+      <div class="sr-stat-value" id="stOrders">—</div>
+      <div class="sr-stat-sub" id="stOrdersSub">orders</div>
+    </div>
+    <div class="sr-stat green">
+      <div class="sr-stat-icon">💰</div>
+      <div class="sr-stat-label">Order Amount</div>
+      <div class="sr-stat-value" id="stRevenue">—</div>
+      <div class="sr-stat-sub">gross revenue</div>
+    </div>
+    <div class="sr-stat red">
+      <div class="sr-stat-icon">🏷️</div>
+      <div class="sr-stat-label">Discounts</div>
+      <div class="sr-stat-value" id="stDiscount">—</div>
+      <div class="sr-stat-sub" id="stDiscSub">direct discounts</div>
+    </div>
+    <div class="sr-stat orange">
+      <div class="sr-stat-icon">🎟️</div>
+      <div class="sr-stat-label">Coupon Deductions</div>
+      <div class="sr-stat-value" id="stCoupon">—</div>
+      <div class="sr-stat-sub" id="stCoupSub">coupon savings</div>
+    </div>
+    <div class="sr-stat blue">
+      <div class="sr-stat-icon">📈</div>
+      <div class="sr-stat-label">Net Revenue</div>
+      <div class="sr-stat-value" id="stNet">—</div>
+      <div class="sr-stat-sub">after all deductions</div>
+    </div>
+  </div>
+
+  <!-- TABLE CARD -->
+  <div class="sr-table-card" id="srTableCard">
+
+    <div class="sr-loading" id="srLoading">
+      <div class="sr-spinner"></div>
+      <div class="sr-spinner-text">Generating report…</div>
+    </div>
+
+    <div class="sr-table-header">
+      <div class="sr-table-title-wrap">
+        <div class="sr-table-title">Order Details</div>
+        <span class="sr-badge" id="srBadge">No data</span>
+        <span class="sr-range-pill" id="srRangePill" style="display:none;"></span>
+      </div>
+      <div class="sr-dl-btns">
+        <button class="sr-btn-dl pdf" onclick="downloadPDF()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+          </svg>
+          Download PDF
+        </button>
+        <button class="sr-btn-dl excel" onclick="downloadExcel()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2"/>
+            <line x1="3" y1="9" x2="21" y2="9"/>
+            <line x1="3" y1="15" x2="21" y2="15"/>
+            <line x1="9" y1="3" x2="9" y2="21"/>
+          </svg>
+          Download Excel
+        </button>
+      </div>
+    </div>
+
+    <div class="sr-table-wrap">
+      <table class="sr-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Order ID</th>
+            <th>Date</th>
+            <th>Customer</th>
+            <th>Products</th>
+            <th>Items</th>
+            <th>Order Amount</th>
+            <th>Discount</th>
+            <th>Coupon Amount</th>
+            <th>Coupon Code</th>
+            <th>Net Amount</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="srBody">
+          <tr>
+            <td colspan="11">
+              <div class="sr-empty">
+                <div class="sr-empty-icon">📊</div>
+                <div class="sr-empty-text">No report generated yet</div>
+                <div class="sr-empty-sub">Select a period and click Generate Report</div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+        <tfoot id="srFoot" style="display:none;">
+          <tr>
+            <td colspan="6"><strong>TOTALS</strong></td>
+            <td class="foot-amt"  id="footAmt"></td>
+            <td class="foot-disc" id="footDisc"></td>
+            <td class="foot-coup" id="footCoup"></td>
+            <td></td>
+            <td class="foot-net"  id="footNet"></td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <div class="sr-pagination" id="srPagination" style="display:none;">
+      <div class="sr-pag-info" id="srPagInfo"></div>
+      <div class="sr-pag-btns" id="srPagBtns"></div>
+    </div>
+
+  </div>
+
+</section>
+
+<div class="sr-toast" id="srToast"></div>
+
+<script>
+  // ── STATE
+  let activePeriod = null, activeFrom = null, activeTo = null;
+  let allRows = [], currentPage = 1;
+  const PAGE_SIZE = 10;
+
+  // ── HELPERS
+  function fmt(n)  { return '₹' + Number(n).toLocaleString('en-IN', { minimumFractionDigits:2, maximumFractionDigits:2 }); }
+  function fmtD(d) { return new Date(d).toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' }); }
+  function todayStr()     { return new Date().toISOString().split('T')[0]; }
+  function startOfWeek()  { const d=new Date(),day=d.getDay(),diff=d.getDate()-day+(day===0?-6:1); d.setDate(diff); return d.toISOString().split('T')[0]; }
+  function startOfMonth() { const d=new Date(); d.setDate(1); return d.toISOString().split('T')[0]; }
+  function startOfYear()  { return new Date().getFullYear()+'-01-01'; }
+
+  function showToast(msg, type='') {
+    const t = document.getElementById('srToast');
+    t.textContent=msg; t.className='sr-toast show '+type;
+    clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),3000);
+  }
+
+  // ── PERIOD SELECTION
+  function selectPeriod(period, el) {
+    document.querySelectorAll('.sr-pill').forEach(p=>p.classList.remove('active'));
+    if (el) el.classList.add('active'); 
+    activePeriod=period;
+    const today=todayStr();
+    if(period==='today')  { activeFrom=today;          activeTo=today; }
+    if(period==='week')   { activeFrom=startOfWeek();  activeTo=today; }
+    if(period==='month')  { activeFrom=startOfMonth(); activeTo=today; }
+    if(period==='year')   { activeFrom=startOfYear();  activeTo=today; }
+    if(period==='custom') { activeFrom=null; activeTo=null; }
+    
+    document.getElementById('srFrom').value = (period!=='custom'&&activeFrom)?activeFrom:'';
+    document.getElementById('srTo').value   = (period!=='custom'&&activeTo)?activeTo:'';
+    
+    if(period!=='custom') generateReport();
+  }
+
+  function onCustomDate() {
+    const f=document.getElementById('srFrom').value, t=document.getElementById('srTo').value;
+    if(f&&t) {
+      activeFrom=f; activeTo=t; activePeriod='custom';
+      document.querySelectorAll('.sr-pill').forEach(p=>p.classList.toggle('active',p.dataset.period==='custom'));
+      generateReport();
+    }
+  }
+
+  // ── GENERATE REPORT
+  async function generateReport() {
+    if(!activeFrom||!activeTo) { showToast('⚠️  Please select a period or set a date range','error'); return; }
+    if(activeFrom>activeTo)    { showToast('⚠️  From date must be before To date','error'); return; }
+    
+    const loadingEl = document.getElementById('srLoading');
+    loadingEl.classList.add('show');
+    
+    try {
+      const url = `/admin/sales-report?json=true&filter=${activePeriod || 'custom'}&startDate=${activeFrom}&endDate=${activeTo}`;
+      const response = await fetch(url);
+      const result = await response.json();
+      
+      if (result.success) {
+        allRows = result.data;
+        currentPage = 1;
+        renderStats(allRows);
+        renderTable();
+        
+        const pill = document.getElementById('srRangePill');
+        pill.textContent = fmtD(activeFrom) + ' – ' + fmtD(activeTo);
+        pill.style.display = '';
+        
+        showToast(`✓ Report generated — ${allRows.length} orders found`, 'success');
+      } else {
+        showToast('❌  ' + (result.message || 'Failed to fetch report data'), 'error');
+      }
+    } catch (error) {
+      console.error('Error generating report:', error);
+      showToast('❌  An error occurred while generating the report', 'error');
+    } finally {
+      loadingEl.classList.remove('show');
+    }
+  }
+
+  // ── STATS
+  function renderStats(rows) {
+    const rev=rows.reduce((s,r)=>s+r.orderAmount,0);
+    const disc=rows.reduce((s,r)=>s+r.discount,0);
+    const coup=rows.reduce((s,r)=>s+r.coupon,0);
+    const net=rows.reduce((s,r)=>s+r.net,0);
+    document.getElementById('stOrders').textContent   = rows.length.toLocaleString('en-IN');
+    document.getElementById('stRevenue').textContent  = fmt(rev);
+    document.getElementById('stDiscount').textContent = fmt(disc);
+    document.getElementById('stCoupon').textContent   = fmt(coup);
+    document.getElementById('stNet').textContent      = fmt(net);
+    document.getElementById('stOrdersSub').textContent = rows.length===1?'order':'orders in period';
+    document.getElementById('stDiscSub').textContent   = rows.filter(r=>r.discount>0).length+' orders discounted';
+    document.getElementById('stCoupSub').textContent   = rows.filter(r=>r.coupon>0).length+' coupons applied';
+  }
+
+  // ── TABLE
+  function renderTable() {
+    const body=document.getElementById('srBody');
+    const foot=document.getElementById('srFoot');
+    const badge=document.getElementById('srBadge');
+
+    if(!allRows.length) {
+      body.innerHTML=`<tr><td colspan="11"><div class="sr-empty">
+        <div class="sr-empty-icon">🔍</div>
+        <div class="sr-empty-text">No orders found</div>
+        <div class="sr-empty-sub">Try a different date range</div>
+      </div></td></tr>`;
+      foot.style.display='none'; badge.textContent='0 orders';
+      document.getElementById('srPagination').style.display='none'; return;
+    }
+
+    const total=allRows.length;
+    const start=(currentPage-1)*PAGE_SIZE;
+    const pageRows=allRows.slice(start,start+PAGE_SIZE);
+    badge.textContent=total+' order'+(total!==1?'s':'');
+
+    body.innerHTML=pageRows.map((r,i)=>`
+      <tr>
+        <td>${start+i+1}</td>
+        <td class="order-id">${r.orderId}</td>
+        <td>${fmtD(r.date)}</td>
+        <td>${r.customer}</td>
+        <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${r.itemNames}">${r.itemNames}</td>
+        <td>${r.items}</td>
+        <td class="amt">${fmt(r.orderAmount)}</td>
+        <td class="disc">${r.discount>0?'-'+fmt(r.discount):'—'}</td>
+        <td class="coup">${r.coupon>0?'-'+fmt(r.coupon):'—'}</td>
+        <td>${r.couponCode}</td>
+        <td class="net-amt">${fmt(r.net)}</td>
+        <td><span class="status-badge status-${r.status}">${r.status.charAt(0).toUpperCase()+r.status.slice(1)}</span></td>
+      </tr>`).join('');
+
+    const tAmt=allRows.reduce((s,r)=>s+r.orderAmount,0);
+    const tDisc=allRows.reduce((s,r)=>s+r.discount,0);
+    const tCoup=allRows.reduce((s,r)=>s+r.coupon,0);
+    const tNet=allRows.reduce((s,r)=>s+r.net,0);
+    document.getElementById('footAmt').textContent  = fmt(tAmt);
+    document.getElementById('footDisc').textContent = tDisc>0?'-'+fmt(tDisc):'—';
+    document.getElementById('footCoup').textContent = tCoup>0?'-'+fmt(tCoup):'—';
+    document.getElementById('footNet').textContent  = fmt(tNet);
+    foot.style.display='';
+    renderPagination(total);
+  }
+
+  function renderPagination(total) {
+    const bar=document.getElementById('srPagination');
+    const info=document.getElementById('srPagInfo');
+    const btns=document.getElementById('srPagBtns');
+    const pages=Math.ceil(total/PAGE_SIZE);
+    if(pages<=1){bar.style.display='none';return;}
+    bar.style.display='flex';
+    const s=(currentPage-1)*PAGE_SIZE+1, e=Math.min(currentPage*PAGE_SIZE,total);
+    info.textContent=`Showing ${s}–${e} of ${total}`;
+    let h=`<button class="sr-page-btn" ${currentPage===1?'disabled':''} onclick="goPage(${currentPage-1})">Previous</button>`;
+    for(let p=1;p<=pages;p++){
+      if(pages>7&&p>2&&p<pages-1&&Math.abs(p-currentPage)>1){if(p===3||p===pages-2)h+=`<button class="sr-page-btn" disabled>…</button>`;continue;}
+      h+=`<button class="sr-page-btn ${p===currentPage?'active':''}" onclick="goPage(${p})">${p}</button>`;
+    }
+    h+=`<button class="sr-page-btn" ${currentPage===pages?'disabled':''} onclick="goPage(${currentPage+1})">Next</button>`;
+    btns.innerHTML=h;
+  }
+
+  function goPage(p) {
+    currentPage=p; renderTable();
+    document.getElementById('srTableCard').scrollIntoView({behavior:'smooth',block:'start'});
+  }
+
+  // ── PDF DOWNLOAD
+  function downloadPDF() {
+    if(!allRows.length){showToast('⚠️  Generate a report first','error');return;}
+    const {jsPDF}=window.jspdf;
+    const doc=new jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
+    doc.setFillColor(255,255,255); doc.rect(0,0,297,210,'F');
+    doc.setFillColor(212,20,90); doc.rect(0,0,297,22,'F');
+    doc.setTextColor(255,255,255); doc.setFontSize(14); doc.setFont('helvetica','bold');
+    doc.text('SALES REPORT',14,14);
+    doc.setFontSize(9); doc.setFont('helvetica','normal');
+    doc.text(`Period: ${fmtD(activeFrom)} – ${fmtD(activeTo)}   |   Generated: ${new Date().toLocaleString('en-IN')}`,14,20);
+
+    const tAmt=allRows.reduce((s,r)=>s+r.orderAmount,0);
+    const tDisc=allRows.reduce((s,r)=>s+r.discount,0);
+    const tCoup=allRows.reduce((s,r)=>s+r.coupon,0);
+    const tNet=allRows.reduce((s,r)=>s+r.net,0);
+
+    doc.setFillColor(253,242,246); doc.roundedRect(14,26,269,14,2,2,'F');
+    [['Orders',allRows.length],['Order Amount',fmt(tAmt)],['Discounts',fmt(tDisc)],['Coupons',fmt(tCoup)],['Net Revenue',fmt(tNet)]].forEach(([l,v],i)=>{
+      const x=18+i*55;
+      doc.setFontSize(7.5); doc.setFont('helvetica','normal'); doc.setTextColor(150,150,150); doc.text(l,x,31);
+      doc.setFont('helvetica','bold'); doc.setTextColor(212,20,90); doc.text(String(v),x,38);
+    });
+
+    doc.autoTable({
+      startY:44,
+      head:[['#','Order ID','Date','Customer','Products','Items','Order Amt','Discount','Coupon Amt','Coupon Code','Net Amt','Status']],
+      body:allRows.map((r,i)=>[i+1,r.orderId,fmtD(r.date),r.customer,r.itemNames,r.items,fmt(r.orderAmount),
+        r.discount>0?'-'+fmt(r.discount):'—',r.coupon>0?'-'+fmt(r.coupon):'—',r.couponCode,fmt(r.net),
+        r.status.charAt(0).toUpperCase()+r.status.slice(1)]),
+      foot:[['','','','','','TOTALS',fmt(tAmt),tDisc>0?'-'+fmt(tDisc):'—',tCoup>0?'-'+fmt(tCoup):'—','',fmt(tNet),'']],
+      styles:{fontSize:7.5,cellPadding:2.5,textColor:[80,80,80]},
+      headStyles:{fillColor:[212,20,90],textColor:[255,255,255],fontStyle:'bold'},
+      footStyles:{fillColor:[253,242,246],textColor:[212,20,90],fontStyle:'bold'},
+      alternateRowStyles:{fillColor:[253,248,251]},
+      columnStyles:{5:{textColor:[25,135,84]},9:{textColor:[212,20,90],fontStyle:'bold'}}
+    });
+
+    doc.save(`sales-report_${activeFrom}_to_${activeTo}.pdf`);
+    showToast('✓ PDF downloaded','success');
+  }
+
+  // ── EXCEL DOWNLOAD
+  function downloadExcel() {
+    if(!allRows.length){showToast('⚠️  Generate a report first','error');return;}
+    const tAmt=allRows.reduce((s,r)=>s+r.orderAmount,0);
+    const tDisc=allRows.reduce((s,r)=>s+r.discount,0);
+    const tCoup=allRows.reduce((s,r)=>s+r.coupon,0);
+    const tNet=allRows.reduce((s,r)=>s+r.net,0);
+    const wb=XLSX.utils.book_new();
+    const summary=[
+      ['SALES REPORT SUMMARY'],
+      ['Period',`${fmtD(activeFrom)} – ${fmtD(activeTo)}`],
+      ['Generated',new Date().toLocaleString('en-IN')],
+      [],
+      ['Metric','Value'],
+      ['Total Orders',allRows.length],
+      ['Overall Order Amount',tAmt],
+      ['Overall Discount',tDisc],
+      ['Overall Coupon Deductions',tCoup],
+      ['Net Revenue',tNet],
+    ];
+    XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(summary),'Summary');
+    const headers=['#','Order ID','Date','Customer','Products','Items','Order Amount (₹)','Discount (₹)','Coupon Amount (₹)','Coupon Code','Net Amount (₹)','Status'];
+    const rows=allRows.map((r,i)=>[i+1,r.orderId,r.date,r.customer,r.itemNames,r.items,r.orderAmount,r.discount,r.coupon,r.couponCode,r.net,r.status]);
+    rows.push(['','','','','','TOTALS',tAmt,tDisc,tCoup,'',tNet,'']);
+    const ws2=XLSX.utils.aoa_to_sheet([headers,...rows]);
+    ws2['!cols']=[4,12,12,18,25,6,18,14,16,14,16,12].map(w=>({wch:w}));
+    XLSX.utils.book_append_sheet(wb,ws2,'Orders');
+    XLSX.writeFile(wb,`sales-report_${activeFrom}_to_${activeTo}.xlsx`);
+    showToast('✓ Excel downloaded','success');
+  }
+
+  // ── INIT
+  (function(){
+    const el=document.getElementById('srDateTime');
+    if (el) {
+      function tick(){ el.textContent=new Date().toLocaleString('en-IN',{weekday:'short',day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}); }
+      tick(); setInterval(tick,1000);
+    }
+    
+    const today=todayStr();
+    document.getElementById('srFrom').value=today;
+    document.getElementById('srTo').value=today;
+    
+    // Auto-load today's report on init
+    selectPeriod('today', document.querySelector('[data-period="today"]'));
+  })();
+</script>
+
+<%- include("../../views/partials/admin/footer") %>
