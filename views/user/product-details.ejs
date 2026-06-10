@@ -1018,19 +1018,34 @@ function changeMainImage(src, thumb) {
 /* ────────────────────────────────────────────────────
    ZOOM (lens + panel)
 ──────────────────────────────────────────────────── */
-const ZOOM = 3;
+let ZOOM = 3;
 const wrapper = document.getElementById('zoomWrapper');
 const mainImg = document.getElementById('mainImage');
 const lens    = document.getElementById('zoomLens');
 const result  = document.getElementById('zoomResult');
 
 function updateZoomBackground() {
-  result.style.backgroundImage = `url('${mainImg.src}')`;
-  const rw = result.offsetWidth  || 420;
-  const rh = result.offsetHeight || 420;
-  result.style.backgroundSize = `${mainImg.offsetWidth * ZOOM}px ${mainImg.offsetHeight * ZOOM}px`;
+  // Use natural dimensions for higher quality zoom
+  const img = mainImg;
+  const naturalW = img.naturalWidth || img.width;
+  const naturalH = img.naturalHeight || img.height;
+  const zoomFactor = ZOOM;
+  result.style.backgroundImage = `url('${img.src}')`;
+  // Set background size based on natural dimensions multiplied by zoom
+  result.style.backgroundSize = `${naturalW * zoomFactor}px ${naturalH * zoomFactor}px`;
 }
 
+// Adjust zoom level with mouse wheel over the zoomResult panel
+result.addEventListener('wheel', (e) => {
+  e.preventDefault();
+  const delta = Math.sign(e.deltaY);
+  const minZoom = 2, maxZoom = 5;
+  const newZoom = Math.min(Math.max(minZoom, ZOOM - delta), maxZoom);
+  if (newZoom !== ZOOM) {
+    ZOOM = newZoom; // update the mutable zoom factor
+    updateZoomBackground();
+  }
+});
 wrapper.addEventListener('mouseenter', (e) => {
   if (e.target.closest('.zoom-result')) return;
   updateZoomBackground();
