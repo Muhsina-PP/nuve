@@ -33,23 +33,49 @@ router.get(
     prompt: "select_account",
   })
 );
+// router.get(
+//   "/google/callback", (req, res, next) => {
+//     passport.authenticate("google", (err, user, infor) => {
+//       if (err) return next(err);
+
+//       if (!user) {
+//         return res.render("login", { message: "User is blocked by admin" })
+//       }
+//       req.logIn(user, (err) => {
+//         if (err) return next(err);
+//         res.redirect("/");
+//       })
+//     })(req, res, next);
+//   }
+// );
+
+// Homepage and shop page managememt
 router.get(
-  "/google/callback", (req, res, next) => {
-    passport.authenticate("google", (err, user, infor) => {
+  "/google/callback",
+  (req, res, next) => {
+    passport.authenticate("google", (err, user, info) => {
+
       if (err) return next(err);
 
       if (!user) {
-        return res.render("login", { message: "User is blocked by admin" })
+        return res.render("login", {
+          message: "User is blocked by admin"
+        });
       }
+
       req.logIn(user, (err) => {
+
         if (err) return next(err);
+
+        req.session.user = user._id;
+
         res.redirect("/");
-      })
+      });
+
     })(req, res, next);
   }
 );
 
-// Homepage and shop page managememt
 router.get("/", userController.loadHomepage);
 router.get("/shop", userAuth, userController.loadShopPage)
 
