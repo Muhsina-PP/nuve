@@ -318,10 +318,10 @@ const placeOrder = async (req, res) => {
     });
 
     await newOrder.save();
-// Debit wallet if used
-if (walletUsed > 0) {
-  await debitWallet(userId, walletUsed, "Wallet payment", newOrder._id);
-}
+    // Debit wallet if used
+    if (walletUsed > 0) {
+      await debitWallet(userId, walletUsed, "Wallet payment", newOrder._id);
+    }
 
     // if (order.paymentMethod !== 'COD' && order.paymentStatus === 'Paid') {
     //   await creditWallet(
@@ -333,20 +333,22 @@ if (walletUsed > 0) {
     // }
 
     if (req.appliedCoupon) {
-  const coupon = req.appliedCoupon;
-  coupon.usedCount += 1;
-  const userIdx = coupon.usedBy.findIndex(u => u.userId.toString() === userId.toString());
-  if (userIdx > -1) {
-    coupon.usedBy[userIdx].count += 1;
-  } else {
-    coupon.usedBy.push({ userId, count: 1 });
-  }
-  await coupon.save();
+      const coupon = req.appliedCoupon;
+      coupon.usedCount += 1;
+      const userIdx = coupon.usedBy.findIndex(u => u.userId.toString() === userId.toString());
+      if (userIdx > -1) {
+        coupon.usedBy[userIdx].count += 1;
+      } else {
+        coupon.usedBy.push({ userId, count: 1 });
+      }
+      await coupon.save();
+
+
+    }
+
     // Clear cart after processing
     cart.items = [];
     await cart.save();
-  
-}
 
     res.json({
       success: true,
@@ -486,55 +488,55 @@ const createRazorpayOrder = async (req, res) => {
 
     console.log("Remaining amount : ", remainingAmount)
 
-      // Wallet only payment: debit wallet, create order, and respond
-      if (remainingAmount === 0) {
-        const addressData = await Address.findOne({ userId });
-        const selectedAddress = addressData.address.find((addr) => addr.isDefault);
-        const totalMRP = cart.items.reduce((sum, item) => sum + item.productId.regularPrice * item.quantity, 0);
-        const productDiscount = totalMRP - totalPrice;
-        
-        // Create order directly with wallet payment
-        const newOrder = new Order({
-          couponCode: couponDiscount > 0 ? coupon : null,
-          coupon: couponDiscount > 0 ? coupon : null,
-          userId,
-          paymentMethod: "Wallet",
-          paymentStatus: "Paid",
-          walletUsed,
-          razorpayPaymentId: null,
-          orderedItems: cart.items.map(item => {
-            const itemPrice = (item.productId.salePrice || item.productId.regularPrice) * item.quantity;
-            const itemCouponShare = totalPrice > 0 ? (itemPrice / totalPrice) * couponDiscount : 0;
-            const finalItemPrice = itemPrice - itemCouponShare;
-            return {
-              product: item.productId,
-              variant: item.variant,
-              quantity: item.quantity,
-              price: item.productId.salePrice || item.productId.regularPrice,
-              regularPrice: item.productId.regularPrice,
-              couponShare: Number(itemCouponShare.toFixed(2)),
-              finalItemPrice: Number(finalItemPrice.toFixed(2))
-            };
-          }),
-          totalPrice,
-          
-          status: "Pending",
-          couponDiscount,
-          discount: productDiscount,
-          basePrice,
-          gstAmount,
-          address: {
-            addressType: selectedAddress.addressType,
-            name: selectedAddress.name,
-            city: selectedAddress.city,
-            landMark: selectedAddress.landMark,
-            state: selectedAddress.state,
-            pincode: selectedAddress.pincode,
-            phone: selectedAddress.phone,
-            altPhone: selectedAddress.altPhone,
-          },
-        });
-        await newOrder.save();
+    // Wallet only payment: debit wallet, create order, and respond
+    if (remainingAmount === 0) {
+      const addressData = await Address.findOne({ userId });
+      const selectedAddress = addressData.address.find((addr) => addr.isDefault);
+      const totalMRP = cart.items.reduce((sum, item) => sum + item.productId.regularPrice * item.quantity, 0);
+      const productDiscount = totalMRP - totalPrice;
+
+      // Create order directly with wallet payment
+      const newOrder = new Order({
+        couponCode: couponDiscount > 0 ? coupon : null,
+        coupon: couponDiscount > 0 ? coupon : null,
+        userId,
+        paymentMethod: "Wallet",
+        paymentStatus: "Paid",
+        walletUsed,
+        razorpayPaymentId: null,
+        orderedItems: cart.items.map(item => {
+          const itemPrice = (item.productId.salePrice || item.productId.regularPrice) * item.quantity;
+          const itemCouponShare = totalPrice > 0 ? (itemPrice / totalPrice) * couponDiscount : 0;
+          const finalItemPrice = itemPrice - itemCouponShare;
+          return {
+            product: item.productId,
+            variant: item.variant,
+            quantity: item.quantity,
+            price: item.productId.salePrice || item.productId.regularPrice,
+            regularPrice: item.productId.regularPrice,
+            couponShare: Number(itemCouponShare.toFixed(2)),
+            finalItemPrice: Number(finalItemPrice.toFixed(2))
+          };
+        }),
+        totalPrice,
+
+        status: "Pending",
+        couponDiscount,
+        discount: productDiscount,
+        basePrice,
+        gstAmount,
+        address: {
+          addressType: selectedAddress.addressType,
+          name: selectedAddress.name,
+          city: selectedAddress.city,
+          landMark: selectedAddress.landMark,
+          state: selectedAddress.state,
+          pincode: selectedAddress.pincode,
+          phone: selectedAddress.phone,
+          altPhone: selectedAddress.altPhone,
+        },
+      });
+      await newOrder.save();
 
       // Debit wallet if fully paid using wallet
       if (walletUsed === finalAmount) {
@@ -545,7 +547,7 @@ const createRazorpayOrder = async (req, res) => {
       }
 
       // if (req.appliedCoupon) { success: true, walletOnly: true, orderId: newOrder._id });
-      }
+    }
 
     const options = {
       amount: Math.round(remainingAmount * 100),
