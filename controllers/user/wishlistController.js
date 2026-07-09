@@ -29,7 +29,18 @@ const loadWishlist = async (req, res) => {
 };
 
 const addToWishlist = async (req, res) => {
+  console.log("========== add to wishlist called =================== ");
+
   try {
+
+    if (!req.session.user) {
+      req.session.returnTo = req.body.returnTo;
+      console.log("Saved info : ", req.session.returnTo)
+      return res.status(401).json({
+        success: false,
+        redirect: "/login"
+      })
+    }
 
     const { productId, variant } = req.body;
 

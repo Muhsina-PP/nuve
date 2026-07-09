@@ -1,0 +1,471 @@
+<%-include("../../views/partials/user/header")%>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms &amp; Conditions – NUVE</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --brand:    #d4145a;
+            --brand-dk: #a81049;
+            --dark:     #1a1a1a;
+            --mid:      #555;
+            --light:    #f8f9fa;
+            --white:    #ffffff;
+            --border:   #e8e8e8;
+        }
+
+        body {
+            font-family: 'Jost', 'Segoe UI', Tahoma, sans-serif;
+            color: var(--dark);
+            line-height: 1.7;
+        }
+
+        /* ── Hero ─────────────────────────────────────── */
+        .legal-hero {
+            position: relative;
+            height: 300px;
+            background: linear-gradient(135deg, #1a0a10 0%, #3d0e26 60%, #1a0a10 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .legal-hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 55% 70% at 20% 50%, rgba(212,20,90,0.2) 0%, transparent 70%),
+                radial-gradient(ellipse 40% 50% at 80% 30%, rgba(212,20,90,0.12) 0%, transparent 70%);
+        }
+
+        .legal-hero::after {
+            content: 'NUVE';
+            position: absolute;
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-size: 200px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.04);
+            letter-spacing: 0.15em;
+            pointer-events: none;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .legal-hero-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            color: var(--white);
+            animation: fadeInUp 0.9s ease both;
+            padding: 0 20px;
+        }
+
+        .legal-hero-content .eyebrow {
+            font-size: 13px;
+            letter-spacing: 0.35em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.5);
+            margin-bottom: 16px;
+        }
+
+        .legal-hero-content h1 {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-size: 50px;
+            font-weight: 600;
+            line-height: 1.1;
+            margin-bottom: 14px;
+        }
+
+        .legal-hero-content h1 em {
+            font-style: italic;
+            color: #f2a0bf;
+        }
+
+        .legal-hero-content p {
+            font-size: 14px;
+            font-weight: 300;
+            color: rgba(255,255,255,0.6);
+            letter-spacing: 0.04em;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(28px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── Layout ───────────────────────────────────── */
+        .legal-section {
+            padding: 70px 5% 100px;
+            background: var(--white);
+        }
+
+        .legal-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 60px;
+            align-items: start;
+        }
+
+        /* ── TOC Sidebar ──────────────────────────────── */
+        .legal-toc {
+            position: sticky;
+            top: 24px;
+            background: var(--light);
+            border-radius: 14px;
+            padding: 26px 22px;
+        }
+
+        .legal-toc h4 {
+            font-size: 12px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--brand);
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .legal-toc ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .legal-toc a {
+            display: block;
+            padding: 8px 10px;
+            border-radius: 8px;
+            font-size: 14px;
+            color: var(--mid);
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .legal-toc a:hover,
+        .legal-toc a.active {
+            background: rgba(212,20,90,0.08);
+            color: var(--brand);
+        }
+
+        /* ── Content ──────────────────────────────────── */
+        .legal-content .section-label {
+            font-size: 12px;
+            letter-spacing: 0.32em;
+            text-transform: uppercase;
+            color: var(--brand);
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .legal-intro {
+            font-size: 15px;
+            color: var(--mid);
+            margin-bottom: 50px;
+            max-width: 640px;
+        }
+
+        .legal-block {
+            padding-bottom: 40px;
+            margin-bottom: 40px;
+            border-bottom: 1px solid var(--border);
+            scroll-margin-top: 24px;
+        }
+
+        .legal-block:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .legal-block-head {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+
+        .legal-block-icon {
+            width: 40px;
+            height: 40px;
+            min-width: 40px;
+            border-radius: 50%;
+            background: rgba(212,20,90,0.1);
+            color: var(--brand);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+        }
+
+        .legal-block-head h3 {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-size: 26px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .legal-block p {
+            font-size: 15px;
+            color: var(--mid);
+            margin-bottom: 14px;
+        }
+
+        .legal-block p:last-child {
+            margin-bottom: 0;
+        }
+
+        .legal-block ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 0 0 14px;
+        }
+
+        .legal-block ul li {
+            font-size: 15px;
+            color: var(--mid);
+            padding-left: 22px;
+            position: relative;
+        }
+
+        .legal-block ul li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 9px;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--brand);
+        }
+
+        .legal-block a.inline-link {
+            color: var(--brand);
+            font-weight: 500;
+            text-decoration: none;
+        }
+
+        .legal-block a.inline-link:hover {
+            text-decoration: underline;
+        }
+
+        /* ── Responsive ───────────────────────────────── */
+        @media (max-width: 900px) {
+            .legal-inner { grid-template-columns: 1fr; }
+            .legal-toc { position: static; }
+        }
+
+        @media (max-width: 600px) {
+            .legal-hero-content h1 { font-size: 32px; }
+            .legal-block-head h3 { font-size: 21px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ── Hero ──────────────────────────────────────── -->
+    <section class="legal-hero">
+        <div class="legal-hero-content">
+            <p class="eyebrow">Legal</p>
+            <h1>Terms &amp; <em>Conditions</em></h1>
+            <p>Last updated: July 2, 2026</p>
+        </div>
+    </section>
+
+    <!-- ── Content ───────────────────────────────────── -->
+    <section class="legal-section">
+        <div class="legal-inner">
+
+            <!-- TOC -->
+            <aside class="legal-toc">
+                <h4>On This Page</h4>
+                <ul>
+                    <li><a href="#acceptance">Acceptance of Terms</a></li>
+                    <li><a href="#eligibility">Eligibility &amp; Accounts</a></li>
+                    <li><a href="#orders">Orders &amp; Payments</a></li>
+                    <li><a href="#shipping">Shipping &amp; Delivery</a></li>
+                    <li><a href="#returns">Returns &amp; Refunds</a></li>
+                    <li><a href="#pricing">Pricing &amp; Promotions</a></li>
+                    <li><a href="#ip">Intellectual Property</a></li>
+                    <li><a href="#conduct">User Conduct</a></li>
+                    <li><a href="#liability">Limitation of Liability</a></li>
+                    <li><a href="#law">Governing Law</a></li>
+                    <li><a href="#changes">Changes to These Terms</a></li>
+                    <li><a href="#contact">Contact Us</a></li>
+                </ul>
+            </aside>
+
+            <!-- Body -->
+            <div class="legal-content">
+                <span class="section-label">Please Read Carefully</span>
+                <p class="legal-intro">
+                    These Terms &amp; Conditions govern your use of nuve.in and any purchase made through our
+                    store. By accessing our website or placing an order, you agree to be bound by the terms
+                    below. If you do not agree, please do not use our site.
+                </p>
+
+                <div class="legal-block" id="acceptance">
+                    <div class="legal-block-head">
+                        <div class="legal-block-icon"><i class="fas fa-file-signature"></i></div>
+                        <h3>Acceptance of Terms</h3>
+                    </div>
+                    <p>
+                        By browsing, creating an account, or purchasing from NUVE, you confirm that you have
+                        read, understood, and agree to these Terms &amp; Conditions, as well as our
+                        <a href="/privacy-policy" class="inline-link">Privacy Policy</a>.
+                    </p>
+                </div>
+
+                <div class="legal-block" id="eligibility">
+                    <div class="legal-block-head">
+                        <div class="legal-block-icon"><i class="fas fa-user-check"></i></div>
+                        <h3>Eligibility &amp; Account Registration</h3>
+                    </div>
+                    <p>You must be at least 18 years old, or have a parent/guardian's consent, to create an account or place an order with us.</p>
+                    <ul>
+                        <li>You're responsible for keeping your account credentials confidential.</li>
+                        <li>You agree to provide accurate, current information when signing up.</li>
+                        <li>We reserve the right to suspend accounts found in violation of these terms.</li>
+                    </ul>
+                </div>
+
+                <div class="legal-block" id="orders">
+                    <div class="legal-block-head">
+                        <div class="legal-block-icon"><i class="fas fa-bag-shopping"></i></div>
+                        <h3>Orders &amp; Payments</h3>
+                    </div>
+                    <p>
+                        Placing an order is an offer to purchase, which we may accept or decline at our
+                        discretion — for example, in cases of pricing errors or stock unavailability. Full
+                        payment is required at checkout via the payment methods listed on our site.
+                    </p>
+                </div>
+
+                <div class="legal-block" id="shipping">
+                    <div class="legal-block-head">
+                        <div class="legal-block-icon"><i class="fas fa-truck"></i></div>
+                        <h3>Shipping &amp; Delivery</h3>
+                    </div>
+                    <p>
+                        Delivery timelines shown at checkout are estimates and not guarantees. NUVE is not
+                        liable for delays caused by courier partners, weather, or circumstances beyond our
+                        control. Risk of loss passes to you once an order is delivered to the shipping address provided.
+                    </p>
+                </div>
+
+                <div class="legal-block" id="returns">
+                    <div class="legal-block-head">
+                        <div class="legal-block-icon"><i class="fas fa-rotate-left"></i></div>
+                        <h3>Returns &amp; Refunds</h3>
+                    </div>
+                    <p>
+                        Returns and exchanges are accepted under the conditions described in our Returns
+                        policy — generally within 7 days of delivery, on unworn items with original tags.
+                        Refunds are issued to the original payment method or as store credit, at your choice.
+                    </p>
+                </div>
+
+                <div class="legal-block" id="pricing">
+                    <div class="legal-block-head">
+                        <div class="legal-block-icon"><i class="fas fa-tags"></i></div>
+                        <h3>Pricing &amp; Promotions</h3>
+                    </div>
+                    <p>
+                        All prices are listed in Indian Rupees (₹) and are subject to change without notice.
+                        Promotional codes cannot be combined unless explicitly stated, and we reserve the
+                        right to cancel orders placed as a result of a pricing error.
+                    </p>
+                </div>
+
+                <div class="legal-block" id="ip">
+                    <div class="legal-block-head">
+                        <div class="legal-block-icon"><i class="fas fa-copyright"></i></div>
+                        <h3>Intellectual Property</h3>
+                    </div>
+                    <p>
+                        All content on nuve.in — including product photography, logos, and written copy —
+                        is the property of NUVE and may not be reproduced, distributed, or used commercially
+                        without our written consent.
+                    </p>
+                </div>
+
+                <div class="legal-block" id="conduct">
+                    <div class="legal-block-head">
+                        <div class="legal-block-icon"><i class="fas fa-hand"></i></div>
+                        <h3>User Conduct</h3>
+                    </div>
+                    <p>When using our site, you agree not to:</p>
+                    <ul>
+                        <li>Use the site for any unlawful purpose or in violation of these terms.</li>
+                        <li>Attempt to gain unauthorized access to our systems or other users' accounts.</li>
+                        <li>Submit false, misleading, or fraudulent information, including in reviews or orders.</li>
+                    </ul>
+                </div>
+
+                <div class="legal-block" id="liability">
+                    <div class="legal-block-head">
+                        <div class="legal-block-icon"><i class="fas fa-scale-balanced"></i></div>
+                        <h3>Limitation of Liability</h3>
+                    </div>
+                    <p>
+                        NUVE is not liable for any indirect, incidental, or consequential damages arising from
+                        your use of the site or products purchased, to the fullest extent permitted by law.
+                        Our total liability for any claim is limited to the amount you paid for the relevant order.
+                    </p>
+                </div>
+
+                <div class="legal-block" id="law">
+                    <div class="legal-block-head">
+                        <div class="legal-block-icon"><i class="fas fa-gavel"></i></div>
+                        <h3>Governing Law</h3>
+                    </div>
+                    <p>
+                        These Terms are governed by the laws of India, and any disputes will be subject to the
+                        exclusive jurisdiction of the courts in Ernakulam, Kerala.
+                    </p>
+                </div>
+
+                <div class="legal-block" id="changes">
+                    <div class="legal-block-head">
+                        <div class="legal-block-icon"><i class="fas fa-clock-rotate-left"></i></div>
+                        <h3>Changes to These Terms</h3>
+                    </div>
+                    <p>
+                        We may revise these Terms &amp; Conditions from time to time. Continued use of the site
+                        after changes are posted constitutes your acceptance of the updated terms.
+                    </p>
+                </div>
+
+                <div class="legal-block" id="contact">
+                    <div class="legal-block-head">
+                        <div class="legal-block-icon"><i class="fas fa-envelope"></i></div>
+                        <h3>Contact Us</h3>
+                    </div>
+                    <p>
+                        Questions about these Terms? Reach us at
+                        <a href="mailto:hello@nuve.in" class="inline-link">hello@nuve.in</a> or visit our
+                        <a href="/contact-us" class="inline-link">Contact Us</a> page.
+                    </p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+</body>
+</html>
+<%-include("../../views/partials/user/footer")%>

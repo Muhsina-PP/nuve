@@ -295,7 +295,10 @@ const login = async (req, res) => {
     }
 
     req.session.user = findUser._id;
-    return res.redirect("/");
+    const redirectTo = req.session.returnTo || "/";
+    delete req.session.returnTo;
+    res.redirect(redirectTo)
+    // return res.redirect("/");
   } catch (error) {
     console.error(" Login user : ", error);
     res.render("login", { message: "Login failed" });
@@ -476,6 +479,33 @@ const loadContactPage = async (req, res) => {
   }
 }
 
+const getFAQ = async (req, res) => {
+  try {
+    res.render("faq")
+  } catch (error) {
+    console.log("Error loading faq page : ", error)
+    res.redirect("/pageNotFound")
+  }
+}
+
+const getPrivacy = async (req, res) => {
+  try {
+    res.render("privacy_policy")
+  } catch (error) {
+    console.log("Error loading privacy policy page : ", error)
+    res.redirect("/pageNotFound")
+  }
+}
+
+const getTerms = async (req, res) => {
+  try {
+    res.render("terms")
+  } catch (error) {
+    console.log("Error loading terms and conditions page : ", error)
+    res.redirect("/pageNotFound")
+  }
+}
+
 
 
 module.exports = {
@@ -491,4 +521,7 @@ module.exports = {
   loadShopPage,
   loadAboutPage,
   loadContactPage,
+  getFAQ,
+  getPrivacy,
+  getTerms
 };

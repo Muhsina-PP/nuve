@@ -13,6 +13,7 @@ const adminRoutes = require('./routes/adminRoutes')
 const { injectedUser } = require("./middlewares/auth")
 const userCounts = require("./middlewares/userCounts")
 const checkUserBlocked = require("./middlewares/checkUserBlocked")
+const footerCategories = require("./middlewares/footerCategories")
 
 app.use(morgan('dev'));
 app.use((req, res, next) => {
@@ -59,6 +60,7 @@ app.use(express.static(path.join(__dirname, 'public')))
 app.use(injectedUser)
 app.use(userCounts)
 app.use(checkUserBlocked)
+app.use(footerCategories)
 
 app.use("/", userRoutes)
 app.use("/admin", adminRoutes)

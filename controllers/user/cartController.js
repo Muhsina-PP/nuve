@@ -4,45 +4,7 @@ const User = require("../../models/userSchema");
 const Wishlist = require("../../models/wishlistSchema");
 const mongoose = require("mongoose");
 
-// const loadCart = async (req, res) => {
-//   try {
-//     const userId = req.session.user;
 
-//     let cart = await Cart.findOne({ userId })
-//       .populate({
-//         path: 'items.productId',
-//         populate: [
-//           { path: 'category' },
-//           { path : 'brand'}
-//         ]
-//       });
-
-//     if (!cart) {
-//       return res.render("cart", { cartItems: [] });
-//     }
-
-//     //  REMOVE INVALID PRODUCTS
-//     cart.items = cart.items.filter(item => {
-//       const product = item.productId;
-
-//       return product &&
-//         !product.isBlocked &&
-//         product.status === 'Available' &&
-//         product.category &&
-//         product.category.isListed;
-//     });
-
-//     await cart.save();
-
-//     res.render("cart", {
-//       cartItems: cart.items
-//     });
-
-//   } catch (error) {
-//     console.log("Cannot load cart:", error);
-//     res.redirect("/pageNotFound");
-//   }
-// };
 
 const loadCart = async (req, res) => {
   try {
@@ -102,6 +64,14 @@ const loadCart = async (req, res) => {
 
 const addToCart = async (req, res) => {
   try {
+    if (!req.session.user) {
+      req.session.returnTo = req.body.returnTo;
+      console.log("Saved info : ", req.session.returnTo)
+      return res.status(401).json({
+        success: false,
+        redirect: '/login'
+      })
+    }
     const userId = req.session.user;
     const { productId, selectedVariant, quantity } = req.body;
     console.log("Request body  : ", req.body, userId);
@@ -175,7 +145,7 @@ const addToCart = async (req, res) => {
 
       console.log("index : ", index);
       if (index > -1) {
-        // Enforce maximum purchase quantity of 10
+        // implementing  maximum purchase quantity of 10
         if (cart.items[index].quantity >= 10) {
           return res.json({
             success: false,
@@ -265,7 +235,7 @@ const updateCart = async (req, res) => {
 
     const stock = variantData.stock;
 
-    // Determine final quantity respecting stock and max limit of 10
+    // Determine final quantity considering stock and max limit of 10
     let finalQty = requestedQty;
     let limited = false;
     let message = "Updated successfully";

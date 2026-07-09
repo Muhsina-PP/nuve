@@ -10,7 +10,22 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
     <style>
+      :root {
+        --ink: #161413;
+        --ink-soft: #6f6a67;
+        --line: #e5e0dc;
+        --pink: #c2185b;
+        --pink-tint: #fdf2f6;
+        --error: #b3261e;
+      }
+
       * {
         margin: 0;
         padding: 0;
@@ -18,223 +33,223 @@
       }
 
       body {
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-        background: #f9f9f9;
+        font-family: "Inter", sans-serif;
+        background: #fbfaf9;
         height: 100vh;
         overflow: hidden;
+        color: var(--ink);
       }
 
-      /* Assuming header takes ~80px, adjust if different */
       main {
         height: calc(100vh - 80px);
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 15px;
+        padding: 20px;
       }
 
       .signup-container {
-        display: flex;
-        width: 950px;
-        height: 100%;
-        max-height: 100%;
+        width: 480px;
         max-width: 95vw;
         background: #fff;
-        border-radius: 20px;
-        overflow: hidden;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 34px 46px;
+        box-shadow: 0 20px 50px rgba(20, 18, 17, 0.06);
       }
 
-      /* Left Side - Fashion Image */
-      .signup-image {
-        flex: 1;
-        background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.4)),
-          url("https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&q=80")
-            center/cover no-repeat;
-        position: relative;
-        display: flex;
-        align-items: flex-end;
-        padding: 30px;
-        color: #fff;
+      .form-heading {
+        text-align: center;
+        margin-bottom: 22px;
       }
 
-      .image-overlay h2 {
-        font-size: 30px;
-        font-weight: 700;
-        margin-bottom: 8px;
-      }
-
-      .image-overlay p {
-        font-size: 15px;
-        opacity: 0.9;
-        line-height: 1.4;
-      }
-
-      /* Right Side - Form */
-      .signup-form-container {
-        flex: 1;
-        padding: 20px 30px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        background: #fff;
-      }
-
-      .signup-form-container h1 {
-        font-size: 26px;
-        color: #333;
+      .form-heading h1 {
+        font-size: 25px;
+        font-weight: 800;
+        letter-spacing: -0.01em;
         margin-bottom: 6px;
-        text-align: center;
       }
 
-      .form-group {
-        margin-bottom: 12px;
-        position: relative;
-      }
-
-      .form-group input {
-        width: 100%;
-        padding: 9px 14px;
-        border: 1.5px solid #ddd;
-        border-radius: 10px;
-        font-size: 14px;
-        transition: all 0.3s;
-      }
-
-      .form-group input:focus {
-        outline: none;
-        border-color: #d4145a;
-        box-shadow: 0 0 0 3px rgba(212, 20, 90, 0.1);
-      }
-
-      .form-group label {
-        position: absolute;
-        left: 16px;
-        top: 10px;
-        font-size: 14px;
-        color: #999;
-        pointer-events: none;
-        transition: all 0.3s;
-        background: #fff;
-        padding: 0 6px;
-      }
-
-      .form-group input:focus ~ label,
-      .form-group input:valid ~ label {
-        top: -10px;
-        font-size: 12px;
-        color: #d4145a;
-        font-weight: 600;
-      }
-
-      /* Google Button */
-      .google-btn {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-        width: 100%;
-        padding: 9px;
-        background: #fff;
-        border: 1.5px solid #ddd;
-        border-radius: 10px;
+      .form-heading p {
         font-size: 13px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s;
-        margin-bottom: 12px;
+        color: var(--ink-soft);
       }
 
-      .google-btn:hover {
-        border-color: #d4145a;
-        background: #fdf2f5;
-      }
-
-      .google-btn i {
-        font-size: 17px;
-        color: #d4145a;
-      }
-
-      /* Divider */
-      .divider {
-        text-align: center;
-        margin: 10px 0;
-        color: #aaa;
-        font-size: 12px;
-      }
-
-      /* Submit Button */
-      .submit-btn {
-        width: 100%;
-        padding: 10px;
-        background: #d4145a;
-        color: white;
-        border: none;
-        border-radius: 10px;
-        font-size: 14px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s;
-        margin-top: 6px;
-      }
-
-      .submit-btn:hover {
-        background: #b8124a;
-        transform: translateY(-1px);
-        box-shadow: 0 8px 20px rgba(212, 20, 90, 0.3);
-      }
-
-      .login-link {
-        text-align: center;
-        margin-top: 14px;
-        font-size: 13px;
-        color: #666;
-      }
-
-      .login-link a {
-        color: #d4145a;
+      .form-heading p a {
+        color: var(--pink);
         font-weight: 600;
         text-decoration: none;
       }
 
-      .login-link a:hover {
+      .form-heading p a:hover {
         text-decoration: underline;
       }
+
+      form#signform {
+        width: 100%;
+      }
+
+      .field-row {
+        display: flex;
+        gap: 14px;
+      }
+
+      .form-group {
+        flex: 1;
+        margin-bottom: 14px;
+        min-width: 0;
+      }
+
+      .form-group label {
+        display: block;
+        font-size: 11.5px;
+        color: var(--ink-soft);
+        margin-bottom: 5px;
+        font-weight: 500;
+      }
+
+      .form-group input {
+        width: 100%;
+        padding: 8px 10px;
+        border: 1.5px solid var(--line);
+        border-radius: 8px;
+        font-size: 13.5px;
+        font-family: "Inter", sans-serif;
+        color: var(--ink);
+        transition: border-color 0.2s, box-shadow 0.2s;
+      }
+
+      .form-group input::placeholder {
+        color: #b8b2ac;
+      }
+
+      .form-group input:focus {
+        outline: none;
+        border-color: var(--pink);
+        box-shadow: 0 0 0 3px var(--pink-tint);
+      }
+
+      .password-wrapper {
+        position: relative;
+      }
+
+      .password-wrapper input {
+        padding-right: 34px;
+      }
+
+      .eye-icon {
+        position: absolute;
+        right: 9px;
+        top: 32px;
+        cursor: pointer;
+        font-size: 14px;
+        line-height: 1;
+        user-select: none;
+      }
+
+      .submit-btn {
+        width: 100%;
+        padding: 11px;
+        background: var(--ink);
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        font-size: 13.5px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+        margin-top: 4px;
+      }
+
+      .submit-btn:hover {
+        background: #000;
+      }
+
+      /* Horizontal divider with "or" */
+      .divider-horizontal {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 18px 0 16px;
+        color: var(--ink-soft);
+        font-size: 11px;
+      }
+
+      .divider-horizontal::before,
+      .divider-horizontal::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: var(--line);
+      }
+
+      /* Social row, centered at the bottom */
+      .social-row {
+        display: flex;
+        justify-content: center;
+      }
+
+      .google-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        width: 260px;
+        max-width: 100%;
+        padding: 10px;
+        background: #fff;
+        border: 1.5px solid var(--line);
+        border-radius: 8px;
+        color: var(--ink);
+        font-size: 12.5px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-decoration: none;
+      }
+
+      .google-btn:hover {
+        border-color: var(--pink);
+        background: var(--pink-tint);
+      }
+
+      .google-btn i {
+        font-size: 14px;
+        color: #db4437;
+      }
+
+      .submit-btn:focus-visible,
+      .google-btn:focus-visible,
+      .form-group input:focus-visible {
+        outline: 2px solid var(--pink);
+        outline-offset: 2px;
+      }
+
+      .login-link {
+        display: none;
+      }
+
       .error-msg {
-        color: red;
-        font-size: 0.75rem;
+        color: var(--error);
+        font-size: 0.68rem;
+        margin-top: 3px;
         display: none;
       }
 
       /* Responsive */
-      @media (max-width: 900px) {
+      @media (max-width: 720px) {
         .signup-container {
-          flex-direction: column;
-        }
-        .signup-image {
-          min-height: 200px;
-          padding: 25px;
-        }
-        .image-overlay h2 {
-          font-size: 26px;
-        }
-        .signup-form-container {
-          padding: 25px 20px;
+          overflow-y: auto;
+          max-height: 92vh;
         }
       }
 
-      @media (max-width: 500px) {
-        main {
-          padding: 10px;
+      @media (max-height: 720px) {
+        .signup-container {
+          padding: 24px 40px;
         }
-        .signup-form-container {
-          padding: 20px 18px;
-        }
-        .signup-image {
-          min-height: 180px;
-        }
-        .image-overlay h2 {
-          font-size: 22px;
+        .form-heading {
+          margin-bottom: 14px;
         }
         .form-group {
           margin-bottom: 10px;
@@ -245,78 +260,70 @@
   <body>
     <main>
       <div class="signup-container">
-        <!-- Left: Fashion Image -->
-        <div class="signup-image">
-          <div class="image-overlay">
-            <h2>Welcome to NUVE</h2>
-            <p>
-              Discover timeless elegance and modern style crafted exclusively
-              for you.
-            </p>
-          </div>
+        <div class="form-heading">
+          <h1>Sign up</h1>
+          <p>Already have an account? <a href="/login">Sign in</a></p>
         </div>
 
-        <!-- Right: Signup Form -->
-        <div class="signup-form-container">
-          <h1>Create Account</h1>
-
-          <form id="signform" action="/signup" method="POST">
-            
-            <!-- Google Signup -->
-            <a href="/auth/google" class="google-btn">
-              <i class="fab fa-google"></i>
-              Continue with Google
-            </a>
-
-            <div class="divider">or sign up with email</div>
-
-            <!-- Full Name -->
+        <form id="signform" action="/signup" method="POST" novalidate>
+          <div class="field-row">
             <div id="name" class="form-group">
-              <input type="text" name="name" />
-              <label>Full Name</label>
+              <label for="name-input">Full Name</label>
+              <input id="name-input" type="text" name="name" placeholder="Muhsina PP" />
               <div id="error1" class="error-msg"></div>
             </div>
 
-            <!-- Email -->
             <div id="email" class="form-group">
-              <input type="email" name="email" />
-              <label>Email Address</label>
+              <label for="email-input">Email</label>
+              <input id="email-input" type="email" name="email" placeholder="muhsinapp@example.com" />
               <div id="error2" class="error-msg"></div>
             </div>
+          </div>
 
-            <!-- Phone -->
+          <div class="field-row">
             <div id="phone" class="form-group">
-              <input type="tel" name="phone" />
-              <label>Phone Number</label>
+              <label for="phone-input">Phone Number</label>
+              <input id="phone-input" type="tel" name="phone" placeholder="9876543210" />
               <div id="error3" class="error-msg"></div>
             </div>
 
-            <!-- Password -->
-            <div id="password" class="form-group">
-              <input type="password" name="password" />
-              <label>Password</label>
+            <div id="referralCode" class="form-group">
+              <label for="ref-input">Referral Code (Optional)</label>
+              <input id="ref-input" type="text" name="ref" value="<%= typeof ref !== 'undefined' ? ref : '' %>" placeholder="Enter code" />
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div id="password" class="form-group password-wrapper">
+              <label for="password-input">Password</label>
+              <input id="password-input" type="password" name="password" placeholder="••••••••" />
+              <span class="eye-icon" data-target="password-input">👁️</span>
               <div id="error4" class="error-msg"></div>
             </div>
 
-            <!-- Confirm Password -->
-            <div id="cPassword" class="form-group">
-              <input type="password" name="cPassword" />
-              <label>Confirm Password</label>
+            <div id="cPassword" class="form-group password-wrapper">
+              <label for="cpassword-input">Confirm Password</label>
+              <input id="cpassword-input" type="password" name="cPassword" placeholder="••••••••" />
+              <span class="eye-icon" data-target="cpassword-input">👁️</span>
               <div id="error5" class="error-msg"></div>
             </div>
-
-            <!-- Referral Code (Optional) -->
-            <div id="referralCode" class="form-group">
-              <input type="text" name="ref" value="<%= typeof ref !== 'undefined' ? ref : '' %>" />
-              <label>Referral Code (Optional)</label>
-            </div>
-
-            <button type="submit" class="submit-btn">Create Account</button>
-          </form>
-
-          <div class="login-link">
-            Already have an account? <a href="/login">Log in</a>
           </div>
+
+          <button type="submit" class="submit-btn">Sign up</button>
+        </form>
+
+        <div class="divider-horizontal">or</div>
+
+        <div class="social-row">
+          <a href="/auth/google" class="google-btn">
+            <i class="fab fa-google"></i>
+            Continue with Google
+          </a>
+        </div>
+
+        <!-- kept for structural compatibility, hidden since link now lives in the heading -->
+        <div class="login-link">
+          Already have an account? <a href="/login">Log in</a>
         </div>
       </div>
     </main>
@@ -335,6 +342,16 @@
       const error4 = document.getElementById("error4");
       const error5 = document.getElementById("error5");
       const signform = document.getElementById("signform");
+
+      // Show/hide password toggles
+      document.querySelectorAll(".eye-icon").forEach(function (icon) {
+        icon.addEventListener("click", function () {
+          const targetInput = document.getElementById(this.dataset.target);
+          const isHidden = targetInput.type === "password";
+          targetInput.type = isHidden ? "text" : "password";
+          this.textContent = isHidden ? "🙈" : "👁️";
+        });
+      });
 
       function nameValidateChecking() {
         const nameVal = nameid.querySelector("input").value.trim();
@@ -488,18 +505,14 @@
       });
     </script>
 
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-<script>
-  <% if (typeof message !== "undefined" && message) { %>
-    Swal.fire({
-      icon: 'error',
-      title: 'Oops...',
-      text: '<%= message %>',
-    });
-  <% } %>
-</script>
-
-
+    <script>
+      <% if (typeof message !== "undefined" && message) { %>
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: '<%= message %>',
+        });
+      <% } %>
+    </script>
   </body>
 </html>

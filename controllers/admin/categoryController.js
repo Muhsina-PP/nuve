@@ -1,5 +1,7 @@
 const Category = require("../../models/categorySchema")
 const Product = require("../../models/productSchema")
+const Order = require("../../models/orderSchema")
+const Offer = require("../../models/offerSchema")
 const { applyBestOffer } = require("../../helpers/offerHelper")
 
 const categoryInfo = async (req, res) => {
@@ -17,11 +19,32 @@ const categoryInfo = async (req, res) => {
     })
       .sort({ createdAt: -1 })
       .skip(skip)
-      .limit(limit);
+      .limit(limit)
+      .lean();
 
     const totalCategoories = await Category.countDocuments();
     const totalPages = Math.ceil(totalCategoories / limit);
 
+
+    for (let category of categoryData) {
+
+      const products = await Product.find({
+        category: category._id
+      }).select("_id");
+
+      const productIds = products.map(p => p._id);
+
+      console.log("Category:", category.name);
+      console.log("Products:", productIds);
+
+      const count = await Order.countDocuments({
+        "orderedItems.product": { $in: productIds }
+      });
+
+      console.log("Count:", count);
+
+      category.orderCount = count;
+    }
 
 
     res.render("category", {
@@ -31,7 +54,6 @@ const categoryInfo = async (req, res) => {
       totalPages: totalPages,
       totalCategoories: totalCategoories,
       search: search,
-      count: count
     })
 
   } catch (error) {
@@ -68,57 +90,6 @@ const addCategory = async (req, res) => {
 }
 
 
-// const addCategoryOffer = async (req,res) =>{
-//   try {
-//     const percentage = parseInt(req.body.percentage);
-//     const categoryId = req.body.categoryId;
-
-//     console.log("CATEGORY ID RECEIVED:", req.body.categoryId);
-
-//     if (!categoryId || categoryId.trim() === "") {
-//       return res.status(400).json({
-//           status: false,
-//           message: "Category ID is required"
-//       });
-//     }
-
-//     if (!percentage || isNaN(percentage) || percentage <= 0 || percentage > 90) {
-//       return res.send({ success: false, message: "Invalid percentage" });
-//     }
-
-//     const category = await Category.findById(categoryId);
-//     if(!category){
-//       return res.status(400).send({success: false, message : "This category doesn't exist"})
-//     }
-
-//     const products = await Product.find({ category : categoryId})
-
-//     const hasProductOffer = products.some(product =>product.productOffer > 0);
-//     if(hasProductOffer){
-//       return res.send({
-//         success : false,
-//         message : 'Cannot add offers, because Products in this category already have product-level offers'
-//       })
-//     }
-
-//     category.categoryOffer = percentage;
-//     await category.save();
-
-//     for (const product of products){
-//       product.productOffer = 0;
-//        product.salePrice = Math.floor(
-//         product.regularPrice - (product.regularPrice * percentage) / 100
-//       );
-//       await product.save();
-//     }
-
-//     return res.send({success : true, message : 'Added product offer succesfully'})
-
-//   } catch (error) {
-//     console.error("Error adding category offer  : ",error);
-//     return res.status(400).send({success : false, message : 'Error adding category offer'})
-//   }
-// }
 
 const addCategoryOffer = async (req, res) => {
   try {
@@ -128,7 +99,7 @@ const addCategoryOffer = async (req, res) => {
       return res.status(400).json({ success: false, message: "Category ID and Offer ID required" });
     }
 
-    const offer = await require('../../models/offerSchema').findById(offerId);
+    const offer = await Offer.findById(offerId);
     if (!offer || !offer.isActive) {
       return res.status(400).json({ success: false, message: "Invalid or inactive offer" });
     }

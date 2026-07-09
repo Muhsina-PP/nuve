@@ -66,7 +66,7 @@ const loadCheckoutPage = async (req, res) => {
         continue;
       }
 
-      // 🔧 adjust quantity if needed
+      //  adjust quantity if needed
       if (item.quantity > variant.stock) {
         item.quantity = variant.stock;
         item.totalPrice = item.price * item.quantity;

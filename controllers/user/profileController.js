@@ -412,11 +412,9 @@ const getAddAddress = async (req, res) => {
 
 const addAddress = async (req, res) => {
   try {
-    console.log("hhhooooooooooo")
     const userId = req.session.user;
     const userData = await User.findById(userId)
     const { addressType, name, city, landMark, state, pincode, phone, altPhone, isDefault } = req.body;
-    console.log("BOSY : ", req.body)
     const userAddress = await Address.findOne({ userId: userData._id })
     if (!userAddress) {
       const newAddress = new Address({

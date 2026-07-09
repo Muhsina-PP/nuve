@@ -6,203 +6,202 @@ const Offer = require("../../models/offerSchema")
 const path = require("path")
 const fs = require("fs")
 const sharp = require("sharp") //to resize images
-const {applyBestOffer} = require("../../helpers/offerHelper")
+const { applyBestOffer } = require("../../helpers/offerHelper")
 const { Types } = require("mongoose")
 
 
-const productInfo = async (req, res) =>{
+const productInfo = async (req, res) => {
   try {
-    
+
     const search = req.query.search?.trim() || "";
     const page = parseInt(req.query.page) || 1;
     const limit = 10;
     const skip = (page - 1) * limit;
 
     const productData = await Product.find({
-      $or : [
-        {productName :{ $regex :search , $options : "i"}}
+      $or: [
+        { productName: { $regex: search, $options: "i" } }
       ]
     })
-    .sort({_id : -1})
-    .limit(limit)
-    .skip(skip)
-    .populate('category')
-    .populate('brand')
-    .exec()
+      .sort({ _id: -1 })
+      .limit(limit)
+      .skip(skip)
+      .populate('category')
+      .populate('brand')
+      .exec()
 
     const totalProducts = await Product.countDocuments({
       $or: [
-        {productName :{ $regex :search , $options : "i"}}
+        { productName: { $regex: search, $options: "i" } }
       ]
     });
     const totalPages = Math.ceil(totalProducts / limit);
 
-    const category = await Category.find({isListed : true});
-    const brand = await Brand.find({isBlocked : false})
+    const category = await Category.find({ isListed: true });
+    const brand = await Brand.find({ isBlocked: false })
 
     const noProductFound = search !== "" && productData.length === 0;
 
-    if(category && brand){
-      res.render("products" , {
-        title : 'Products',
-        product : productData,
-        currentPage : page,
-        totalPages : totalPages,
-        category : category,
-        brand : brand,
+    if (category && brand) {
+      res.render("products", {
+        title: 'Products',
+        product: productData,
+        currentPage: page,
+        totalPages: totalPages,
+        category: category,
+        brand: brand,
         noProductFound,
-        search : search
+        search: search
       })
-    }else{
+    } else {
       return res.status(500).json({
-        success : false,
-        message : 'An error occured while displaying product listing page'
+        success: false,
+        message: 'An error occured while displaying product listing page'
       })
     }
-   
+
   } catch (error) {
-    console.log('Error getting product details page : ',error);
+    console.log('Error getting product details page : ', error);
     return res.status(404).json({
-      success : false,
-      message : 'Error getting product details page'
-    })    
+      success: false,
+      message: 'Error getting product details page'
+    })
   }
 }
 
-const getAddProductPage = async (req, res) =>{
+const getAddProductPage = async (req, res) => {
   try {
-    const category = await Category.find({isListed : true})
-    const brand = await Brand.find({isBlocked : false})
+    const category = await Category.find({ isListed: true })
+    const brand = await Brand.find({ isBlocked: false })
     res.render("add-products", {
-      title : 'Products',
+      title: 'Products',
       category,
-      brand 
+      brand
     })
   } catch (error) {
-    console.log("Error getting products adding page : ",error);
+    console.log("Error getting products adding page : ", error);
     return res.status(404).json({
-      success : false,
-      message : 'Error getting products adding page'
+      success: false,
+      message: 'Error getting products adding page'
     })
   }
 }
 
 
 const addProducts = async (req, res) => {
-    try {
-        const products = req.body;
+  try {
+    const products = req.body;
 
-        const existingProduct = await Product.findOne({ 
-            productName: products.productName 
-        });
+    const existingProduct = await Product.findOne({
+      productName: products.productName
+    });
 
-        if (existingProduct) {
-            console.log("Product already exists with this name");
-            return res.status(400).json({
-                success: false,
-                message: 'Product with this name already exists. Please use a different name.'
-            });
-        }
-
-        const sizes = ["S", "M", "L", "XL", "XXL"];
-        const variants = []
-        for (const size of sizes) {
-            const qty = Number(products[`quantity_${size}`]) || 0;
-            variants.push({ size, stock: qty });
-        }
-
-        const images = [];
-        
-        if (req.files && req.files.length > 0) {
-            if (req.files.length > 4) {
-                return res.status(400).json({
-                    success: false,
-                    message: 'Maximum 4 images allowed'
-                });
-            }
-
-            console.log('hiiiii... : ',req.files)
-            
-            for (let file of req.files) {
-                try {
-                    const originalPath = file.path;
-                    const resizedFilename = `resized-${file.filename}`;
-                    const resizedPath = `${file.destination}/${resizedFilename}`;
-
-                    await sharp(originalPath)
-                        .resize(800, 800, {
-                            fit: 'cover',
-                            position: 'center',
-                            withoutEnlargement: false
-                        })
-                        .jpeg({ 
-                            quality: 90,
-                            mozjpeg: true 
-                        })
-                        .toFile(resizedPath);
-
-                    images.push(resizedFilename);
-
-                } catch (imageError) {
-                    console.error('Error processing image:', imageError);
-                }
-            }
-        }
-
-        if (images.length === 0) {
-            return res.status(400).json({
-                success: false,
-                message: 'At least one product image is required'
-            });
-        }
-
-        const categoryId = await Category.findById(products.category);
-        if (!categoryId) {
-            return res.status(404).json({
-                success: false,
-                message: 'Invalid category name'
-            });
-        }
-        const brandId = await Brand.findById(products.brand);
-        if (!brandId) {
-            return res.status(404).json({
-                success: false,
-                message: 'Invalid brand name'
-            });
-        }
-
-        const regularPrice = Number(products.regularPrice);
-        let salePrice = regularPrice;
-        
-        if (categoryId.categoryOffer) {
-          salePrice = regularPrice - (regularPrice * categoryId.categoryOffer) / 100;
-        }
-
-        const newProduct = new Product({
-            productName: products.productName,
-            description: products.description,
-            brand: brandId._id,
-            category: categoryId._id,
-            regularPrice : products.regularPrice,
-            salePrice ,
-            variants: variants,
-            color: products.color,
-            productImage: images,
-            status: 'Available'
-        });
-
-        await newProduct.save();
-        console.log('Product added successfully:', newProduct._id);
-        return res.redirect("/admin/products");
-
-    } catch (error) {
-        console.error("Error adding product:", error);
-        return res.status(500).json({
-            success: false,
-            message: 'Internal server error while adding product',
-            error: error.message
-        });
+    if (existingProduct) {
+      console.log("Product already exists with this name");
+      return res.status(400).json({
+        success: false,
+        message: 'Product with this name already exists. Please use a different name.'
+      });
     }
+
+    const sizes = ["S", "M", "L", "XL", "XXL"];
+    const variants = []
+    for (const size of sizes) {
+      const qty = Number(products[`quantity_${size}`]) || 0;
+      variants.push({ size, stock: qty });
+    }
+
+    const images = [];
+
+    if (req.files && req.files.length > 0) {
+      if (req.files.length > 4) {
+        return res.status(400).json({
+          success: false,
+          message: 'Maximum 4 images allowed'
+        });
+      }
+
+
+      for (let file of req.files) {
+        try {
+          const originalPath = file.path;
+          const resizedFilename = `resized-${file.filename}`;
+          const resizedPath = `${file.destination}/${resizedFilename}`;
+
+          await sharp(originalPath)
+            .resize(800, 800, {
+              fit: 'cover',
+              position: 'center',
+              withoutEnlargement: false
+            })
+            .jpeg({
+              quality: 90,
+              mozjpeg: true
+            })
+            .toFile(resizedPath);
+
+          images.push(resizedFilename);
+
+        } catch (imageError) {
+          console.error('Error processing image:', imageError);
+        }
+      }
+    }
+
+    if (images.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'At least one product image is required'
+      });
+    }
+
+    const categoryId = await Category.findById(products.category);
+    if (!categoryId) {
+      return res.status(404).json({
+        success: false,
+        message: 'Invalid category name'
+      });
+    }
+    const brandId = await Brand.findById(products.brand);
+    if (!brandId) {
+      return res.status(404).json({
+        success: false,
+        message: 'Invalid brand name'
+      });
+    }
+
+    const regularPrice = Number(products.regularPrice);
+    let salePrice = regularPrice;
+
+    if (categoryId.categoryOffer) {
+      salePrice = regularPrice - (regularPrice * categoryId.categoryOffer) / 100;
+    }
+
+    const newProduct = new Product({
+      productName: products.productName,
+      description: products.description,
+      brand: brandId._id,
+      category: categoryId._id,
+      regularPrice: products.regularPrice,
+      salePrice,
+      variants: variants,
+      color: products.color,
+      productImage: images,
+      status: 'Available'
+    });
+
+    await newProduct.save();
+    console.log('Product added successfully:', newProduct._id);
+    return res.redirect("/admin/products");
+
+  } catch (error) {
+    console.error("Error adding product:", error);
+    return res.status(500).json({
+      success: false,
+      message: 'Internal server error while adding product',
+      error: error.message
+    });
+  }
 };
 
 const addProductOffer = async (req, res) => {
@@ -278,62 +277,62 @@ const removeProductOffer = async (req, res) => {
 }
 
 
- const blockProduct = async (req,res) =>{
+const blockProduct = async (req, res) => {
   try {
     const productId = req.query.productId;
-    await Product.updateOne({_id : productId},{$set :{isBlocked : true}})
+    await Product.updateOne({ _id: productId }, { $set: { isBlocked: true } })
     return res.redirect("/admin/products")
   } catch (error) {
-    console.error('Error blocking product : ',error);
+    console.error('Error blocking product : ', error);
     return res.status(404).json({
-      success : false,
-      message : 'Error blocking product'
+      success: false,
+      message: 'Error blocking product'
     })
   }
- }
+}
 
 
- const unblockProduct = async (req,res) =>{
+const unblockProduct = async (req, res) => {
   try {
     const productId = req.query.productId;
-    await Product.updateOne({_id : productId},{$set :{isBlocked : false}})
+    await Product.updateOne({ _id: productId }, { $set: { isBlocked: false } })
     return res.redirect("/admin/products")
   } catch (error) {
-    console.error('Error unblocking product : ',error);
+    console.error('Error unblocking product : ', error);
     return res.status(404).json({
-      success : false,
-      message : 'Error unblocking product'
+      success: false,
+      message: 'Error unblocking product'
     })
   }
- }
+}
 
 
- const getEditProductPage = async (req, res) =>{
+const getEditProductPage = async (req, res) => {
   try {
     const id = req.query.id;
-    const product = await Product.findOne({_id : id})
+    const product = await Product.findOne({ _id: id })
     const category = await Category.find()
     const brand = await Brand.find()
 
-    return res.render("edit-product",{
-      title : 'Products',
+    return res.render("edit-product", {
+      title: 'Products',
       product,
       category,
       brand
-    })    
+    })
   } catch (error) {
-    console.error('Error getting edit-product page : ',error);
+    console.error('Error getting edit-product page : ', error);
     return res.status(404).json({
-      success : false,
-      message : 'Error getting edit-product page'
+      success: false,
+      message: 'Error getting edit-product page'
     })
   }
- }
+}
 
 
 //  const editProduct = async (req,res) =>{
 //   try {
-    
+
 //     const id = req.params.id;
 //     const products = req.body;
 
@@ -425,7 +424,7 @@ const removeProductOffer = async (req, res) => {
 //       variants : variants,
 //       productImage : productImage
 //     },{new : true})
-    
+
 //     if(updateProduct){
 //       return res.json({
 //         success: true,
@@ -448,8 +447,7 @@ const removeProductOffer = async (req, res) => {
 
 const editProduct = async (req, res) => {
   try {
-    console.log('hhhhhiiiii');
-    
+
     const id = req.params.id;
     const products = req.body;
 
@@ -512,7 +510,7 @@ const editProduct = async (req, res) => {
       }
     }
 
-    // 4. Guard: must have at least 1 image, max 4
+    // 4. must have at least 1 image, max 4
     if (productImage.length === 0) {
       return res.status(400).json({ success: false, message: "At least one product image is required" });
     }

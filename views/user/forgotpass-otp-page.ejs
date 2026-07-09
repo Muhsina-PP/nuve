@@ -3,276 +3,296 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+  rel="stylesheet"
+/>
 <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --ink: #161413;
+    --ink-soft: #6f6a67;
+    --line: #e5e0dc;
+    --pink: #c2185b;
+    --pink-tint: #fdf2f6;
+    --error: #b3261e;
+  }
 
-    body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background: #f9f9f9;
-        height: 100vh;
-        overflow: hidden;
-    }
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
 
-    main {
-        height: calc(100vh - 80px);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 15px;
-    }
+  body {
+    font-family: "Inter", sans-serif;
+    background: #fbfaf9;
+    height: 100vh;
+    overflow: hidden;
+    color: var(--ink);
+  }
 
-    .login-container {
-        display: flex;
-        width: 900px;
-        height: 100%;
-        max-height: 100%;
-        max-width: 95vw;
-        background: #fff;
-        border-radius: 20px;
-        overflow: hidden;
-        box-shadow: 0 20px 60px rgba(0,0,0,0.15);
-    }
+  main {
+    height: calc(100vh - 80px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
 
-    /* Left Side - Fashion Image */
-    .login-image {
-        flex: 1;
-        background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.4)),
-                    url('https://images.unsplash.com/photo-1483985988355-763728e1935b?w=800&q=80') center/cover no-repeat;
-        display: flex;
-        align-items: flex-end;
-        padding: 30px;
-        color: #fff;
-    }
+  .otp-container {
+    width: 420px;
+    max-width: 95vw;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 34px 42px;
+    box-shadow: 0 20px 50px rgba(20, 18, 17, 0.06);
+  }
 
-    /* Right Side */
-    .login-form-container {
-        flex: 1;
-        padding: 30px 40px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        background: #fff;
-    }
+  .icon-wrap {
+    text-align: center;
+    margin-bottom: 14px;
+  }
 
-    .icon-wrap {
-        text-align: center;
-        margin-bottom: 16px;
-    }
+  .icon-wrap i {
+    font-size: 22px;
+    color: var(--pink);
+  }
 
-    .icon-wrap i {
-        font-size: 42px;
-        color: #d4145a;
-        opacity: 0.85;
-    }
+  .form-heading {
+    text-align: center;
+    margin-bottom: 22px;
+  }
 
-    .login-form-container h1 {
-        font-size: 30px;
-        color: #333;
-        margin-bottom: 8px;
-        text-align: center;
-    }
+  .form-heading h1 {
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    margin-bottom: 8px;
+  }
 
-    .helper-text {
-        text-align: center;
-        color: #888;
-        font-size: 13px;
-        margin-bottom: 24px;
-        line-height: 1.6;
-    }
+  .form-heading p {
+    font-size: 13px;
+    color: var(--ink-soft);
+    line-height: 1.6;
+  }
 
-    /* OTP Input */
-    .form-group {
-        margin-bottom: 18px;
-        position: relative;
-    }
+  .form-group {
+    margin-bottom: 6px;
+  }
 
-    .form-group input {
-        width: 100%;
-        padding: 12px 14px;
-        border: 1.5px solid #ddd;
-        border-radius: 10px;
-        font-size: 18px;
-        letter-spacing: 6px;
-        text-align: center;
-        transition: all 0.3s;
-    }
+  .form-group label {
+    display: block;
+    font-size: 11.5px;
+    color: var(--ink-soft);
+    margin-bottom: 8px;
+    font-weight: 500;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
 
-    .form-group input:focus {
-        outline: none;
-        border-color: #d4145a;
-        box-shadow: 0 0 0 3px rgba(212, 20, 90, 0.1);
-    }
+  .form-group input {
+    width: 100%;
+    padding: 10px 10px;
+    border: 1.5px solid var(--line);
+    border-radius: 8px;
+    font-size: 20px;
+    letter-spacing: 8px;
+    text-align: center;
+    font-family: "Inter", sans-serif;
+    color: var(--ink);
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
 
-    .form-group label {
-        display: block;
-        font-size: 13px;
-        font-weight: 600;
-        color: #555;
-        margin-bottom: 8px;
-        text-align: center;
-    }
+  .form-group input::placeholder {
+    color: #b8b2ac;
+    letter-spacing: 6px;
+  }
 
-    .error-msg {
-        color: red;
-        font-size: 11px;
-        text-align: center;
-        margin-top: 5px;
-        min-height: 16px;
-    }
+  .form-group input:focus {
+    outline: none;
+    border-color: var(--pink);
+    box-shadow: 0 0 0 3px var(--pink-tint);
+  }
 
-    /* Timer */
-    .timer-row {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-        margin-bottom: 16px;
-    }
+  .error-msg {
+    color: var(--error);
+    font-size: 0.68rem;
+    text-align: center;
+    margin-top: 6px;
+    min-height: 14px;
+  }
 
-    .otp-timer {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 52px;
-        height: 52px;
-        border-radius: 50%;
-        border: 2.5px solid #d4145a;
-        font-size: 14px;
-        font-weight: 700;
-        color: #d4145a;
-        background: #fff5f8;
-    }
+  /* Timer */
+  .timer-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin: 18px 0 16px;
+  }
 
-    .timer-label {
-        font-size: 13px;
-        color: #888;
-    }
+  .otp-timer {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: 2px solid var(--pink);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--pink);
+    background: var(--pink-tint);
+  }
 
-    /* Buttons */
-    .submit-btn {
-        width: 100%;
-        padding: 13px;
-        background: #d4145a;
-        color: white;
-        border: none;
-        border-radius: 10px;
-        font-size: 16px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s;
-        margin-bottom: 12px;
-    }
+  .timer-label {
+    font-size: 12.5px;
+    color: var(--ink-soft);
+  }
 
-    .submit-btn:hover {
-        background: #b8124a;
-        transform: translateY(-2px);
-        box-shadow: 0 10px 25px rgba(212, 20, 90, 0.3);
-    }
+  /* Buttons */
+  .submit-btn {
+    width: 100%;
+    padding: 11px;
+    background: var(--ink);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
 
-    .resend-btn {
-        width: 100%;
-        padding: 11px;
-        background: #fff;
-        color: #d4145a;
-        border: 1.5px solid #d4145a;
-        border-radius: 10px;
-        font-size: 14px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s;
-        margin-bottom: 18px;
-    }
+  .submit-btn:hover {
+    background: #c2185b;
+  }
 
-    .resend-btn:hover:not(:disabled) {
-        background: #fdf2f5;
-    }
+  .resend-btn {
+    width: 100%;
+    padding: 10px;
+    background: #fff;
+    color: var(--ink);
+    border: 1.5px solid var(--line);
+    border-radius: 8px;
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
 
-    .resend-btn:disabled {
-        opacity: 0.4;
-        cursor: not-allowed;
-        border-color: #ccc;
-        color: #aaa;
-    }
+  .resend-btn:hover:not(:disabled) {
+    border-color: var(--pink);
+    background: var(--pink-tint);
+    color: var(--pink);
+  }
 
-    .back-link {
-        text-align: center;
-        font-size: 14px;
-        color: #666;
-    }
+  .resend-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
 
-    .back-link a {
-        color: #d4145a;
-        font-weight: 600;
-        text-decoration: none;
-    }
+  .submit-btn:focus-visible,
+  .resend-btn:focus-visible,
+  .form-group input:focus-visible {
+    outline: 2px solid var(--pink);
+    outline-offset: 2px;
+  }
 
-    .back-link a:hover { text-decoration: underline; }
+  .alert-danger {
+    color: var(--error);
+    background: #fdf0ef;
+    border: 1px solid #f3cfcc;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 12.5px;
+    text-align: center;
+    margin-top: 14px;
+  }
 
-    /* Responsive */
-    @media (max-width: 900px) {
-        .login-container { flex-direction: column; }
-        .login-image { min-height: 200px; padding: 25px; }
-        .login-form-container { padding: 30px 25px; }
-    }
+  .back-link {
+    text-align: center;
+    font-size: 13px;
+    color: var(--ink-soft);
+    margin-top: 18px;
+  }
 
-    @media (max-width: 500px) {
-        main { padding: 10px; }
-        .login-form-container { padding: 25px 20px; }
-        .login-image { min-height: 180px; }
-        .login-form-container h1 { font-size: 26px; }
-    }
+  .back-link a {
+    color: var(--pink);
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .back-link a:hover { text-decoration: underline; }
+
+  /* Responsive */
+  @media (max-width: 500px) {
+    main { padding: 12px; }
+    .otp-container { padding: 26px 24px; }
+  }
+
+  @media (max-height: 720px) {
+    .otp-container { padding: 24px 40px; }
+    .form-heading { margin-bottom: 14px; }
+  }
 </style>
 
 <main>
-    <div class="login-container">
+    <div class="otp-container">
 
-        <!-- Left: Fashion Image -->
-        <div class="login-image"></div>
+        <div class="icon-wrap">
+            <i class="fas fa-shield-halved"></i>
+        </div>
 
-        <!-- Right: OTP Form -->
-        <div class="login-form-container">
-
-            <div class="icon-wrap">
-                <i class="fas fa-shield-halved"></i>
-            </div>
-
+        <div class="form-heading">
             <h1>Email Verification</h1>
-            <p class="helper-text">
-                We've sent a 6-digit OTP to your email.<br>Enter it below to verify your account.
-            </p>
+            <p>We've sent a 6-digit OTP to your email.<br>Enter it below to verify your account.</p>
+        </div>
 
-            <form id="otpForm" action="verify-passForgot-otp" method="POST" onsubmit="return validateOtp()">
-                <div class="form-group">
-                    <label for="otp">Enter OTP</label>
-                    <input type="text" id="otp" name="otp" maxlength="6" placeholder="— — — — — —" autocomplete="one-time-code">
-                    <div class="error-msg" id="otpError"></div>
-                </div>
-
-                <button type="submit" class="submit-btn">
-                    <i class="fas fa-check-circle" style="margin-right:8px;"></i>Verify OTP
-                </button>
-            </form>
+        <form id="otpForm" action="verify-passForgot-otp" method="POST" onsubmit="return validateOtp()">
+            <div class="form-group">
+                <label for="otp">Enter OTP</label>
+                <input type="text" id="otp" name="otp" maxlength="6" placeholder="——————" autocomplete="one-time-code">
+                <div class="error-msg" id="otpError"></div>
+            </div>
 
             <div class="timer-row">
                 <div class="otp-timer" id="otpTimer">60s</div>
                 <span class="timer-label">Resend available after timer</span>
             </div>
 
-            <button type="button" class="resend-btn" id="resendBtn" onclick="resendOtp()" disabled>
-                <i class="fas fa-rotate-right" style="margin-right:6px;"></i>Resend OTP
+            <button type="submit" class="submit-btn">
+                <i class="fas fa-check-circle"></i>Verify OTP
             </button>
+        </form>
 
-            <% if (locals.message && message.length > 0) { %>
-             <div class="alert alert-danger mt-3">
-              <%=message%>
-             </div>
-            <% } %>
+        <button type="button" class="resend-btn" id="resendBtn" onclick="resendOtp()" disabled>
+            <i class="fas fa-rotate-right"></i>Resend OTP
+        </button>
 
-            <div class="back-link">
-                Already verified? <a href="/login">Login now</a>
-            </div>
+        <% if (locals.message && message.length > 0) { %>
+         <div class="alert-danger">
+          <%=message%>
+         </div>
+        <% } %>
 
+        <div class="back-link">
+            Already verified? <a href="/login">Login now</a>
         </div>
+
     </div>
 </main>
 

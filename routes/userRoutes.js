@@ -77,7 +77,7 @@ router.get(
 );
 
 router.get("/", userController.loadHomepage);
-router.get("/shop", userAuth, userController.loadShopPage)
+router.get("/shop", userController.loadShopPage)
 
 
 // Profile management
@@ -107,16 +107,16 @@ router.post("/editAddress", userAuth, profileController.editAddress)
 router.get("/deleteAddress/:id", userAuth, profileController.deleteAddress)
 
 // Product management
-router.get("/productDetails", userAuth, productController.productDetails)
+router.get("/productDetails", productController.productDetails)
 
 // Wishlist management
 router.get("/wishlist", userAuth, wishlistController.loadWishlist)
-router.post('/addToWishlist', userAuth, wishlistController.addToWishlist)
+router.post('/addToWishlist', wishlistController.addToWishlist)
 router.get('/removeFromWishlist', userAuth, wishlistController.removeFromWishlist)
 
 // Cart management
 router.get("/cart", userAuth, cartController.loadCart)
-router.post("/addToCart", userAuth, cartController.addToCart);
+router.post("/addToCart", cartController.addToCart);
 router.get('/updateCart', userAuth, cartController.updateCart);
 router.get("/removeFromCart", userAuth, cartController.removeFromCart);
 
@@ -147,8 +147,14 @@ router.post("/cancel-order", userAuth, orderController.cancelSingleItem);
 router.patch("/return-item", userAuth, orderController.returnOrder);
 
 // Navbar management
-router.get("/about", userAuth, userController.loadAboutPage)
-router.get("/contact-us", userAuth, userController.loadContactPage)
+router.get("/about", userController.loadAboutPage)
+router.get("/contact-us", userController.loadContactPage)
+
+
+// Footer management
+router.get("/faq", userController.getFAQ)
+router.get("/privacy", userController.getPrivacy)
+router.get("/terms", userController.getTerms)
 
 
 

@@ -70,18 +70,20 @@
                 <ul>
                     <li><a href="/about">About Us</a></li>
                     <li><a href="/contact-us">Contact</a></li>
-                    <li><a href="/contact-us">FAQ</a></li>
+                    <li><a href="/faq">FAQ</a></li>
                     <li><a href="/orders">Order Info</a></li>
                 </ul>
             </div>
             <div class="footer-section">
                 <h3>Categories</h3>
                 <ul>
-                    <li><a href="/category/dresses">Dresses</a></li>
-                    <li><a href="/category/tops">Tops & Blouses</a></li>
-                    <li><a href="/category/bottoms">Bottoms</a></li>
-                    <li><a href="/category/outerwear">Outerwear</a></li>
-                    <li><a href="/category/accessories">Accessories</a></li>
+                    <% footerCategories.forEach(category =>{ %>
+                        <li>
+                            <a href="/shop?category=<%= category._id %>">
+                                <%= category.name%>
+                            </a>
+                        </li>
+                    <%})  %>
                 </ul>
             </div>
             <div class="footer-section">

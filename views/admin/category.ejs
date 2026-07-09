@@ -621,8 +621,11 @@
                           <td class="text-start">
                             <a href="/admin/editCategory/<%=category[i]._id%>" class="btn btn-info text-white">Edit</a>
                           </td>
-                          <td><%= count %>
-                          </td>
+                          
+
+<td>
+  <%= category[i].orderCount %>
+</td>
             
                         </tr>
                    <% } %>

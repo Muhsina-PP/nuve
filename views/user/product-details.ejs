@@ -1142,7 +1142,8 @@ function addToCart(productId ){
   $.ajax({
     url: '/addToCart',
     method: 'POST',
-    data: { productId, selectedVariant : selectedBtn.textContent.trim(), quantity : qty},
+    data: { productId, selectedVariant : selectedBtn.textContent.trim(), quantity : qty, returnTo:window.location.pathname + window.location.search},
+
 
     success: (res) => {
       if(res.success){
@@ -1150,6 +1151,18 @@ function addToCart(productId ){
       }else {
         Swal.fire('Oops!', res.message, 'error');
       }
+    },
+    error : (xhr) =>{
+      if(xhr.status===401){
+        const response = xhr.responseJSON;
+        window.location.href = response.redirect;
+        return;
+      }
+      Swal.fire(
+            'Oops!',
+            'Something went wrong',
+            'error'
+        );
     }
   })
 }
@@ -1173,7 +1186,7 @@ function addToCart(productId ){
     $.ajax({
       url :'/addToWishlist',
       method : 'POST',
-      data : {productId : productId,  variant : selectedBtn.textContent.trim()},
+      data : {productId : productId,  variant : selectedBtn.textContent.trim(), returnTo : window.location.pathname + window.location.search},
       success : (response)=>{
         if(response.success){
           Swal.fire({
@@ -1197,6 +1210,11 @@ function addToCart(productId ){
         }
       },
       error : (error)=>{
+        if(error.status===401){
+          const response = error.responseJSON;
+          window.location.href = response.redirect;
+          return;
+        }
         Swal.fire({
           title : 'Error',
           text :'An error occured while adding item to wishlist',
