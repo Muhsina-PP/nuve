@@ -2,9 +2,16 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <link rel="icon" type="image/png" href="/images/favicon.png">
+
+    <link rel="stylesheet" href="/css/style.css">
     <title>NUVE - Admin Dashboard</title>
+
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <meta name="description" content="NUVE Women's Fashion Admin Dashboard">
+    <meta name="descriptions" content="NUVE Women's Fashion Admin Dashboard">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="shortcut icon" type="image/x-icon" href="#">
     <link href="/admin-assets/css/main.css" rel="stylesheet" type="text/css" />
@@ -439,77 +446,6 @@ nav {
                 <span class="brand-text">NUVE</span>
             </a>
             <div>
-                <button class="btn btn-icon btn-aside-minimize">
-                    <i class="material-icons md-menu_open"></i>
-                </button>
-            </div>
-        </div>
-        
-        <nav>
-            <ul class="menu-aside">
-                <li class="menu-item">
-                    <a class="menu-link active" href="/admin">
-                        <i class="icon material-icons md-home"></i>
-                        <span class="text">Dashboard</span>
-                    </a>
-                </li>
-                <li class="menu-item">
-                    <a class="menu-link" href="/admin/users">
-                        <i class="icon material-icons md-people"></i>
-                        <span class="text">Customers</span>
-                    </a>
-                </li>
-                <li class="menu-item">
-                    <a class="menu-link" href="/admin/category">
-                        <i class="icon material-icons md-category"></i>
-                        <span class="text">Category</span>
-                    </a>
-                </li>
-                <li class="menu-item">
-                    <a class="menu-link" href="/admin/brands">
-                        <i class="icon material-icons md-stars"></i>
-                        <span class="text">Brands</span>
-                    </a>
-                </li>
-                <li class="menu-item">
-                    <a class="menu-link" href="/admin/products">
-                        <i class="icon material-icons md-shopping_bag"></i>
-                        <span class="text">Products</span>
-                    </a>
-                </li>
-                <li class="menu-item">
-                    <a class="menu-link" href="/admin/coupon">
-                        <i class="icon material-icons md-local_offer"></i>
-                        <span class="text">Coupon</span>
-                    </a>
-                </li>
-                <li class="menu-item">
-                    <a class="menu-link" href="/admin/banner">
-                        <i class="icon material-icons md-photo_size_select_actual"></i>
-                        <span class="text">Banner</span>
-                    </a>
-                </li>
-                <li class="menu-item">
-                    <a class="menu-link" href="/admin/orderList">
-                        <i class="icon material-icons md-shopping_cart"></i>
-                        <span class="text">Orders</span>
-                    </a>
-                </li>
-            </ul>
-        </nav>
-    </aside>
-    
-    <!-- Main Content -->
-    <main class="main-wrap">
-        <header class="main-header navbar">
-            <div class="col-search">
-                <h2 class="header-title">Dashboard</h2>
-            </div>
-            <div class="col-nav">
-                <!-- Commented mobile admin icon -->
-                <!-- <button class="btn btn-icon btn-mobile me-auto" data-trigger="#offcanvas_aside">
-                    <i class="material-icons md-apps"></i>
-                </button> -->
                 <ul class="nav">
                     <li class="dropdown nav-item">
                         <!-- Removed class="dropdown-toggle"  -->
@@ -527,5 +463,84 @@ nav {
                         </div>
                     </li>
                 </ul>
+                <!-- <button class="btn btn-icon btn-aside-minimize">
+                    <i class="material-icons md-menu_open"></i>
+                </button> -->
             </div>
+        </div>
+        
+        <nav>
+            <ul class="menu-aside">
+               <li class="menu-item">
+                    <a class="menu-link <%= title === 'Dashboard' ? 'active' : '' %>" href="/admin/dashboard">
+                        <i class="icon material-icons md-home"></i>
+                        <span class="text">Dashboard</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a class="menu-link <%= title === 'Customers' ? 'active' : '' %>" href="/admin/users">
+                        <i class="icon material-icons md-people"></i>
+                        <span class="text">Customers</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a class="menu-link <%= title === 'Category' ? 'active' : '' %>" href="/admin/category">
+                        <i class="icon material-icons md-category"></i>
+                        <span class="text">Category</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a class="menu-link <%= title === 'Brands' ? 'active' : '' %>" href="/admin/brands">
+                        <i class="icon material-icons md-stars"></i>
+                        <span class="text">Brands</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a class="menu-link <%= title === 'Products' ? 'active' : '' %>" href="/admin/products">
+                        <i class="icon material-icons md-shopping_bag"></i>
+                        <span class="text">Products</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a class="menu-link <%= title === 'Coupon' ? 'active' : '' %>" href="/admin/coupon">
+                        <i class="icon material-icons md-local_offer"></i>
+                        <span class="text">Coupon</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a class="menu-link <%= title === 'Offer Management' ? 'active' : '' %>" href="/admin/offers">
+                        <i class="icon material-icons md-local_offer"></i>
+                        <span class="text">Offers</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a class="menu-link <%= title === 'Banner' ? 'active' : '' %>" href="/admin/banner">
+                        <i class="icon material-icons md-photo_size_select_actual"></i>
+                        <span class="text">Banner</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a class="menu-link <%= title === 'Orders' ? 'active' : '' %>" href="/admin/orders">
+                        <i class="icon material-icons md-shopping_cart"></i>
+                        <span class="text">Orders</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a class="menu-link <%= title === 'Sales Report' ? 'active' : '' %>" href="/admin/sales-report">
+                        <i class="icon material-icons md-shopping_cart"></i>
+                        <span class="text">Sales Report</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="main-wrap">
+        <header class="main-header navbar">
+            <div class="col-search">
+                <h2 class="header-title"><%= title %></h2>
+
+            </div>
+           
         </header>

@@ -1,0 +1,283 @@
+<%- include("../../views/partials/user/header") %>
+<link rel="stylesheet" href="https://cdn-uicons.flaticon.com/uicons-regular-rounded/css/uicons-regular-rounded.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+  .page-header {
+    background: #fff;
+    border-bottom: 1px solid #eee;
+    padding: 14px 5%;
+  }
+  .breadcrumb { font-size: 13px; color: #999; display: flex; align-items: center; gap: 6px; }
+  .breadcrumb a { color: #d4145a; text-decoration: none; }
+  .breadcrumb span { color: #ddd; }
+
+  .wishlist-section {
+    padding: 50px 5%;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .wishlist-header {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+  .wishlist-header h2 {
+    font-size: 26px;
+    font-weight: 700;
+    color: #222;
+    letter-spacing: -0.5px;
+  }
+  .wishlist-header span { font-size: 13px; color: #aaa; }
+
+  .wishlist-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #f0f0f0;
+  }
+
+  .wishlist-table thead tr {
+    background: #fbeaf0;
+  }
+  .wishlist-table thead th {
+    padding: 16px 20px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #d4145a;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid #f4c0d1;
+    text-align: left;
+  }
+  .wishlist-table thead th.center { text-align: center; }
+
+  .wishlist-table tbody tr {
+    border-bottom: 1px solid #f5f5f5;
+    transition: background 0.2s;
+  }
+  .wishlist-table tbody tr:last-child { border-bottom: none; }
+  .wishlist-table tbody tr:hover { background: #fffafc; }
+
+  .wishlist-table tbody td {
+    padding: 18px 20px;
+    vertical-align: middle;
+    font-size: 14px;
+    color: #333;
+  }
+  .wishlist-table tbody td.center { text-align: center; }
+
+  .product-thumbnail {
+    width: 70px;
+    height: 70px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #f0f0f0;
+    display: block;
+  }
+
+  .product-name a {
+    font-weight: 600;
+    color: #222;
+    text-decoration: none;
+    font-size: 15px;
+    display: block;
+    margin-bottom: 4px;
+  }
+  .product-name a:hover { color: #d4145a; }
+  .product-name .product-meta {
+    font-size: 12px;
+    color: #aaa;
+  }
+
+  .product-price {
+    font-size: 17px;
+    font-weight: 700;
+    color: #d4145a;
+  }
+
+  .add-cart-btn {
+    display: inline-block;
+    padding: 9px 22px;
+    background: #d4145a;
+    color: #fff !important;
+    border-radius: 50px;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none !important;
+    transition: all 0.3s;
+    white-space: nowrap;
+    border: none;
+    cursor: pointer;
+  }
+  .add-cart-btn:hover { background: #a81049; transform: translateY(-1px); }
+
+  .remove-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #fff;
+    border: 1px solid #eee;
+    color: #999;
+    font-size: 14px;
+    text-decoration: none;
+    transition: all 0.25s;
+    cursor: pointer;
+  }
+  .remove-btn:hover { background: #d4145a; color: #fff; border-color: #d4145a; }
+
+  /* Empty state */
+  .empty-wishlist {
+    text-align: center;
+    padding: 80px 20px;
+    background: #fff;
+    border-radius: 12px;
+    border: 1px dashed #f4c0d1;
+  }
+  .empty-icon {
+    width: 72px;
+    height: 72px;
+    background: #fbeaf0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    font-size: 28px;
+    color: #d4145a;
+  }
+  .empty-title { font-size: 20px; font-weight: 600; color: #333; margin-bottom: 8px; }
+  .empty-sub { font-size: 14px; color: #aaa; margin-bottom: 24px; }
+  .shop-btn {
+    display: inline-block;
+    padding: 12px 32px;
+    background: #d4145a;
+    color: #fff;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 14px;
+    text-decoration: none;
+    transition: all 0.3s;
+  }
+  .shop-btn:hover { background: #a81049; }
+</style>
+
+<main>
+  <div class="page-header">
+    <div class="breadcrumb">
+      <a href="/" rel="nofollow">Home</a>
+      <span>&#9656;</span>  <a href="/shop" rel="nofollow">Shop</a>
+      <span>&#9656;</span> My Wishlist
+    </div>
+  </div>
+
+  <section class="wishlist-section">
+    <div class="wishlist-header">
+      <h2>My Wishlist</h2>
+      <span><%= wishlistItems.length %> item<%= wishlistItems.length !== 1 ? 's' : '' %> saved</span>
+    </div>
+
+    
+
+      <div style="overflow-x: auto;">
+        <table class="wishlist-table">
+          <thead>
+            <tr>
+              <th>Image</th>
+              <th>Name</th>
+              <th>Price</th>
+              <th class="center">Add to Cart</th>
+              <th class="center">Remove</th>
+            </tr>
+          </thead>
+          <% if (wishlistItems.length > 0) { %>
+          <tbody>
+            <% for( let item of wishlistItems ) { %>
+              <tr>
+                <td>
+                  <img
+                    src="/uploads/product-images/<%= item.productId.productImage?.[0] %>"
+                    alt="<%= item.productName %>"
+                    class="product-thumbnail"
+                  />
+                </td>
+                <td class="product-name">
+                  <a href="/productDetails?id=<%= item.productId._id %>"><%= item.productId.productName %></a>
+                    <span class="product-meta"><%= item.productId.brand?.brandName %></span><br>
+                   <span class="product-meta"><%= item.productId.category?.name %></span>
+                </td>
+                <td>
+                  <span class="product-price">₹<%= item.productId.salePrice %></span>
+                </td>
+                <td class="center">
+                  <a href="#" onclick="addToCart('<%= item.productId._id %>','<%= item.variant %>'); return false" class="add-cart-btn">Add to Cart</a>
+                </td>
+                <td class="center">
+                  <a href="#" onclick="confirmRemove('<%= item.productId._id %>')" class="remove-btn" title="Remove">
+                    <i class="fa-solid fa-trash"></i>
+                  </a>
+                </td>
+              </tr>
+              <% } %>
+          </tbody>
+          <% } else { %>
+        </table> 
+      </div>
+
+    
+
+      <div class="empty-wishlist">
+        <div class="empty-title">Your wishlist is empty</div>
+        <div class="empty-sub">Save items you love and come back to them anytime.</div>
+        <a href="/shop" class="shop-btn">Continue Shopping</a>
+      </div>
+
+    <% } %>
+
+  </section>
+</main>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+  function confirmRemove(productId){
+    Swal.fire({
+      title : 'Are you sure?',
+      text : 'Are you sure you want to remove this item from wishlist?',
+      icon : 'warning',
+      showCancelButton : true,
+      confirmButtonText : 'Yes, remove',
+      cancelButtonText : 'cancel'
+    }).then((result)=>{
+      if(result.isConfirmed){
+        window.location.href = `/removeFromWishlist?productId=${productId}`
+      }
+    })
+  }
+
+  function addToCart(productId, variant){
+  console.log("Clicked:", productId); // 👈 add this
+  $.ajax({
+    url: '/addToCart',
+    method: 'POST',
+    data: { productId : productId, selectedVariant : variant},
+
+    success: (res) => {
+      if(res.success){
+        Swal.fire('Added!', res.message, 'success')
+        .then(()=>{
+          location.reload();
+        })
+      }else {
+        Swal.fire('Oops!', res.message, 'error');
+      }
+    }
+  })
+}
+</script>

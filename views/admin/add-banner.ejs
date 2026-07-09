@@ -1,0 +1,454 @@
+<%- include("../../views/partials/admin/header") %>
+
+<head>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.css">
+    
+</head>
+
+<style>
+    /* ────────────────────────────────────────────────
+       Reuse main site variables & feel
+    ──────────────────────────────────────────────── */
+    :root {
+        --primary:    #d4145a;
+        --primary-dark: #a81049;
+        --light-bg:   #f8f9fa;
+        --card-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        --transition: all 0.3s ease;
+    }
+
+    body {
+        background: var(--light-bg);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: #333;
+    }
+
+    .content-main {
+        padding: 40px 5%;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .content-title {
+        font-size: 32px;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 30px;
+    }
+
+    .card {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: var(--card-shadow);
+        border: none;
+        margin-bottom: 40px;
+    }
+
+    .card-header {
+        background: #f8f9fa;
+        padding: 20px;
+        border-bottom: 1px solid #eee;
+        font-size: 20px;
+        font-weight: 600;
+        color: #444;
+    }
+
+    .card-body {
+        padding: 30px;
+    }
+
+    /* Form elements – match main site inputs */
+    .form-label {
+        font-weight: 600;
+        color: #444;
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .form-control {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 12px 16px;
+        font-size: 15px;
+        transition: var(--transition);
+    }
+
+    .form-control:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(212, 20, 90, 0.15);
+        outline: none;
+    }
+
+    textarea.form-control {
+        min-height: 110px;
+    }
+
+    /* Error messages */
+    .error-message {
+        color: #dc3545;
+        font-size: 13px;
+        margin-top: 6px;
+        min-height: 20px;
+    }
+
+    /* Image upload area – modern & consistent */
+    .image-upload-wrapper {
+        border: 2px dashed #ccc;
+        border-radius: 12px;
+        padding: 40px 20px;
+        text-align: center;
+        background: #fafafa;
+        transition: var(--transition);
+        cursor: pointer;
+        margin: 20px 0;
+    }
+
+    .image-upload-wrapper:hover {
+        border-color: var(--primary);
+        background: #fff5f8;
+    }
+
+    .image-upload-wrapper img#imgView1 {
+        max-width: 100%;
+        max-height: 280px;
+        border-radius: 8px;
+        margin: 15px auto;
+        display: block;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    #inputFile {
+        display: none;
+    }
+
+    .custom-file-btn {
+        background: var(--primary);
+        color: white;
+        padding: 12px 28px;
+        border-radius: 50px;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-block;
+        transition: var(--transition);
+        margin-top: 12px;
+    }
+
+    .custom-file-btn:hover {
+        background: var(--primary-dark);
+        transform: translateY(-2px);
+    }
+
+    /* Cropper container */
+    .image-cropper {
+        margin: 25px auto;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        overflow: hidden;
+        background: white;
+        padding: 15px;
+        max-width: 520px;
+    }
+
+    /* Submit button – match .btn-primary from home */
+    .btn-publish {
+        background: var(--primary);
+        color: white;
+        padding: 14px 40px;
+        border-radius: 50px;
+        font-size: 16px;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        transition: var(--transition);
+        box-shadow: 0 4px 12px rgba(212,20,90,0.2);
+    }
+
+    .btn-publish:hover {
+        background: var(--primary-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(212,20,90,0.25);
+    }
+
+    .btn-publish:active {
+        transform: translateY(0);
+    }
+
+    /* Thumbnails (if you keep multiple) */
+    .thumbnails-container {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 15px;
+    }
+
+    .thumbnail {
+        position: relative;
+        width: 80px;
+        height: 80px;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .thumbnail img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .image-cropper[style*="display: block"] ~ .custom-file-btn {
+        display: none;   /* or opacity: 0.4; pointer-events: none; */
+    }
+
+    @media (max-width: 992px) {
+        .content-main { padding: 30px 4%; }
+        .card-body { padding: 24px; }
+    }
+</style>
+
+<section class="content-main">
+    <h2 class="content-title">Add New Banner</h2>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-xl-7">
+            <div class="card mb-4">
+                <div class="card-body">
+
+                    <form method="POST" action="/admin/addBanner" enctype="multipart/form-data">
+
+                        <!-- Title -->
+                        <div class="mb-4">
+                            <label for="product_name" class="form-label">Banner Title</label>
+                            <input type="text" name="title" class="form-control" id="product_name" placeholder="Summer Sale 2025">
+                            <div id="productName-error" class="error-message"></div>
+                        </div>
+
+                        <!-- Description -->
+                        <div class="mb-4">
+                            <label class="form-label">Description</label>
+                            <textarea name="description" class="form-control" rows="4" placeholder="Up to 70% off – limited time only!"></textarea>
+                            <div id="description-error" class="error-message"></div>
+                        </div>
+
+                        <!-- Dates -->
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <label for="startingDate" class="form-label">Start Date</label>
+                                <input type="date" name="startDate" class="form-control" id="startingDate" required>
+                                <div id="error-start-date" class="error-message"></div>
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <label for="expiringDate" class="form-label">End Date</label>
+                                <input type="date" name="endDate" class="form-control" id="expiringDate" required>
+                                <div id="error-end-date" class="error-message"></div>
+                            </div>
+                        </div>
+
+                        <!-- Link -->
+                        <div class="mb-4">
+                            <label class="form-label">Link (URL)</label>
+                            <input type="text" name="link" class="form-control" placeholder="https://example.com/sale">
+                            <div id="link-error" class="error-message"></div>
+                        </div>
+
+                        <!-- Image Upload + Crop Section -->
+                        <div class="card-header mt-4">Banner Image</div>
+
+                        <div class="image-upload-wrapper mt-3" id="uploadArea">
+                            <img id="previewImage" 
+                                 alt="Banner preview" 
+                                 style="display: none; max-width: 100%; max-height: 380px; border-radius: 8px; margin: 0 auto 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+
+                            <label for="inputFile" class="custom-file-btn">Choose Image</label>
+                            <input type="file" name="image" id="inputFile" accept="image/png, image/jpeg, image/jpg" hidden>
+
+                            <p class="mt-3 text-muted small text-center">
+                                Recommended size: 1360 × 777 px (will be cropped to this ratio)
+                            </p>
+                            <div id="image-error" class="error-message text-center"></div>
+                        </div>
+
+                        <!-- Crop Area -->
+                        <div class="image-cropper mt-4" id="cropperContainer" style="display:none; position: relative; max-width: 680px; margin: 0 auto;">
+                            <button type="button" id="saveCropBtn" class="btn btn-primary mt-3 w-100">
+                                Save Crop & Continue
+                            </button>
+                        </div>
+
+                        <!-- Submit -->
+                        <div class="mt-5 text-center">
+                            <button type="button" class="btn-publish" onclick="validateAndSubmit()">
+                                Publish Banner
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.js"></script>
+<script>
+    let cropper = null;
+    let isCropping = false;
+
+    // Prevent clicking inside upload area from opening file dialog while cropping
+    document.getElementById('uploadArea').addEventListener('click', function(e) {
+        if (isCropping) return;
+        if (e.target.tagName === 'LABEL') return;
+        document.getElementById('inputFile').click();
+    });
+
+    // File selected → show preview + start cropper
+    document.getElementById('inputFile').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (!file || !file.type.startsWith('image/')) {
+            displayErrorMessage("image-error", "Please select a JPEG or PNG image");
+            return;
+        }
+
+        resetErrorMessages();
+
+        const reader = new FileReader();
+        reader.onload = function(ev) {
+            const img = document.getElementById('previewImage');
+            img.src = ev.target.result;
+            img.style.display = 'block';
+
+            // Destroy previous cropper
+            if (cropper) {
+                cropper.destroy();
+                cropper = null;
+            }
+
+            // Show crop area
+            document.getElementById('cropperContainer').style.display = 'block';
+            isCropping = true;
+
+            // Initialize Cropper on the preview image
+            cropper = new Cropper(img, {
+                aspectRatio: NaN,
+                viewMode: 1,
+                guides: true,
+                background: false,
+                autoCropArea: 0.8,
+                zoomable: true,
+                movable: true,
+                rotatable: false,
+                scalable: false,
+                ready: function () {
+                    console.log("Cropper is ready");
+                }
+            });
+        };
+        reader.readAsDataURL(file);
+    });
+
+    // Save cropped image
+    document.getElementById('saveCropBtn').addEventListener('click', function() {
+        if (!cropper) return;
+
+        const canvas = cropper.getCroppedCanvas({
+            width: 1360,
+            height: 777,
+            fillColor: '#fff'
+        });
+
+        canvas.toBlob(function(blob) {
+            // Replace the file in the input
+            const input = document.getElementById('inputFile');
+            const croppedFile = new File([blob], `banner-cropped-${Date.now()}.jpg`, { type: 'image/jpeg' });
+
+            const dt = new DataTransfer();
+            dt.items.add(croppedFile);
+            input.files = dt.files;
+
+            // Update preview with cropped version
+            const preview = document.getElementById('previewImage');
+            preview.src = URL.createObjectURL(blob);
+
+            // Hide cropper
+            document.getElementById('cropperContainer').style.display = 'none';
+            cropper.destroy();
+            cropper = null;
+            isCropping = false;
+
+            console.log("Cropped image saved and preview updated");
+        }, 'image/jpeg', 0.92);
+    });
+
+    // ────────────────────────────────────────────────
+    // Validation functions (your existing ones)
+    // ────────────────────────────────────────────────
+
+    function validateAndSubmit() {
+        if (validateForm()) {
+            document.forms[0].submit();
+        }
+    }
+
+    function validateForm() {
+        resetErrorMessages();
+        let isValid = true;
+
+        const title = document.getElementById("product_name").value.trim();
+        const description = document.querySelector('textarea[name="description"]').value.trim();
+        const link = document.querySelector('input[name="link"]').value.trim();
+        const startDate = document.querySelector('input[name="startDate"]').value;
+        const endDate = document.querySelector('input[name="endDate"]').value;
+        const imageInput = document.getElementById('inputFile');
+
+        if (!title) {
+            displayErrorMessage("productName-error", "Banner title is required");
+            isValid = false;
+        }
+
+        if (!description) {
+            displayErrorMessage("description-error", "Description is required");
+            isValid = false;
+        }
+
+        if (!link) {
+            displayErrorMessage("link-error", "Link is required");
+            isValid = false;
+        }
+
+        if (!startDate) {
+            displayErrorMessage("error-start-date", "Start date is required");
+            isValid = false;
+        }
+
+        if (!endDate) {
+            displayErrorMessage("error-end-date", "End date is required");
+            isValid = false;
+        }
+
+        if (startDate && endDate && new Date(startDate) > new Date(endDate)) {
+            displayErrorMessage("error-end-date", "End date must be after start date");
+            isValid = false;
+        }
+
+        if (!imageInput.files || imageInput.files.length === 0) {
+            displayErrorMessage("image-error", "Please upload and crop an image");
+            isValid = false;
+        }
+
+        return isValid;
+    }
+
+    function displayErrorMessage(id, msg) {
+        const el = document.getElementById(id);
+        el.textContent = msg;
+        el.style.display = 'block';
+    }
+
+    function resetErrorMessages() {
+        document.querySelectorAll('.error-message').forEach(el => {
+            el.textContent = '';
+            el.style.display = 'none';
+        });
+    }
+</script>

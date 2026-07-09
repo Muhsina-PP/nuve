@@ -1,0 +1,259 @@
+<%- include("../../views/partials/admin/header") %>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<style>
+    /* Reuse your home-page variables & feel */
+    :root {
+        --primary: #d4145a;
+        --primary-dark: #a81049;
+        --light-bg: #f8f9fa;
+        --card-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        --transition: all 0.3s ease;
+    }
+
+    body {
+        background: var(--light-bg);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .content-header {
+        padding: 25px 5%;
+        background: white;
+        border-bottom: 1px solid #eee;
+        margin-bottom: 30px;
+    }
+
+    .content-title {
+        font-size: 28px;
+        font-weight: 700;
+        color: #333;
+        margin: 0;
+    }
+
+    /* Card wrapper for table */
+    .table-container {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: var(--card-shadow);
+        margin: 0 5% 40px;
+        max-width: 1400px;
+    }
+
+    /* Modern table styling */
+    .table {
+        margin-bottom: 0;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+    .table thead th {
+        background: #f1f3f5;
+        color: #555;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 13px;
+        letter-spacing: 0.5px;
+        padding: 16px 20px;
+        border-bottom: 2px solid #e0e0e0;
+    }
+
+    .table tbody tr {
+        transition: var(--transition);
+    }
+
+    .table tbody tr:hover {
+        background: #f8fbff;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(212,20,90,0.08);
+    }
+
+    .table td {
+        padding: 20px;
+        vertical-align: middle;
+        border-top: 1px solid #f0f0f0;
+        color: #444;
+    }
+
+    /* Image in table */
+    .banner-img {
+        width: 80px;
+        height: 50px;
+        object-fit: cover;
+        border-radius: 6px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    /* Status badges – pill style like home page */
+    .badge-status {
+        padding: 6px 14px;
+        font-size: 13px;
+        font-weight: 600;
+        border-radius: 50px;
+    }
+
+    .badge-active {
+        background: #e6f4ea;
+        color: #2e7d32;
+    }
+
+    .badge-inactive {
+        background: #ffebee;
+        color: #c62828;
+    }
+
+    /* Delete button */
+    .action a {
+        color: #e74c3c;
+        font-size: 1.3rem;
+        transition: var(--transition);
+    }
+
+    .action a:hover {
+        color: #c0392b;
+        transform: scale(1.15);
+    }
+
+    /* Add Banner button – match home page .btn-primary */
+    .btn-primary-admin {
+        background: var(--primary);
+        color: white;
+        padding: 12px 32px;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 15px;
+        border: none;
+        transition: var(--transition);
+        box-shadow: 0 4px 12px rgba(212,20,90,0.2);
+    }
+
+    .btn-primary-admin:hover {
+        background: var(--primary-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(212,20,90,0.25);
+    }
+
+    .btn-primary-admin:active {
+        transform: translateY(0);
+    }
+
+    @media (max-width: 768px) {
+        .table thead { display: none; }
+        .table tr { display: block; margin-bottom: 20px; border: 1px solid #eee; border-radius: 10px; }
+        .table td { display: block; text-align: right; position: relative; padding-left: 50%; border: none; }
+        .table td:before { content: attr(data-label); position: absolute; left: 20px; width: 45%; font-weight: 600; text-align: left; color: #555; }
+    }
+</style>
+
+<div class="content-header row">
+    <div class="d-flex justify-content-between align-items-center">
+        <h2 class="content-title card-title">Banners</h2>
+    </div>
+</div>
+
+<div class="table-container">
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Image</th>
+                <th scope="col">Title</th>
+                <th scope="col">Description</th>
+                <th scope="col">Active</th>
+                <th scope="col">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+          <% if (locals.banners) { %>
+            <% for( let i = 0; i < banners.length; i++ ) { %>
+              <tr>
+                    <td data-label="Image">
+                        <img src="/uploads/product-images/<%=banners[i].image%>" class="banner-img" alt="<%=banners[i].title%>">
+                    </td>
+                    <td data-label="Title"><%=banners[i].title%></td>
+                    <td data-label="Description"><%=banners[i].description%></td>
+                    <td data-label="Active">
+                      <% if (banners[i].startDate < Date.now() && banners[i].endDate > Date.now()) { %>
+                        <span class="badge-status badge-active">Active</span>
+                      <% } else { %>
+                        <span class="badge-status badge-inactive">Inactive</span>
+                      <% } %>
+                    </td>
+
+                    <td data-label="Actions" class="action">
+                        <a href="/admin/deleteBanner?id=<%= banners[i]._id %>" class="delete-banner">
+                            <i class="material-icons" style="color:red;">delete</i>
+                        </a>
+                    </td>
+                </tr>
+                <% } %>
+             <% } else { %>
+              No Banner Added Yet            
+             <% } %>
+        </tbody>
+    </table>
+</div>
+
+<div class="container mt-4 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 text-center">
+            <a href="/admin/addBanner">
+                <button class="btn-primary-admin" type="button">Add New Banner</button>
+            </a>
+        </div>
+    </div>
+</div>
+
+ <!-- Pagination -->
+    <div class="container mt-3">
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center mb-20" style="margin-right: 200px;">
+                  <% for( let i = 1; i <= totalPages ; i++ ) { %>
+                    <li class="page-item <%= (i===currentPage) ? 'active' : '' %>">
+                      <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+                    </li>             
+                  <% } %>
+                </ul>
+          </nav>
+    </div>
+
+<script>
+    const url = new URL(window.location);
+
+    if(url.searchParams.get("success") === "bannerAdded"){
+        Swal.fire({
+            icon: "success",
+            title: "Banner Added!",
+            text: "The banner  added successfully.",
+            confirmButtonColor: "#d4145a"
+        });
+
+        url.searchParams.delete("success");
+        window.history.replaceState({}, document.title, url);
+    }
+</script>
+<script>
+document.querySelectorAll(".delete-banner").forEach(button => {
+    button.addEventListener("click", function(e) {
+        e.preventDefault();
+
+        const link = this.getAttribute("href");
+
+        Swal.fire({
+            title: "Are you sure?",
+            text: "This banner will be deleted!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Yes, delete it!"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = link;
+            }
+        });
+    });
+});
+</script>
+
+<%- include("../../views/partials/admin/footer") %>

@@ -1,0 +1,438 @@
+<%-include("../../views/partials/user/header")%>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy – NUVE</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --brand:    #d4145a;
+            --brand-dk: #a81049;
+            --dark:     #1a1a1a;
+            --mid:      #555;
+            --light:    #f8f9fa;
+            --white:    #ffffff;
+            --border:   #e8e8e8;
+        }
+
+        body {
+            font-family: 'Jost', 'Segoe UI', Tahoma, sans-serif;
+            color: var(--dark);
+            line-height: 1.7;
+        }
+
+        /* ── Hero ─────────────────────────────────────── */
+        .legal-hero {
+            position: relative;
+            height: 300px;
+            background: linear-gradient(135deg, #1a0a10 0%, #3d0e26 60%, #1a0a10 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .legal-hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 55% 70% at 20% 50%, rgba(212,20,90,0.2) 0%, transparent 70%),
+                radial-gradient(ellipse 40% 50% at 80% 30%, rgba(212,20,90,0.12) 0%, transparent 70%);
+        }
+
+        .legal-hero::after {
+            content: 'NUVE';
+            position: absolute;
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-size: 200px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.04);
+            letter-spacing: 0.15em;
+            pointer-events: none;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .legal-hero-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            color: var(--white);
+            animation: fadeInUp 0.9s ease both;
+            padding: 0 20px;
+        }
+
+        .legal-hero-content .eyebrow {
+            font-size: 13px;
+            letter-spacing: 0.35em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.5);
+            margin-bottom: 16px;
+        }
+
+        .legal-hero-content h1 {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-size: 50px;
+            font-weight: 600;
+            line-height: 1.1;
+            margin-bottom: 14px;
+        }
+
+        .legal-hero-content h1 em {
+            font-style: italic;
+            color: #f2a0bf;
+        }
+
+        .legal-hero-content p {
+            font-size: 14px;
+            font-weight: 300;
+            color: rgba(255,255,255,0.6);
+            letter-spacing: 0.04em;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(28px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── Layout ───────────────────────────────────── */
+        .legal-section {
+            padding: 70px 5% 100px;
+            background: var(--white);
+        }
+
+        .legal-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 60px;
+            align-items: start;
+        }
+
+        /* ── TOC Sidebar ──────────────────────────────── */
+        .legal-toc {
+            position: sticky;
+            top: 24px;
+            background: var(--light);
+            border-radius: 14px;
+            padding: 26px 22px;
+        }
+
+        .legal-toc h4 {
+            font-size: 12px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--brand);
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .legal-toc ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .legal-toc a {
+            display: block;
+            padding: 8px 10px;
+            border-radius: 8px;
+            font-size: 14px;
+            color: var(--mid);
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .legal-toc a:hover,
+        .legal-toc a.active {
+            background: rgba(212,20,90,0.08);
+            color: var(--brand);
+        }
+
+        /* ── Content ──────────────────────────────────── */
+        .legal-content .section-label {
+            font-size: 12px;
+            letter-spacing: 0.32em;
+            text-transform: uppercase;
+            color: var(--brand);
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .legal-intro {
+            font-size: 15px;
+            color: var(--mid);
+            margin-bottom: 50px;
+            max-width: 640px;
+        }
+
+        .legal-block {
+            padding-bottom: 40px;
+            margin-bottom: 40px;
+            border-bottom: 1px solid var(--border);
+            scroll-margin-top: 24px;
+        }
+
+        .legal-block:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .legal-block-head {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+
+        .legal-block-icon {
+            width: 40px;
+            height: 40px;
+            min-width: 40px;
+            border-radius: 50%;
+            background: rgba(212,20,90,0.1);
+            color: var(--brand);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+        }
+
+        .legal-block-head h3 {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-size: 26px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .legal-block p {
+            font-size: 15px;
+            color: var(--mid);
+            margin-bottom: 14px;
+        }
+
+        .legal-block p:last-child {
+            margin-bottom: 0;
+        }
+
+        .legal-block ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 0 0 14px;
+        }
+
+        .legal-block ul li {
+            font-size: 15px;
+            color: var(--mid);
+            padding-left: 22px;
+            position: relative;
+        }
+
+        .legal-block ul li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 9px;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--brand);
+        }
+
+        .legal-block a.inline-link {
+            color: var(--brand);
+            font-weight: 500;
+            text-decoration: none;
+        }
+
+        .legal-block a.inline-link:hover {
+            text-decoration: underline;
+        }
+
+        /* ── Responsive ───────────────────────────────── */
+        @media (max-width: 900px) {
+            .legal-inner { grid-template-columns: 1fr; }
+            .legal-toc { position: static; }
+        }
+
+        @media (max-width: 600px) {
+            .legal-hero-content h1 { font-size: 32px; }
+            .legal-block-head h3 { font-size: 21px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ── Hero ──────────────────────────────────────── -->
+    <section class="legal-hero">
+        <div class="legal-hero-content">
+            <p class="eyebrow">Legal</p>
+            <h1>Privacy <em>Policy</em></h1>
+            <p>Last updated: July 2, 2026</p>
+        </div>
+    </section>
+
+    <!-- ── Content ───────────────────────────────────── -->
+    <section class="legal-section">
+        <div class="legal-inner">
+
+            <!-- TOC -->
+            <aside class="legal-toc">
+                <h4>On This Page</h4>
+                <ul>
+                    <li><a href="#information-we-collect">Information We Collect</a></li>
+                    <li><a href="#how-we-use-it">How We Use Your Information</a></li>
+                    <li><a href="#cookies">Cookies &amp; Tracking</a></li>
+                    <li><a href="#sharing">Sharing Your Information</a></li>
+                    <li><a href="#security">Data Security</a></li>
+                    <li><a href="#your-rights">Your Rights &amp; Choices</a></li>
+                    <li><a href="#children">Children's Privacy</a></li>
+                    <li><a href="#changes">Changes to This Policy</a></li>
+                    <li><a href="#contact">Contact Us</a></li>
+                </ul>
+            </aside>
+
+            <!-- Body -->
+            <div class="legal-content">
+                <span class="section-label">Your Privacy Matters</span>
+                <p class="legal-intro">
+                    This Privacy Policy explains how NUVE ("we", "us", "our") collects, uses, and protects
+                    your personal information when you visit our website, create an account, or place an
+                    order with us. By using nuve.in, you agree to the practices described below.
+                </p>
+
+                <div class="legal-block" id="information-we-collect">
+                    <div class="legal-block-head">
+                        <div class="legal-block-icon"><i class="fas fa-database"></i></div>
+                        <h3>Information We Collect</h3>
+                    </div>
+                    <p>We collect information that you provide directly to us, as well as information gathered automatically as you use our site.</p>
+                    <ul>
+                        <li><strong>Account details</strong> — name, email address, phone number, and password when you sign up.</li>
+                        <li><strong>Order information</strong> — shipping address, billing address, and items purchased.</li>
+                        <li><strong>Payment information</strong> — processed securely by our payment partners; we do not store full card numbers.</li>
+                        <li><strong>Usage data</strong> — pages visited, products viewed, and interactions with the site, collected via cookies.</li>
+                    </ul>
+                </div>
+
+                <div class="legal-block" id="how-we-use-it">
+                    <div class="legal-block-head">
+                        <div class="legal-block-icon"><i class="fas fa-gears"></i></div>
+                        <h3>How We Use Your Information</h3>
+                    </div>
+                    <p>We use the information we collect to:</p>
+                    <ul>
+                        <li>Process and deliver your orders, and keep you updated on their status.</li>
+                        <li>Personalize your shopping experience and recommend products you may like.</li>
+                        <li>Send order confirmations, shipping updates, and — if you've opted in — promotional emails.</li>
+                        <li>Improve our website, prevent fraud, and respond to customer support requests.</li>
+                    </ul>
+                </div>
+
+                <div class="legal-block" id="cookies">
+                    <div class="legal-block-head">
+                        <div class="legal-block-icon"><i class="fas fa-cookie-bite"></i></div>
+                        <h3>Cookies &amp; Tracking</h3>
+                    </div>
+                    <p>
+                        We use cookies and similar technologies to keep you signed in, remember items in your
+                        cart, and understand how visitors use our site. You can disable cookies in your browser
+                        settings, though some features of NUVE may not work correctly without them.
+                    </p>
+                </div>
+
+                <div class="legal-block" id="sharing">
+                    <div class="legal-block-head">
+                        <div class="legal-block-icon"><i class="fas fa-share-nodes"></i></div>
+                        <h3>Sharing Your Information</h3>
+                    </div>
+                    <p>We do not sell your personal information. We only share it with:</p>
+                    <ul>
+                        <li>Shipping and logistics partners, to deliver your orders.</li>
+                        <li>Payment gateway providers, to process transactions securely.</li>
+                        <li>Service providers who help us run the site (hosting, analytics, email delivery), under confidentiality agreements.</li>
+                        <li>Authorities, only where required by law.</li>
+                    </ul>
+                </div>
+
+                <div class="legal-block" id="security">
+                    <div class="legal-block-head">
+                        <div class="legal-block-icon"><i class="fas fa-shield-halved"></i></div>
+                        <h3>Data Security</h3>
+                    </div>
+                    <p>
+                        We use industry-standard measures — including encryption in transit and access controls —
+                        to protect your data. While no method of transmission over the internet is 100% secure,
+                        we work continuously to safeguard your information against unauthorized access.
+                    </p>
+                </div>
+
+                <div class="legal-block" id="your-rights">
+                    <div class="legal-block-head">
+                        <div class="legal-block-icon"><i class="fas fa-user-check"></i></div>
+                        <h3>Your Rights &amp; Choices</h3>
+                    </div>
+                    <p>You can:</p>
+                    <ul>
+                        <li>Access, update, or delete your account information anytime from your profile.</li>
+                        <li>Unsubscribe from marketing emails using the link at the bottom of any email.</li>
+                        <li>Request a copy of the personal data we hold about you by contacting us below.</li>
+                    </ul>
+                </div>
+
+                <div class="legal-block" id="children">
+                    <div class="legal-block-head">
+                        <div class="legal-block-icon"><i class="fas fa-child-reaching"></i></div>
+                        <h3>Children's Privacy</h3>
+                    </div>
+                    <p>
+                        NUVE is not intended for children under 16. We do not knowingly collect personal
+                        information from children. If you believe a child has provided us with personal data,
+                        please contact us and we will delete it promptly.
+                    </p>
+                </div>
+
+                <div class="legal-block" id="changes">
+                    <div class="legal-block-head">
+                        <div class="legal-block-icon"><i class="fas fa-clock-rotate-left"></i></div>
+                        <h3>Changes to This Policy</h3>
+                    </div>
+                    <p>
+                        We may update this Privacy Policy from time to time. Any changes will be posted on this
+                        page with a revised "Last updated" date. We encourage you to review it periodically.
+                    </p>
+                </div>
+
+                <div class="legal-block" id="contact">
+                    <div class="legal-block-head">
+                        <div class="legal-block-icon"><i class="fas fa-envelope"></i></div>
+                        <h3>Contact Us</h3>
+                    </div>
+                    <p>
+                        If you have questions about this Privacy Policy or how we handle your data, reach out
+                        at <a href="mailto:hello@nuve.in" class="inline-link">hello@nuve.in</a> or visit our
+                        <a href="/contact-us" class="inline-link">Contact Us</a> page.
+                    </p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+</body>
+</html>
+<%-include("../../views/partials/user/footer")%>

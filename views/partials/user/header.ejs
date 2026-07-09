@@ -1,225 +1,297 @@
- <style>
-  
-        /* Header Styles */
-        header {
-            background: #fff;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="/images/favicon.png">
+  <title>NUVE - Women's Fashion Store</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
 
-        nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem 5%;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
+<style>
+/* Header */
+.site-header {
+    background: #fff;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    border-bottom: 1px solid #eee;
+}
 
-        .logo {
-            font-size: 28px;
-            font-weight: bold;
-            color: #d4145a;
-            text-decoration: none;
-        }
+.main-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 1rem 5%;
+}
 
-        .nav-links {
-            display: flex;
-            list-style: none;
-            gap: 2rem;
-        }
+.logo {
+    font-size: 2.1rem;
+    font-weight: 800;
+    color: #d4145a;
+    text-decoration: none;
+    letter-spacing: -1px;
+}
 
-        .nav-links a {
-            text-decoration: none;
-            color: #333;
-            font-weight: 500;
-            transition: color 0.3s;
-        }
+.nav-links {
+    display: flex;
+    list-style: none;
+    gap: 2.5rem;
+    margin: 0;
+}
 
-        .nav-links a:hover {
-            color: #d4145a;
-        }
+.nav-links a {
+    color: #333;
+    font-weight: 500;
+    text-decoration: none;
+    font-size: 1.05rem;
+    transition: color 0.25s ease, transform 0.25s ease;
+    position: relative;
+}
 
-        .nav-icons {
-            display: flex;
-            gap: 1.5rem;
-            font-size: 20px;
-        }
+.nav-links a:hover,
+.nav-links a.active {
+    color: #d4145a;
+    transform: translateY(-1px);
+}
 
-        .nav-icons a {
-            color: #333;
-            position: relative;
-            transition: color 0.3s;
-        }
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+}
 
-        .nav-icons a:hover {
-            color: #d4145a;
-        }
+/* ── Search form – sits inline in the nav ── */
+.nav-search-form {
+    display: flex;
+    align-items: center;
+    background: #f5f5f5;
+    border: 1.5px solid #e8e8e8;
+    border-radius: 50px;
+    overflow: hidden;
+    height: 38px;
+    transition: border-color 0.25s, box-shadow 0.25s;
+}
 
-        .cart-count {
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            background: #d4145a;
-            color: #fff;
-            border-radius: 50%;
-            width: 18px;
-            height: 18px;
-            font-size: 11px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .auth-link {
-            font-weight: 600 !important;           
-            padding: 8px 20px;                     /* gives them button-like feel */
-            border-radius: 6px;
-            transition: all 0.3s ease;
-        }
+.nav-search-form:focus-within {
+    border-color: #d4145a;
+    box-shadow: 0 0 0 3px rgba(212,20,90,0.1);
+    background: #fff;
+}
 
-        .signup-link {
-            background: #d4145a;
-            color: #fff !important;
-        }
+.nav-search-form input[type="text"] {
+    border: none;
+    background: transparent;
+    outline: none;
+    padding: 0 14px;
+    font-size: 0.9rem;
+    color: #333;
+    width: 180px;
+    font-family: 'Segoe UI', sans-serif;
+}
 
-        .signup-link:hover {
-            background: #b8124a;
-            color: #fff;
-        }
+.nav-search-form input[type="text"]::placeholder {
+    color: #aaa;
+}
 
-        /* Login button – white with pink border & text */
-        .login-link {
-            background: #fff;
-            color: #d4145a !important;
-            border: 2px solid #d4145a;
-        }
+.nav-search-form button[type="submit"] {
+    border: none;
+    background: #d4145a;
+    color: #fff;
+    height: 100%;
+    padding: 0 16px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 0 50px 50px 0;
+    transition: background 0.25s;
+    white-space: nowrap;
+}
 
-        .login-link:hover {
-            background: #d4145a;
-            color: #fff !important;
-        }
-        /* Wrapper for username dropdown */
-        .user-dropdown {
-            position: relative;
-            list-style: none;
-            cursor: pointer;
-        }
+.nav-search-form button[type="submit"]:hover {
+    background: #a81049;
+}
 
-        /* Trigger section (icon + name + arrow) */
-        .user-trigger {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            color: #333;
-            font-weight: 600;
-            border-radius: 6px;
-        }
+/* Auth buttons */
+.auth-btn {
+    padding: 0.65rem 1.6rem;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 0.98rem;
+    text-decoration: none;
+    transition: all 0.25s ease;
+    border: none;
+    cursor: pointer;
+}
 
-        .user-trigger:hover {
-            background-color: #f3f3f3;
-        }
+.signup {
+    background: #d4145a;
+    color: white;
+}
 
-        /* Dropdown Menu */
-        .dropdown-menu {
-            position: absolute;
-            top: 40px;
-            right: 0;
-            background: white;
-            width: 150px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            padding: 8px 0;
-            display: none;
-            z-index: 100;
-        }
+.signup:hover {
+    background: #b30f4d;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(212,20,90,0.25);
+}
 
-        /* Menu items */
-        .dropdown-menu li {
-            list-style: none;
-        }
+.login {
+    background: white;
+    color: #d4145a;
+    border: 2px solid #d4145a;
+}
 
-        .dropdown-menu li a {
-            text-decoration: none;
-            display: block;
-            padding: 10px 15px;
-            color: #333;
-            font-weight: 500;
-        }
+.login:hover {
+    background: #d4145a;
+    color: white;
+    transform: translateY(-1px);
+}
 
-        .dropdown-menu li a:hover {
-            background-color: #f5f5f5;
-        }
+/* Icons */
+.nav-icons {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    font-size: 1.35rem;
+}
 
-        /* Rotate arrow when open */
-        .user-dropdown.open .dropdown-arrow {
-            transform: rotate(180deg);
-        }
+.nav-icons a {
+    color: #444;
+    position: relative;
+    transition: color 0.25s;
+    display: flex;
+    align-items: center;
+}
 
-  </style> 
+.nav-icons a:hover { color: #d4145a; }
 
-  <!-- Header -->
-  <header>
-        <nav>
-            <a href="/" class="logo">NUVE</a>
-            <ul class="nav-links">
-                <li><a href="/shop">Shop</a></li>
-                <li><a href="/orders">Orders</a></li>
-                <li><a href="/contact-us">Contact us</a></li>
-                <li><a href="/about">About</a></li>
+.count-badge {
+    position: absolute;
+    top: -8px; right: -8px;
+    background: #d4145a;
+    color: white;
+    font-size: 0.68rem;
+    font-weight: 600;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
-                <% if ( !user ) { %>
-                    <li><a href="/signup" class="auth-link signup-link">Signup</a></li>
-                    <li><a href="/login" class="auth-link login-link">Login</a></li>
-                <% } else { %>
-                    <li class="user-dropdown">
-                        <div class="user-trigger">
-                            <i class="fas fa-user-circle"></i>
-                            <span><%= user.name %></span>
-                        </div>
+/* User dropdown */
+.user-profile.visible {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
 
-                        <ul class="dropdown-menu">
-                            <li><a href="/profile">Profile</a></li>
-                            <li><a href="/logout">Logout</a></li>
-                        </ul>
-                    </li>
-                <% } %>
+.user-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #333;
+    text-decoration: none;
+    font-weight: 500;
+    padding: 8px 12px;
+    border-radius: 50px;
+    transition: background 0.2s;
+}
 
-            </ul>
-            <div class="nav-icons">
-                <a href="/search"><i class="fas fa-search"></i></a>
-                <a href="/profile"><i class="fas fa-user"></i></a>
-                <a href="/wishlist"><i class="fas fa-heart"></i></a>
-                <a href="/cart">
-                    <i class="fas fa-shopping-bag"></i>
-                    <span class="cart-count">3</span>
-                </a>
-            </div>
-        </nav>
-    </header>
+.user-link:hover { background: #f8f8f8; }
 
+.user-dropdown-menu {
+    position: absolute;
+    top: 100%; right: 0;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    min-width: 160px;
+    padding: 8px 0;
+    display: none;
+    z-index: 100;
+    margin-top: 4px;
+    list-style: none;
+}
 
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const userDropdown = document.querySelector(".user-dropdown");
-            const trigger = document.querySelector(".user-trigger");
-            const menu = document.querySelector(".dropdown-menu");
+.user-profile:hover .user-dropdown-menu { display: block; }
 
-            if (trigger) {
-                trigger.addEventListener("click", (e) => {
-                    e.stopPropagation();
-                    userDropdown.classList.toggle("open");
-                    menu.style.display = userDropdown.classList.contains("open") ? "block" : "none";
-                });
-            }
+.user-dropdown-menu li a {
+    display: block;
+    padding: 10px 20px;
+    color: #333;
+    text-decoration: none;
+}
 
-            // Close dropdown when clicking outside
-            document.addEventListener("click", () => {
-                if (userDropdown) {
-                    userDropdown.classList.remove("open");
-                    menu.style.display = "none";
-                }
-            });
-        });
-    </script>
+.user-dropdown-menu li a:hover { background: #f5f5f5; }
+
+/* Responsive */
+@media (max-width: 992px) {
+    .nav-links { display: none; }
+    .nav-search-form input[type="text"] { width: 130px; }
+}
+
+@media (max-width: 600px) {
+    .nav-search-form input[type="text"] { width: 90px; font-size: 0.8rem; }
+    .nav-search-form button[type="submit"] { padding: 0 10px; font-size: 0.8rem; }
+}
+</style>
+
+<header class="site-header">
+  <nav class="main-nav">
+    <a href="/" class="logo">NUVE</a>
+
+    <ul class="nav-links">
+      <li><a href="/shop">Shop</a></li>
+      <li><a href="/orders">Orders</a></li>
+      <li><a href="/contact-us">Contact us</a></li>
+      <li><a href="/about">About</a></li>
+    </ul>
+
+    <div class="nav-right">
+      <% if (!user) { %>
+        <a href="/signup" class="auth-btn signup">Sign up</a>
+        <a href="/login"  class="auth-btn login">Log in</a>
+      <% } else { %>
+        <div class="user-profile visible">
+          <a href="#" class="user-link">
+            <i class="fas fa-user-circle"></i>
+            <span><%= user.name.split(' ')[0] %></span>
+          </a>
+          <ul class="user-dropdown-menu">
+            <li><a href="/userProfile">Profile</a></li>
+            <li><a href="/orders">My Orders</a></li>
+            <li><a href="/logout">Logout</a></li>
+          </ul>
+        </div>
+      <% } %>
+
+      <div class="nav-icons">
+        <a href="/wishlist" title="Wishlist">
+          <i class="fas fa-heart"></i>
+          <% if (typeof wishlistCount !== 'undefined' && wishlistCount > 0) { %>
+            <span class="count-badge"><%= wishlistCount %></span>
+          <% } %>
+        </a>
+        <a href="/cart" title="Cart" style="position:relative;">
+          <i class="fas fa-shopping-bag"></i>
+          <% if (typeof cartCount !== 'undefined' && cartCount > 0) { %>
+            <span class="count-badge"><%= cartCount %></span>
+          <% } %>
+        </a>
+      </div>
+
+      <!-- Search – pill-shaped, inline with nav -->
+      <form class="nav-search-form" action="/shop" method="GET">
+        <input
+          type="text"
+          name="search"
+          placeholder="Search products..."
+          value="<%= typeof search !== 'undefined' ? search : '' %>"
+        >
+        <button type="submit"><i class="fas fa-search"></i></button>
+      </form>
+    </div>
+  </nav>
+</header>
