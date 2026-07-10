@@ -428,6 +428,7 @@ const returnOrder = async (req, res) => {
 
     item.status = "Return Requested";
     item.returnReason = reason;
+    order.status = "Return Requested";
 
     await order.save();
 

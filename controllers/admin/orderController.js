@@ -28,7 +28,30 @@ const loadOrders = async (req, res) => {
     }
 
     if (statusFilter) {
-      query.status = statusFilter;
+      if (statusFilter === "Return Requested") {
+        if (query.$or && query.$or.length > 0) {
+          query = {
+            $and: [
+              { $or: query.$or },
+              {
+                $or: [
+                  { status: "Return Requested" },
+                  { "orderedItems.status": "Return Requested" }
+                ]
+              }
+            ]
+          };
+        } else {
+          query = {
+            $or: [
+              { status: "Return Requested" },
+              { "orderedItems.status": "Return Requested" }
+            ]
+          };
+        }
+      } else {
+        query.status = statusFilter;
+      }
     }
 
     let sortOption = { createdOn: -1 };
@@ -275,6 +298,13 @@ const verifyReturn = async (req, res) => {
 
     if (allReturned) {
       order.status = 'Returned'
+    } else {
+      const hasPendingReturn = order.orderedItems.some(
+        i => i.status === 'Return Requested'
+      )
+      if (!hasPendingReturn) {
+        order.status = 'Delivered'
+      }
     }
 
     console.log("Crediting wallet:", order.userId, itemAmount);
